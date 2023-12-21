@@ -1,0 +1,1 @@
+device(lsi,INST_IO,devbpm_data_combinerVersion,"bpm_data_combiner version")

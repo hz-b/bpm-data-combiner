@@ -1,0 +1,6 @@
+record(lsi, "$(user):bpm_data_combiner:version") {
+    field(DTYP, "bpm_data_combiner version")
+    field(DESC, "Version string")
+    field(SIZV, "$(SIZV=200)")
+    field(PINI, "YES")
+}
