@@ -57,7 +57,6 @@ record(longin, "$(PREFIX)$(DEV_NAME):par:inc:x")
     field(DESC, "increment for x")
     field(VAL, 1)
     field(PINI, "YES")
-    field(FLNK, "$(PREFIX)$(DEV_NAME):im:cnt:x")
 }
 
 record(longin, "$(PREFIX)$(DEV_NAME):par:inc:y")
@@ -65,24 +64,30 @@ record(longin, "$(PREFIX)$(DEV_NAME):par:inc:y")
     field(DESC, "increment for y")
     field(VAL, -1)
     field(PINI, "YES")
-    field(FLNK, "$(PREFIX)$(DEV_NAME):im:cnt:y")
 }
 
 record(calc, "$(PREFIX)$(DEV_NAME):im:cnt:x")
 {
    field(DESC, "continously add values: to x")
-   field(INPA, "$(PREFIX)$(DEV_NAME):par:inc:x")
+   field(INPA, "$(PREFIX)$(DEV_NAME):par:inc:x PP")
    field(INPB, "$(PREFIX)$(DEV_NAME):im:cnt:x")
    field(CALC, "A+B")
+   # Start one below
+   # this field is triggered when par is upated
+   field(VAL, 0)
    field(FLNK, "$(PREFIX)$(DEV_NAME):im:x")
 }
 
 record(calc, "$(PREFIX)$(DEV_NAME):im:cnt:y")
 {
    field(DESC, "continously add values: to y")
-   field(INPA, "$(PREFIX)$(DEV_NAME):par:inc:y")
+   field(INPA, "$(PREFIX)$(DEV_NAME):par:inc:y PP")
    field(INPB, "$(PREFIX)$(DEV_NAME):im:cnt:y")
    field(CALC, "A+B")
+   # Start one below
+   # this field is triggered when par is upated
+   # note: y is counting downwards
+   field(VAL, 0)
    field(FLNK, "$(PREFIX)$(DEV_NAME):im:y")
 }
 
@@ -93,7 +98,7 @@ record(calc, "$(PREFIX)$(DEV_NAME):im:cnt:trg")
    field(VAL, 0)
    field(PINI, "YES")
    field(CALC, "A+1")
-   field(SCAN, "1 second")
+   field(SCAN, "5 second")
    field(FLNK, "$(PREFIX)$(DEV_NAME):im:fanout")
 }
 
