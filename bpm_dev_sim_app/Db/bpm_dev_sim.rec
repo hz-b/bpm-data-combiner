@@ -1,0 +1,108 @@
+# Simulation a single simple bpm device
+#------------------------------------------------------------------------------
+# mimic the interface
+record(longin, "$(PREFIX)$(DEV_NAME):im:x")
+{
+    field(DESC, "BPM dev simulator, input x")
+    field(EGU, "nm")
+    field(VAL, -1)
+    field(PINI, "YES")
+    field(INP, "$(PREFIX)$(DEV_NAME):im:cnt:x")
+    info(Q:group, {
+        "$(PREFIX)$(DEV_NAME)":{"x": {+channel:"VAL", +trigger:""}}
+    })
+}
+
+record(longin, "$(PREFIX)$(DEV_NAME):im:y")
+{
+    field(DESC, "BPM dev simulator, input y")
+    field(EGU, "nm")
+    field(VAL, -1)
+    field(PINI, "YES")
+    field(INP, "$(PREFIX)$(DEV_NAME):im:cnt:y")
+    info(Q:group, {
+        "$(PREFIX)$(DEV_NAME)":{"y": {+channel:"VAL", +trigger:""}}
+    })
+}
+
+# this record is expected to be the last one to be updated
+record(longin, "$(PREFIX)$(DEV_NAME):im:cnt")
+{
+    field(DESC, "BPM dev simulator, time counter")
+    field(EGU, "ds")
+    field(VAL, 0)
+    field(PINI, "YES")
+    field(INP, "$(PREFIX)$(DEV_NAME):im:cnt:trg")
+    info(Q:group, {
+        "$(PREFIX)$(DEV_NAME)":{"cnt": {+channel:"VAL", +trigger:"*"}}
+    })
+}
+
+record(stringin, "$(PREFIX)$(DEV_NAME):im:name")
+{
+    field(DESC, "BPM dev simulator, dev name")
+    field(VAL, "$(DEV_NAME)")
+    field(PINI, "YES")
+    info(Q:group, {
+        "$(PREFIX)$(DEV_NAME)":{"cfg.name": {+channel:"VAL"}}
+    })
+}
+
+#------------------------------------------------------------------------------
+# mimic some data ... just to be able to see changes
+# first the incremetns on x and y
+#
+record(longin, "$(PREFIX)$(DEV_NAME):par:inc:x")
+{
+    field(DESC, "increment for x")
+    field(VAL, 1)
+    field(PINI, "YES")
+    field(FLNK, "$(PREFIX)$(DEV_NAME):im:cnt:x")
+}
+
+record(longin, "$(PREFIX)$(DEV_NAME):par:inc:y")
+{
+    field(DESC, "increment for y")
+    field(VAL, -1)
+    field(PINI, "YES")
+    field(FLNK, "$(PREFIX)$(DEV_NAME):im:cnt:y")
+}
+
+record(calc, "$(PREFIX)$(DEV_NAME):im:cnt:x")
+{
+   field(DESC, "continously add values: to x")
+   field(INPA, "$(PREFIX)$(DEV_NAME):par:inc:x")
+   field(INPB, "$(PREFIX)$(DEV_NAME):im:cnt:x")
+   field(CALC, "A+B")
+   field(FLNK, "$(PREFIX)$(DEV_NAME):im:x")
+}
+
+record(calc, "$(PREFIX)$(DEV_NAME):im:cnt:y")
+{
+   field(DESC, "continously add values: to y")
+   field(INPA, "$(PREFIX)$(DEV_NAME):par:inc:y")
+   field(INPB, "$(PREFIX)$(DEV_NAME):im:cnt:y")
+   field(CALC, "A+B")
+   field(FLNK, "$(PREFIX)$(DEV_NAME):im:y")
+}
+
+# provide count and trigger x and y over fanout
+record(calc, "$(PREFIX)$(DEV_NAME):im:cnt:trg")
+{
+   field(INPA, "$(PREFIX)$(DEV_NAME):im:cnt:trg")
+   field(VAL, 0)
+   field(PINI, "YES")
+   field(CALC, "A+1")
+   field(SCAN, "1 second")
+   field(FLNK, "$(PREFIX)$(DEV_NAME):im:fanout")
+}
+
+record(fanout, "$(PREFIX)$(DEV_NAME):im:fanout")
+{
+   field(DESC, "trigger cnt, x and y")
+   field(LNK1, "$(PREFIX)$(DEV_NAME):im:cnt:x")
+   field(LNK2, "$(PREFIX)$(DEV_NAME):im:cnt:y")
+   # this triggered last: this update will
+   # trigger the PV update
+   field(LNK3, "$(PREFIX)$(DEV_NAME):im:cnt")
+}
