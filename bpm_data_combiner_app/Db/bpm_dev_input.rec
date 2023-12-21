@@ -1,0 +1,52 @@
+# Input data collected from the different bpm devices
+
+# Input of one record device ... collect them here
+# locally (again)
+# so one can check what the IOC uses
+record(longin, "$(PREFIX)$(DEV_NAME):x")
+{
+    field(DESC, "mirror: x value $(REMOTE)")
+    field(INP, {pva:{
+        pv:"$(REMOTE)$(DEV_NAME)",
+	field:"x",
+	proc:true,
+	}}
+    )
+    field(VAL, -1)
+    field(PINI, "YES")
+}
+
+record(longin, "$(PREFIX)$(DEV_NAME):y")
+{
+    field(DESC, "mirror: y value")
+    field(INP, {pva:{
+        pv:"$(REMOTE)$(DEV_NAME)",
+	field:"y",
+	proc:true,
+	}}
+    )
+    field(VAL, -1)
+    field(PINI, "YES")
+}
+
+record(longin, "$(PREFIX)$(DEV_NAME):cnt")
+{
+    field(DESC, "mirror: (time) cnt")
+    field(INP, {pva:{
+        pv:"$(REMOTE)$(DEV_NAME)",
+	field:"cnt",
+	proc:true
+	}}
+    )
+}
+
+record(stringin, "$(PREFIX)$(DEV_NAME):name")
+{
+    field(DESC, "mirror: name")
+    field(INP, {pva:{
+        pv:"$(REMOTE)$(DEV_NAME)",
+	field:"cfg.name",
+	proc:true,
+	}}
+    )
+}
