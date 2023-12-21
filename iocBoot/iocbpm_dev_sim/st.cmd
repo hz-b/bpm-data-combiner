@@ -14,7 +14,7 @@ dbLoadDatabase "dbd/bpm_dev_sim.dbd"
 bpm_dev_sim_registerRecordDeviceDriver pdbbase
 
 ## Load record instances
-dbLoadTemplate "db/bpm_dev_sim.db",  "PREFIX=$(PREFIX)"
+dbLoadTemplate "db/bpm_dev_sim.db", "PREFIX=$(PREFIX)"
 
 #- Set this to see messages from mySub
 #-var mySubDebug 1
