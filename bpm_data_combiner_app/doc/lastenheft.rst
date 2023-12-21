@@ -1,5 +1,5 @@
-Requirement specification implementation
-========================================
+Scope statement
+===============
 
 Anstelle eines Lastenhefts
 
