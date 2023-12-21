@@ -2,5 +2,5 @@ file "db/bpm_dev_input.rec"
 {
 	pattern { DEV_NAME  }
 	        { BPM1Z1D1R }
-	        # { BPM1Z2D1R }
+		{ BPM1Z2D1R }
 }
