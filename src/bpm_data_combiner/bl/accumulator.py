@@ -14,7 +14,6 @@ class Accumulator:
     def add(self, col: BPMDataCollection):
         self.collections.append(col)
 
-
     def get(self) -> BPMDataCollectionStats:
         """Find out which data actually to use
         """
@@ -34,7 +33,7 @@ class Accumulator:
 
         return BPMDataCollectionStats(
             x=BPMDataCollectionStatsPlane(values=x.mean(axis=0), weights=x.std(axis=0)),
-            y=BPMDataCollectionStatsPlane(values=x.mean(axis=0), weights=x.std(axis=0)),
-            names=cols[0].names
+            y=BPMDataCollectionStatsPlane(values=y.mean(axis=0), weights=y.std(axis=0)),
+            names=names
         )
 
