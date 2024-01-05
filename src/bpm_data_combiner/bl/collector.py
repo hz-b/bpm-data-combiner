@@ -14,6 +14,7 @@ Question:
 import functools
 from typing import Sequence, Hashable
 
+from .event import Event
 from ..data_model.bpm_data_reading import BPMReading
 
 
@@ -32,6 +33,7 @@ class ReadingsCollection:
         self._ready = False
         self._above_threshold = False
         self._is_active = True
+
 
     def add_reading(self, val: BPMReading):
         dev_name = val.dev_name
@@ -81,18 +83,26 @@ class Collector:
     """
     def __init__(self, *, devices_names: Sequence[str], max_collections: int=50):
         self.device_names = devices_names
+        self.on_new_collection = Event(name="on_new_collection")
+        self.on_above_threshold = Event(name="reading_collection_on_threshold")
+        self.on_ready = Event(name="reading_collection_on_ready")
 
         @functools.lru_cache(maxsize=max_collections)
         def _get_collection(cnt: Hashable):
-            return ReadingsCollection(device_names=self.device_names)
+            r = ReadingsCollection(device_names=self.device_names)
+            self.on_new_collection.trigger(r)
+            return r
 
         self._get_collection = _get_collection
 
     def get_collection(self, cnt: Hashable):
         col = self._get_collection(cnt)
-        assert col.active
+        #: todo: I think this is always true
+        assert col.active or col.ready
         return col
 
     def new_reading(self, val: BPMReading):
-        self._get_collection(val.cnt).add_reading(val)
-
+        rc = self._get_collection(val.cnt)
+        rc.add_reading(val)
+        if rc.ready: self.on_ready.trigger(rc)
+        if rc.above_threshold: self.on_above_threshold.trigger(rc)

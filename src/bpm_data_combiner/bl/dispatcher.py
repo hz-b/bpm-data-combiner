@@ -7,6 +7,8 @@ Todo:
 """
 import functools
 from typing import List
+
+from .event import Event
 from ..data_model.bpm_data_reading import BPMReadingBeingProcessed, BPMReading
 
 
@@ -14,10 +16,10 @@ class Dispatcher:
     def __init__(self, dev_name):
         self.dev_name = dev_name
         self.reading = None
-        self.subscribers = []
+        self.on_ready = Event(name="dispatcher_data_ready")
 
     def subscribe(self, cb):
-        self.subscribers.append(cb)
+        self.on_ready.add_subscriber(cb)
 
     def new_reading(self, cnt):
         assert self.reading is None
@@ -39,7 +41,7 @@ class Dispatcher:
         assert self.reading.ready(chk)
         r = BPMReading(cnt=self.reading.cnt, x=self.reading.x, y=self.reading.y, dev_name=self.dev_name)
         self.reading = None
-        for sub in self.subscribers: sub(r)
+        self.on_ready.trigger(r)
 
     def update(self, **kwargs):
         cmds = dict(
