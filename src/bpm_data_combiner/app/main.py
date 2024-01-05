@@ -64,8 +64,10 @@ def update(*, dev_name, **kwargs):
     """Inform the dispatcher associated to the device that new data is available
 
     """
-
-    cmd, _ = kwargs.copy().popitem()
+    # just to get the cmd: first kwarg
+    # for cmd in kwargs: break;
+    # that code says it
+    cmd = next(iter(kwargs))
     method = cmds[cmd]
     try:
         method(dev_name=dev_name, **kwargs)
