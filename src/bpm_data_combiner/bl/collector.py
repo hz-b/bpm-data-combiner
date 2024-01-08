@@ -57,7 +57,7 @@ def collection_to_bpm_data_collection(
         x=BPMDataCollectionPlane(values=ma[:, 0]),
         y=BPMDataCollectionPlane(values=ma[:, 1]),
         names=dev_names_index.values,
-        # assuming to be the same for both
+        # assuming to be the same for both planes
         active=ma.mask[:, 0],
         cnt=reading.cnt,
     )
