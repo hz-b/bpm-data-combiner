@@ -12,10 +12,55 @@ Question:
    how long of a queue to preserve
 """
 import functools
-from typing import Sequence, Hashable
+from typing import Sequence, Hashable, Dict
+import numpy as np
+import numpy.ma as ma
+from pandas import Index
 
+from ..errors import DoubleSubmissionError
 from .event import Event
 from ..data_model.bpm_data_reading import BPMReading
+from ..data_model.bpm_data_collection import BPMDataCollection, BPMDataCollectionPlane
+
+
+def _combine_collections_by_device_names(
+    collections: Sequence[Dict[str, BPMReading]], dev_names_index: Index
+) -> ma.masked_array:
+    """use the name to stuff data into correct location
+
+    Todo:
+        Should it return a masked array
+    """
+    res = np.zeros([len(collections), len(dev_names_index), 2], dtype=np.int64)
+    res = ma.array(res, fill_value=0, mask=True)
+
+    # now fill data at appropriate place
+    for cnt, data_collection in enumerate(collections):
+        for name, bpm_data in data_collection.items():
+            idx = dev_names_index.get_loc(name)
+            res.mask[cnt, idx, :] = False
+            res[cnt, idx, 0] = bpm_data.x
+            res[cnt, idx, 1] = bpm_data.y
+    return res
+
+
+def collection_to_bpm_data_collection(
+    collection: Dict[str, BPMReading], dev_names_index: Index
+):
+    ma = _combine_collections_by_device_names([collection], dev_names_index)
+    # only one collection -> first dimension one entry
+    (ma,) = ma
+    # need one reading to get its count
+    for _, reading in collection.items():
+        break
+    return BPMDataCollection(
+        x=BPMDataCollectionPlane(values=ma[:, 0]),
+        y=BPMDataCollectionPlane(values=ma[:, 1]),
+        names=dev_names_index.values,
+        # assuming to be the same for both
+        active=ma.mask[:, 0],
+        cnt=reading.cnt,
+    )
 
 
 class ReadingsCollection:
@@ -23,6 +68,7 @@ class ReadingsCollection:
 
     use :meth:`ready` to see if sufficient data is here
     """
+
     def __init__(self, *, device_names: Sequence, threshold: int = None):
         self.collection = dict()
         self.device_names = set(device_names)
@@ -34,21 +80,23 @@ class ReadingsCollection:
         self._above_threshold = False
         self._is_active = True
 
-
     def add_reading(self, val: BPMReading):
         dev_name = val.dev_name
         # data from known / expected device
         assert dev_name in self.device_names
         # not one device sending twice
-        assert dev_name not in self.collection
+        if dev_name in self.collection:
+            raise DoubleSubmissionError(f"{dev_name=} already in collection")
         # data expected
         assert self.active
         self.collection[dev_name] = val
         self._ready, self._above_threshold = self.is_ready()
 
+    def data(self) -> Dict[str, BPMReading]:
+        return self.collection
+
     def is_ready(self) -> (bool, bool):
-        """Compare to device list and see if all names are in
-        """
+        """Compare to device list and see if all names are in"""
         L = len(self.device_names.difference(self.collection.keys()))
         return L == 0, L < self.threshold
 
@@ -81,7 +129,8 @@ class Collector:
         to be able to discard :class:`BPMReading` instances that
         arrive far too late?
     """
-    def __init__(self, *, devices_names: Sequence[str], max_collections: int=50):
+
+    def __init__(self, *, devices_names: Sequence[str], max_collections: int = 50):
         self.device_names = devices_names
         self.on_new_collection = Event(name="on_new_collection")
         self.on_above_threshold = Event(name="reading_collection_on_threshold")
@@ -104,5 +153,7 @@ class Collector:
     def new_reading(self, val: BPMReading):
         rc = self._get_collection(val.cnt)
         rc.add_reading(val)
-        if rc.ready: self.on_ready.trigger(rc)
-        if rc.above_threshold: self.on_above_threshold.trigger(rc)
+        if rc.ready:
+            self.on_ready.trigger(rc.data())
+        if rc.above_threshold:
+            self.on_above_threshold.trigger(rc.data())

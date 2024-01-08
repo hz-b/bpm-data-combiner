@@ -1,0 +1,32 @@
+# BPM data collected
+record(waveform, "$(PREFIX)$(VIEW):x")
+{
+    field(DESC, "x values")
+    field(DTYP, "pydev")
+    field(EGU, "nm")
+    field(FTVL, "DOUBLE")
+    field(SCAN, "I/O Intr")
+    field(INP,  "@pydev.iointr('$(PREFIX)$(VIEW):x')")
+    field(NELM, 128)
+    info(Q:group, {
+         "$(PREFIX)$(VIEW)": {
+            "x": {+channel:"VAL"}
+        }
+    }
+}
+
+record(waveform, "$(PREFIX)$(VIEW):y")
+{
+    field(DESC, "y value")
+    field(EGU, "nm")
+    field(DTYP, "pydev")
+    field(FTVL, "DOUBLE")
+    field(SCAN, "I/O Intr")
+    field(INP,  "@pydev.iointr('$(PREFIX)$(VIEW):y')")
+    field(NELM, 128)
+    info(Q:group, {
+         "$(PREFIX)$(VIEW)": {
+            "y": {+channel:"VAL"}
+        }
+    }
+}

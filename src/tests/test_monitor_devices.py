@@ -8,7 +8,7 @@ _devices = [MonitoredDevice("Test1"), MonitoredDevice("Test2")]
 
 
 def test_monitor_enable_disable():
-    mon_dev =  MonitorDevices(_devices)
+    mon_dev = MonitorDevices(_devices)
     # should be by default ... check method works
     mon_dev.set_enabled("Test2", True)
     for val, chk in zip(mon_dev.get_devicenames(), [dev.name for dev in _devices]):
@@ -21,7 +21,7 @@ def test_monitor_enable_disable():
 
 
 def test_monitor_enable_disable():
-    mon_dev =  MonitorDevices(_devices)
+    mon_dev = MonitorDevices(_devices)
     mon_dev.set_active("Test1", False)
     for val, chk in zip_longest(mon_dev.get_devicenames(), ["Test2"]):
         assert val == chk

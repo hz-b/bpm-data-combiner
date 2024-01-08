@@ -30,6 +30,7 @@ def test_dispatcher_not_started():
     with pytest.raises(AssertionError) as rc:
         disp.update(x=1)
 
+
 def test_dispatcher_not_restarted():
     disp = Dispatcher("test_dev")
     for i in range(3):
@@ -41,16 +42,16 @@ def test_dispatcher_not_restarted():
 def test_dispatcher_calls_subscribers():
 
     cnt = 0
+
     def cb(val):
         assert isinstance(val, BPMReading)
         nonlocal cnt
         cnt += 1
 
-
     disp = Dispatcher("test_dev")
     disp.subscribe(cb)
 
-    _run_disp_standard(cnt=-1,x=3,y=5,disp=disp)
+    _run_disp_standard(cnt=-1, x=3, y=5, disp=disp)
     assert cnt == 1
 
 
@@ -58,4 +59,3 @@ def test_dispatcher_collection():
     dp_col = DispatcherCollection()
     dp_col.get_dispatcher("BPMZ1T2R")
     dp_col.get_dispatcher("BPMZ4T8R")
-

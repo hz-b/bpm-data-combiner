@@ -13,7 +13,7 @@ identifier.
 * Accumulator: accumulate readings together based on the individual
   time count
 
-*Code resuse*: at current stage only the dispatcher depends on
+*Code reuse*: at current stage only the dispatcher depends on
 :class:`BPMReading
 """
-__all__= ["accumulator", "collector", "dispatcher"]
+__all__ = ["accumulator", "collector", "dispatcher", "event", "monitor_devices"]
