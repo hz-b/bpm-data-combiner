@@ -10,6 +10,7 @@ DB += bpm_dev_input.rec
 # views / outputs, gets data from python world
 DB += bpm_book_keeping.rec
 DB += bpm_with_stats.rec
+DB += bpm.rec
 DB += bpm.db
 # version of the bpm
 DB += bpm_data_combinerVersion.db
