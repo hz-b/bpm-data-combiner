@@ -11,16 +11,17 @@ class Event:
     meth:`trigger` will be called. This object is then
     submitted to the subscribers
     """
+
     def __init__(self, *, name: str, subscribers: Sequence[Callable] = None):
         self.name = name
         if subscribers is None:
             subscribers = []
         self.subscribers = []
-        for sub in subscribers: self.add_subscriber(sub)
+        for sub in subscribers:
+            self.add_subscriber(sub)
 
     def add_subscriber(self, cb: Callable):
-        """each callable shall expect a single argument
-        """
+        """each callable shall expect a single argument"""
         assert callable(cb)
         self.subscribers.append(cb)
 
@@ -30,7 +31,8 @@ class Event:
         Todo:
             review name
         """
-        for sub in self.subscribers: sub(obj)
+        for sub in self.subscribers:
+            sub(obj)
 
     def __repr__(self):
         cls_name = self.__class__.__name__

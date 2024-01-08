@@ -9,10 +9,12 @@ def test_collector_behaving():
 
     col = Collector(devices_names=dev_names)
 
-    chk=0
+    chk = 0
+
     def cb(col):
         nonlocal chk
         chk += 1
+
     col.on_new_collection.add_subscriber(cb)
 
     cnt = 7
@@ -33,6 +35,8 @@ def test_collector_behaving():
     col.new_reading(BPMReading(cnt=cnt, x=17, y=19, dev_name=dev_names[-2]))
     assert rc.ready == True
     assert rc.above_threshold == True
+
+    data = rc.data()
 
 
 def test_collector_double_submission():

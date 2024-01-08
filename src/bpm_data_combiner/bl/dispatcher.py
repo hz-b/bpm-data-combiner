@@ -39,7 +39,12 @@ class Dispatcher:
             find a better name?
         """
         assert self.reading.ready(chk)
-        r = BPMReading(cnt=self.reading.cnt, x=self.reading.x, y=self.reading.y, dev_name=self.dev_name)
+        r = BPMReading(
+            cnt=self.reading.cnt,
+            x=self.reading.x,
+            y=self.reading.y,
+            dev_name=self.dev_name,
+        )
         self.reading = None
         self.on_ready.trigger(r)
 
@@ -48,7 +53,7 @@ class Dispatcher:
             cnt=self.new_reading,
             x=self.update_x_val,
             y=self.update_y_val,
-            cnt_chk=self.update_check
+            cnt_chk=self.update_check,
         )
         for cmd, val in kwargs.items():
             method = cmds[cmd]
@@ -61,7 +66,8 @@ class DispatcherCollection:
         if subscribers is None:
             subscribers = []
         assert callable(subscribers.append)
-        for sub in subscribers: assert callable(sub)
+        for sub in subscribers:
+            assert callable(sub)
         self.subscribers = subscribers
 
     def subscribe(self, cb):
@@ -78,8 +84,3 @@ class DispatcherCollection:
             dp.subscribe(cb)
         self.dispatchers[dev_name] = dp
         return dp
-
-
-
-
-

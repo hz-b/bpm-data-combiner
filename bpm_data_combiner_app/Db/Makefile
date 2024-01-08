@@ -3,9 +3,15 @@ include $(TOP)/configure/CONFIG
 #----------------------------------------
 #  ADD MACRO DEFINITIONS BELOW HERE
 
-# Install databases, templates & substitutions like this
+# input "mirror" of different bpm's
+# pushes data to python world
 DB += bpm_dev_input.db
 DB += bpm_dev_input.rec
+# views / outputs, gets data from python world
+DB += bpm_book_keeping.rec
+DB += bpm_with_stats.rec
+DB += bpm.db
+# version of the bpm
 DB += bpm_data_combinerVersion.db
 
 # If <anyname>.db template is not named <anyname>*.template add

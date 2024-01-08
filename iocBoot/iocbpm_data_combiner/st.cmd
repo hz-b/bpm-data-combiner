@@ -17,9 +17,10 @@ bpm_data_combiner_registerRecordDeviceDriver pdbbase
 
 ## Load record instances
 dbLoadTemplate("db/bpm_dev_input.db", "REMOTE=$(REMOTE),PREFIX=$(PREFIX)")
+dbLoadTemplate("db/bpm.db", "PREFIX=$(PREFIX)")
 dbLoadRecords "db/bpm_data_combinerVersion.db", "user=mfp"
 
-pydev("from misc import update")
+pydev("from bpm_data_combiner.app.main import update")
 
 #- Set this to see messages from mySub
 #-var mySubDebug 1

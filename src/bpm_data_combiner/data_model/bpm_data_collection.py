@@ -7,10 +7,12 @@ class BPMDataCollectionPlane:
     values : Sequence[int]
 
 
+@dataclass
 class BPMDataCollection:
     x: BPMDataCollectionPlane
     y: BPMDataCollectionPlane
     names : Sequence[str]
+    active: Sequence[bool]
     cnt: int
 
 
@@ -24,7 +26,9 @@ class BPMDataCollectionStatsPlane:
     weights : Sequence[float]
 
 
+@dataclass
 class BPMDataCollectionStats:
     x: BPMDataCollectionStatsPlane
     y: BPMDataCollectionStatsPlane
+    active : Sequence[bool]
     names : Sequence[str]
