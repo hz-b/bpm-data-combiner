@@ -12,7 +12,7 @@ record(waveform, "$(PREFIX)$(VIEW):x")
          "$(PREFIX)$(VIEW)": {
             "x": {+channel:"VAL"}
         }
-    }
+    })
 }
 
 record(waveform, "$(PREFIX)$(VIEW):y")
@@ -28,5 +28,5 @@ record(waveform, "$(PREFIX)$(VIEW):y")
          "$(PREFIX)$(VIEW)": {
             "y": {+channel:"VAL"}
         }
-    }
+    })
 }
