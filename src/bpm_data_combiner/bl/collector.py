@@ -40,6 +40,7 @@ def _combine_collections_by_device_names(
     res = ma.array(res, fill_value=0, mask=True)
 
     # now fill data at appropriate place
+    # todo: handle that x and y plane can be enabled separately
     for cnt, data_collection in enumerate(collections):
         for name, bpm_data in data_collection.items():
             idx = dev_names_index.get_loc(name)
