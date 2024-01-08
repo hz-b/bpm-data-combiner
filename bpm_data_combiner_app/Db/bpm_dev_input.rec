@@ -152,10 +152,11 @@ record(longout, "$(PREFIX)$(DEV_NAME):im:monitor")
 {
     field(DESC, "start of count down")
     field(VAL, 20)
-    field(PINI, "YES")
-    field(DOL, "$(PREFIX)$(DEV_NAME):im:cnt_dwn")
+    # set to yes for debug purposes
+    # field(PINI, "YES")
+    field(OUT, "$(PREFIX)$(DEV_NAME):im:cnt_dwn.VAL PP")
     field(OMSL, "closed_loop")
-    field(FLNK, "$(PREFIX)$(DEV_NAME):im:cnt_dwn")
+    # field(FLNK, "$(PREFIX)$(DEV_NAME):im:cnt_dwn")
 }
 
 record(calcout, "$(PREFIX)$(DEV_NAME):im:cnt_dwn")
@@ -165,6 +166,7 @@ record(calcout, "$(PREFIX)$(DEV_NAME):im:cnt_dwn")
     field(INPA, "$(PREFIX)$(DEV_NAME):im:monitor NPP")
     field(CALC, "(VAL > 0) ? (VAL - 1) : 0")
     field(SCAN, ".5 second")
+    field(DOPT, "Use CALC")
     field(FLNK, "$(PREFIX)$(DEV_NAME):im:active")
 }
 
@@ -172,22 +174,28 @@ record(calcout, "$(PREFIX)$(DEV_NAME):im:active")
 {
     field(DESC, "motr stat: active?")
     field(INPA, "$(PREFIX)$(DEV_NAME):im:cnt_dwn")
+    # to provoke a active change at first arrival
+    # of data
+    field(VAL, 0)
     field(CALC, "A > 0")
     field(OOPT, "On Change")
-    field(FLNK, "$(PREFIX)$(DEV_NAME):im:active")
+    field(DOPT, "Use CALC")
+    field(OUT, "$(PREFIX)$(DEV_NAME):active PP")
 }
 
 record(bo, "$(PREFIX)$(DEV_NAME):active")
 {
     field(DESC, "motr stat: active -> py")
+    field(DTYP, "pydev")
     field(ZNAM, "not responding")
     field(ONAM, "active")
+    # assume not responding by default
     field(VAL, 0)
     field(PINI, "YES")
-    field(DTYP, "pydev")
     field(DOL, "$(PREFIX)$(DEV_NAME):im:active")
     field(OMSL, "closed_loop")
     field(OUT, "@update(dev_name='$(DEV_NAME)', active=%VAL%)")
+    field(TPRO, 1)
 }
 
 record(bo, "$(PREFIX)$(DEV_NAME):enabled")
@@ -197,5 +205,6 @@ record(bo, "$(PREFIX)$(DEV_NAME):enabled")
     field(ONAM, "active")
     field(VAL, 1)
     field(PINI, "YES")
+    field(TPRO, 1)
     field(OUT, "@update(dev_name='$(DEV_NAME)', enabled=%VAL%)")
 }
