@@ -16,8 +16,8 @@ logger = logging.getLogger("bpm-data-combiner")
 dev_names = [
     [
         [
-            [f"BPM{cnt}Z{child}{sec_type}{sec}R" for cnt in range(1, 4+1)]
-            for child in range(1, 4+1)
+            [f"BPM{cnt}Z{child}{sec_type}{sec}R" for cnt in range(1, 4 + 1)]
+            for child in range(1, 4 + 1)
         ]
         for sec_type in ("D", "T")
     ]
@@ -55,13 +55,6 @@ viewer = Viewer(prefix="Pierre:COM")
 
 
 def cb(collection):
-    lc = len(collection)
-    if isinstance(collection, dict):
-        pass
-    else:
-        pass
-    if lc == 1:
-        pass
     data = collection_to_bpm_data_collection(collection, dev_names)
     viewer.ready_data.update(data)
 
