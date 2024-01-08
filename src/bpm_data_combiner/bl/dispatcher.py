@@ -1,6 +1,14 @@
 """Dispatch received data to subscribes as dataclasses
 
-The last reassembly
+All subscribers to :class:`DispatcherCollection` subscribe to all
+:class:`Dispatcher`. Currently handled by:
+
+:class:`DispatcherCollection` subscribes its
+on_ready :meth:`Event.trigger` to each created dispatcher event
+:any:`Dispatcher.on_ready`. Subscribers to
+:class:`DispatcherCollection` are subscribing to its on_ready
+event, and thus any dispatcher triggering on_ready will trigger
+the subscribers to DispatcherCollection
 
 Todo:
     does p4p solves that in this case
@@ -17,9 +25,6 @@ class Dispatcher:
         self.dev_name = dev_name
         self.reading = None
         self.on_ready = Event(name="dispatcher_data_ready")
-
-    def subscribe(self, cb):
-        self.on_ready.add_subscriber(cb)
 
     def new_reading(self, cnt):
         assert self.reading is None
@@ -61,26 +66,18 @@ class Dispatcher:
 
 
 class DispatcherCollection:
-    def __init__(self, subscribers: List = None):
+    def __init__(self, subscribers: List = []):
         self.dispatchers = dict()
-        if subscribers is None:
-            subscribers = []
-        assert callable(subscribers.append)
         for sub in subscribers:
             assert callable(sub)
-        self.subscribers = subscribers
+        self.on_ready = Event(name="dispatcher_collection_data_ready")
 
     def subscribe(self, cb):
-        assert callable(cb)
-        self.subscribers.append(cb)
-        for _, dp in self.dispatchers.items():
-            for cb in self.subscribers:
-                dp.subscribe(cb)
+        self.on_ready.add_subscriber(cb)
 
     @functools.lru_cache(maxsize=None)
     def get_dispatcher(self, dev_name) -> Dispatcher:
         dp = Dispatcher(dev_name)
-        for cb in self.subscribers:
-            dp.subscribe(cb)
+        dp.on_ready.add_subscriber(self.on_ready.trigger)
         self.dispatchers[dev_name] = dp
         return dp

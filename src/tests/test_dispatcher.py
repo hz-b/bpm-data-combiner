@@ -49,7 +49,7 @@ def test_dispatcher_calls_subscribers():
         cnt += 1
 
     disp = Dispatcher("test_dev")
-    disp.subscribe(cb)
+    disp.on_ready.add_subscriber(cb)
 
     _run_disp_standard(cnt=-1, x=3, y=5, disp=disp)
     assert cnt == 1
