@@ -56,7 +56,7 @@ def test_accumulator_entry_missing():
     indices = np.arange(1, L + 1)
     for i, cnt in enumerate(indices):
         # Make one device looking missing
-        idx = np.ones(L, np.bool)
+        idx = np.ones(L, bool)
         idx[i] = False
         names = dev_names[idx]
         X = np.arange(1, L) * cnt
@@ -85,7 +85,7 @@ def test_accumulator_devices_always_missing():
     acc = Accumulator(dev_names)
 
     L = len(dev_names)
-    selection = np.ones(len(dev_names), dtype=np.bool)
+    selection = np.ones(len(dev_names), dtype=bool)
     selection[5] = False
     selection[7] = False
     names = dev_names[selection]
