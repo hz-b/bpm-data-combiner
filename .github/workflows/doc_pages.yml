@@ -24,7 +24,7 @@ jobs:
            **/requirements*.txt
     - uses: abatilo/actions-poetry@v2.1.3
     - name: install
-      run: (cd src && poetry install -E amazon -E docs)
+      run: (cd src && poetry install -E docs)
     - name: Build documentation
       run: |
         mkdir gh-pages
