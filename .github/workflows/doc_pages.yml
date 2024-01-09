@@ -1,10 +1,11 @@
 name: Docs2Pages
 on:
   push:
-    tags: '*'
+    branches: [ "main" ]
+#  push:
+#    tags: '*'
   pull_request:
-    branches:
-      - master
+    branches: [ "main" ]
 
 jobs:
   build-docs:
