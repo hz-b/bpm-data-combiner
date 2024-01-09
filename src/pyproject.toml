@@ -1,0 +1,26 @@
+[build-system]
+requires = [ "poetry-core>=1.0.0",]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry]
+name = "bpm_data_combiner"
+version = "0.0.1"
+description = "Combine BPM data published by individual IOC's to waveforms"
+authors = [ "Pierre Schnizer"]
+license = "GPL-3.0"
+homepage = "https://github.com/hz-b/bpm-data-combiner"
+documentation = "https://github.com/hz-b/bpm-data-combiner"
+repository = "https://github.com/hz-b/bpm-data-combiner.git"
+keywords = []
+
+[tool.poetry.dependencies]
+python = ">=3.7"
+numpy = "*"
+pandas = "*"
+
+Sphinx = { version = "*", optional = true }
+sphinx-rtd-theme = { version = "*", optional = true }
+sphinxcontrib-napoleon = { version = "*", optional = true }
+
+[tool.poetry.extras]
+docs = ["Sphinx", "sphinx-rtd-theme", "sphinxcontrib-napoleon"]
