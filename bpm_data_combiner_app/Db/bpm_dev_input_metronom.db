@@ -1,0 +1,79 @@
+record(ai, "$(PREFIX)metrnm:im:dly")
+{
+    field(DESC, "Make adjustable delay")
+    field(EGU, "s")
+    field(DTYP, "pydev")
+    field(INP,  "@pydev.iointr('$(PREFIX)metrnm:im:dly')")
+    field(SCAN, "I/O Intr")
+    field(VAL, 0)
+    field(PREC, 3)
+    field(PINI, "YES")
+    field(FLNK, "$(PREFIX)metrnm:im:dly:fwd")
+    field(TPRO, 1)
+}
+
+record(ao, "$(PREFIX)metrnm:im:dly:fwd")
+{
+    field(DESC, "forward delay to calc")
+    field(OMSL, "closed_loop")
+    field(PREC, 3)
+
+    # enforce range
+    field(DRVL, 0)
+    field(DRVH, 0.1)
+    # Target is: hit into the middle of two updates
+    # its roughly 100 ms, tick on linux is
+    # roughly 1ms. update in 5 to 10 ms should be enough
+    field(MDEL, 5e-3)
+    field(ADEL, 5e-3)
+    field(DOL,  "$(PREFIX)metrnm:im:dly")
+    field(OUT,  "$(PREFIX)metrnm:im:cnt.ODLY")
+    field(FLNK, "$(PREFIX)metrnm:im:dly:psh")
+   # delay can not be less than a second
+    field(LOPR, -0.05)
+    # todo: necessary to accept round of errors?
+    field(LOW, -0.5e-3)
+    field(LOLO, -1e-3)
+    # delay should not be more than 0.1
+    # todo: perhaps to limit it to 0.05?
+    # currently setting high limit to that
+    field(HOPR, 0.15)
+    field(HIGH, 0.05)
+    field(HIHI, 0.15)
+
+    field(LSV, "MINOR")
+    field(HSV, "MINOR")
+    field(LLSV, "MAJOR")
+    field(HHSV, "MAJOR")
+}
+
+record(calcout, "$(PREFIX)metrnm:im:cnt")
+{
+    field(DESC, "periodic 100 ms cntr")
+    field(VAL, 0)
+    field(PINI, "YES")
+    field(CALC, "VAL + 1")
+    field(ODLY, 0)
+    field(SCAN, "1 second")
+    field(FLNK, "$(PREFIX)metrnm:im:cnt:psh")
+}
+
+record(longout, "$(PREFIX)metrnm:im:cnt:psh")
+{
+    field(DESC, "push metronom count to python")
+    field(DTYP, "pydev")
+    field(DOL, "$(PREFIX)metrnm:im:cnt")
+    field(OMSL, "closed_loop")
+    field(OUT, "@update(dev_name=None, metronom=%VAL%, type='tick')")
+    field(TPRO, 1)
+}
+
+record(ao, "$(PREFIX)metrnm:im:dly:psh")
+{
+    field(DESC, "push metronom count to python")
+    field(DTYP, "pydev")
+    field(OMSL, "closed_loop")
+    field(DOL, "$(PREFIX)metrnm:im:dly:fwd")
+    field(OUT, "@update(dev_name=None, metronom=%VAL%, type='delay')")
+    field(TPRO, 1)
+}
