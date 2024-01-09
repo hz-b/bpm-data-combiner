@@ -110,9 +110,12 @@ class ReadingsCollection:
 
     @property
     def active(self) -> bool:
-        """just a convenience
+        """just a convenience function
 
-        Or more expressive
+        return not self.ready
+
+        Todo:
+            check if it should be removed
         """
         return not self.ready
 

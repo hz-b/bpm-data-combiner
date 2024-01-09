@@ -7,6 +7,7 @@ Combine data from beam position monitor sources
 
 
    api.rst
+   internals.rst
 
 
 Indices and tables

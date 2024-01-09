@@ -16,9 +16,9 @@ TODO's
   new reading collection is dispatched
 
 
-Data models
------------
 
+Data model
+----------
 
 Status of a BPM
 ~~~~~~~~~~~~~~~
@@ -37,67 +37,12 @@ Data provided by a single IOC
    :undoc~members:
    :show~inheritance:
 
+
+
 Representing the data collected from a set of BPM IOC's
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: bpm_data_combiner.data_model.bpm_data_collection
-   :members:
-   :undoc~members:
-   :show~inheritance:
-
-
-
-Business Logic
---------------
-
-.. automodule:: bpm_data_combiner.bl
-   :members:
-   :undoc~members:
-   :show~inheritance:
-
-
-Monitor devices
-~~~~~~~~~~~~~~~
-
-.. automodule:: bpm_data_combiner.bl.monitor_devices
-   :members:
-   :undoc~members:
-   :show~inheritance:
-
-
-Event
-~~~~~
-
-.. automodule:: bpm_data_combiner.bl.event
-   :members:
-   :undoc~members:
-   :show~inheritance:
-
-
-
-Dispatcher
-~~~~~~~~~~
-
-.. automodule:: bpm_data_combiner.bl.dispatcher
-   :members:
-   :undoc~members:
-   :show~inheritance:
-
-
-Collector
-~~~~~~~~~
-
-.. automodule:: bpm_data_combiner.bl.collector
-   :members:
-   :undoc~members:
-   :show~inheritance:
-
-
-
-Accumulator
-~~~~~~~~~~~
-
-.. automodule:: bpm_data_combiner.bl.accumulator
    :members:
    :undoc~members:
    :show~inheritance:
