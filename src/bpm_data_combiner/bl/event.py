@@ -8,8 +8,8 @@ from typing import Sequence, Callable
 class Event:
     """A single event managing subscribers
 
-    meth:`trigger` will be called. This object is then
-    submitted to the subscribers
+    The subscribers will be called when :method:`trigger` is called.
+    The object is then passed to the subscribers.
     """
 
     def __init__(self, *, name: str, subscribers: Sequence[Callable] = None):
@@ -38,3 +38,6 @@ class Event:
         cls_name = self.__class__.__name__
         subs_text = ", ".join([repr(s) for s in self.subscribers])
         return f"{cls_name}(name={self.name}, subscribers={subs_text})"
+
+
+__all__ = ["Event"]
