@@ -5,7 +5,7 @@ Beam position data is published by different input output
 controllers. These need to be combined into a consistent
 data structure.
 
-For details see
+For details see:
 
 * Product requirements document or `Lastenheft`_
 * Scope statement of `Pflichtenheft`_
@@ -13,9 +13,11 @@ For details see
 .. _`Lastenheft` : bpm_data_combiner_app/doc/lastenheft.rst
 .. _`Pflichtenheft` : bpm_data_combiner_app/doc/pflichtenheft.rst
 
-
-For the python part see
- https://hz-b.github.io/bpm-data-combiner/ .
+The functionallity is implemented as  EPICS IOC's. A significant
+fraction is implemented in python using pydevice. All python code
+is implemented in the python module `bpm-data-combiner`. Have a
+look to  https://hz-b.github.io/bpm-data-combiner/ for its
+documentation.
 
 
 
