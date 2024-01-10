@@ -90,15 +90,24 @@ def process_enabled(*, dev_name, enabled):
     return monitor_devices.set_enabled(dev_name, enabled)
 
 
-def process_metronom(*, dev_name, metronom, type):
+def process_offbeat(*, dev_name, metronom, type):
+    """
+
+    Todo:
+        fix offbead_delay
+    """
     assert dev_name is None
     key, val = type, metronom
+    # return
+    # print(f"          metronom {key=} with {val=}")
+
     if key == "tick":
-        offbeat_delay.counter(val)
+        offbeat_delay.set_counter(val)
     elif key == "delay":
         offbeat_delay.set_delay(val)
     else:
         raise ValueError(f"Unknown {key=} with {val=}")
+    # print(f"processed metronom {key=} with {val=}")
 
 
 cmds = dict(
@@ -112,7 +121,7 @@ cmds = dict(
     active=process_active,
     # metronom: used to derive appropriate delay
     # to wait for all data
-    metronom=process_metronom,
+    metronom=process_offbeat,
 )
 
 class UpdateContex:
@@ -133,6 +142,7 @@ class UpdateContex:
         )
         marker = "-" * 78
         logger.error("%s\nTraceback:\n%s\n%s\n", marker, exc_tb, marker)
+
 
 
 def update(*, dev_name, **kwargs):
