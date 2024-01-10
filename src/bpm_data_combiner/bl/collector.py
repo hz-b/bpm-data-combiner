@@ -98,7 +98,8 @@ class ReadingsCollection:
         if dev_name in self.collection:
             raise DoubleSubmissionError(f"{dev_name=} already in collection")
         # data expected
-        assert self.active
+        if not self.active:
+            raise AssertionError("Reading is not active")
         self.collection[dev_name] = val
         self._ready, self._above_threshold = self.is_ready()
 

@@ -87,7 +87,6 @@ class OffBeatDelay:
     def data_arrived(self, *, name):
         if self.counter is None:
             return
-
         self.col.new_reading(
             DataArrived(cnt=self.counter, timestamp=_now(), dev_name=name)
         )

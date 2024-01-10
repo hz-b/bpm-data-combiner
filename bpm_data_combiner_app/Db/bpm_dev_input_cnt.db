@@ -1,0 +1,9 @@
+record(longout, "$(PREFIX)devices:cnt")
+{
+    field(DESC, "global counter")
+    field(DTYP, "pydev")
+    field(OMSL, "closed_loop")
+    field(DOL, "$(PREFIX)offbeat:im:cnt MS")
+    field(OUT, "@update(dev_name=None, cnt=%VAL%)")
+    field(TPRO, 0)
+}

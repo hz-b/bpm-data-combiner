@@ -17,18 +17,8 @@ from ..data_model.timestamp import DataArrived
 logger = logging.getLogger("bpm-data-combiner")
 
 #: Todo where to get the device names from
-dev_names = [
-    [
-        [
-            [f"BPM{cnt}Z{child}{sec_type}{sec}R" for cnt in range(1, 4 + 1)]
-            for child in range(1, 4 + 1)
-        ]
-        for sec_type in ("D", "T")
-    ]
-    for sec in range(1, 8 + 1)
-]
-
-_dev_names = list(itertools.chain(*itertools.chain(*itertools.chain(*dev_names))))
+_dev_names = [f"SPARK{cnt:02d}" for cnt in range(33)]
+_dev_names = _dev_names[1:3]
 dev_names = Index(_dev_names)
 # Now connect all the different objects together
 # ToDo: would a proper message bus simplify the code
@@ -39,14 +29,16 @@ monitor_devices = MonitorDevices([MonitoredDevice(name) for name in dev_names])
 # ToDo: Collector should get / retrieve an updated set of valid
 #       device names every time a new reading collections is created
 col = Collector(name="data_collector", devices_names=dev_names)
+def cb(val):
+    col.new_reading(val)
+dispatcher_collection.subscribe(cb)
+
 # Off beat treats each plane as separate device
 offbeat_delay = OffBeatDelay(name="offbeat_delay_collector", device_names=list(itertools.chain(*[(name + ":x", name + ":y") for name in _dev_names])))
 
-
-def cb(val):
-    col.new_reading(val)
-
-dispatcher_collection.subscribe(cb)
+# def cb(delay):
+#     print(f"new delay {delay*1000:0f} ms")
+#offbeat_delay.on_new_delay.add_subscriber(cb)
 
 
 #: accumulate data above threshold
@@ -57,18 +49,28 @@ acc_ready = Accumulator(dev_names)
 # col.on_ready.add_subscriber(acc_ready.add)
 
 viewer = Viewer(prefix="Pierre:COM")
-
-
 def cb(collection):
     data = collection_to_bpm_data_collection(collection, dev_names)
     viewer.ready_data.update(data)
 
-
+def mangle_view_delay_cb(delay):
+    period = 0.1
+    delay = delay % period
+    # test if delay is too large
+    if delay < 0:
+        delay = 0
+    elif delay > period*3/4:
+        delay = 0
+    viewer.pll_delay.update(delay)
 col.on_ready.add_subscriber(cb)
+offbeat_delay.on_new_delay.add_subscriber(mangle_view_delay_cb)
 
 
 def process_cnt(*, dev_name, cnt):
-    return dispatcher_collection.get_dispatcher(dev_name).new_reading(cnt)
+    assert dev_name is None
+    for name in _dev_names:
+        assert name is not None
+        dispatcher_collection.get_dispatcher(name).new_reading(cnt)
 
 
 def process_x_val(*, dev_name, x):
@@ -88,14 +90,14 @@ def process_enabled(*, dev_name, enabled):
     return monitor_devices.set_enabled(dev_name, enabled)
 
 
-def process_offbeat(*, dev_name, metronom, type):
+def process_offbeat(*, dev_name, offbeat, type):
     """
 
     Todo:
         fix offbeat_delay
     """
     assert dev_name is None
-    key, val = type, metronom
+    key, val = type, offbeat
 
     if key == "tick":
         offbeat_delay.set_counter(val)
@@ -116,7 +118,7 @@ cmds = dict(
     active=process_active,
     # metronom: used to derive appropriate delay
     # to wait for all data
-    metronom=process_offbeat,
+    offbeat=process_offbeat,
 )
 
 class UpdateContex:
@@ -136,6 +138,7 @@ class UpdateContex:
             f"Could not process command {self.cmd=}:"
             f"{self.method=} {self.dev_name=} {self.kwargs=}: {exc_type}({exc_val})"
         )
+        return
         marker = "-" * 78
         tb_buf = io.StringIO()
         traceback.print_tb(exc_tb, file=tb_buf)

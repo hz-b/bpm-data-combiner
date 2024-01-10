@@ -1,5 +1,9 @@
+import logging
 from ..data_model.bpm_data_collection import BPMDataCollection, BPMDataCollectionStats
 import pydev
+
+logger = logging.getLogger("bpm-data-combiner")
+
 
 class ViewBPMDataCollection:
     def __init__(self, prefix: str):
@@ -26,7 +30,18 @@ class ViewBPMDataCollectionStats:
             pydev.iointr(label, var)
 
 
+class PLLDelayViewer:
+    def __init__(self, prefix: str):
+        self.prefix = prefix
+
+    def update(self, delay: float):
+        label = self.prefix
+        # logger.warning(f"New delay: {label=} {delay * 1000:.0f}ms")
+        pydev.iointr(label, delay)
+
+
 class Viewer:
     def __init__(self, prefix: str):
         self.ready_data = ViewBPMDataCollection(prefix + ":ready")
         self.periodic_data = ViewBPMDataCollectionStats(prefix + ":periodic")
+        self.pll_delay = PLLDelayViewer(prefix + ":offbeat:im:dly")

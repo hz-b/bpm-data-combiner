@@ -6,6 +6,8 @@ include $(TOP)/configure/CONFIG
 # input "mirror" of different bpm's
 # pushes data to python world
 DB += bpm_dev_input_offbeat.db
+# the global counter for all dev_input records
+DB += bpm_dev_input_cnt.db
 DB += bpm_dev_input.db
 DB += bpm_dev_input.rec
 # views / outputs, gets data from python world
