@@ -27,8 +27,8 @@ record(ao, "$(PREFIX)metrnm:im:dly:fwd")
     field(MDEL, 5e-3)
     field(ADEL, 5e-3)
     field(DOL,  "$(PREFIX)metrnm:im:dly")
-    field(OUT,  "$(PREFIX)metrnm:im:cnt.ODLY")
-    field(FLNK, "$(PREFIX)metrnm:im:dly:psh")
+    field(OUT,  "$(PREFIX)metrnm:im:cnt.ODLY MS")
+    field(FLNK, "$(PREFIX)metrnm:im:dly:psh MS")
    # delay can not be less than a second
     field(LOPR, -0.05)
     # todo: necessary to accept round of errors?
