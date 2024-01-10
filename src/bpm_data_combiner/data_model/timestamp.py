@@ -7,4 +7,4 @@ from typing import Union
 class DataArrived:
     cnt:int
     dev_name: str
-    timestamp: Union[datetime | float]
+    timestamp: Union[datetime, float]
