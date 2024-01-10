@@ -1,0 +1,96 @@
+# the epics database part of an PPL loop
+# assumes that the delay to get into an offbeat is provided to it
+# by other means: here I assume the data is provided by
+# `$(PREFIX)offbeat:im:dly`
+# the delay used in this record is pushed to the "other" side by
+# the record $(PREFIX)offbeat:im:dly:psh
+# the count is pushed too
+record(ai, "$(PREFIX)offbeat:im:dly")
+{
+    field(DESC, "Make adjustable delay")
+    field(EGU, "s")
+    # field(DTYP, "pydev")
+    # field(INP,  "@pydev.iointr('$(PREFIX)offbeat:im:dly')")
+    # field(SCAN, "I/O Intr")
+    field(VAL, 0)
+    field(PREC, 3)
+    field(PINI, "YES")
+    field(FLNK, "$(PREFIX)offbeat:im:dly:fwd")
+    field(TPRO, 1)
+}
+
+record(ao, "$(PREFIX)offbeat:im:dly:fwd")
+{
+    field(DESC, "forward delay to calc")
+    field(EGU, "s")
+    field(PREC, 3)
+
+    field(OMSL, "closed_loop")
+    field(DOL,  "$(PREFIX)offbeat:im:dly")
+    field(OUT,  "$(PREFIX)offbeat:im:cnt.ODLY MS")
+
+    # enforce range
+    field(DRVL, 0)
+    field(DRVH, 0.1)
+    # Target is: hit into the middle of two updates
+    # its roughly 100 ms, tick on linux is
+    # roughly 1ms. update in 5 to 10 ms should be enough
+    field(MDEL, 5e-3)
+    field(ADEL, 5e-3)
+    # delay can not be less than a second
+    # todo: adjust operation range as soon as UI is designed
+    field(LOPR, -0.05)
+    # todo: necessary to accept round of errors?
+    field(LOW, -0.5e-3)
+    field(LOLO, -1e-3)
+    # delay should not be more than 0.1
+    # todo: perhaps to limit it to 0.05?
+    # currently setting high limit to that
+    field(HOPR, 0.15)
+    field(HIGH, 0.05)
+    field(HIHI, 0.15)
+
+    field(LSV, "MINOR")
+    field(HSV, "MINOR")
+    field(LLSV, "MAJOR")
+    field(HHSV, "MAJOR")
+}
+
+record(calcout, "$(PREFIX)offbeat:im:cnt")
+{
+    field(DESC, "periodic 100 ms cntr")
+    field(VAL, 0)
+    field(PINI, "YES")
+    field(CALC, "VAL + 1")
+    field(ODLY, 0)
+    field(SCAN, "1 second")
+    field(FLNK, "$(PREFIX)offbeat:im:cnt:fan MS")
+}
+
+record(fanout, "$(PREFIX)offbeat:im:cnt:fan")
+{
+    # Todo: Order crucial: so that collector cnt will know which
+    #       delay was used
+    field(LNK0, "$(PREFIX)offbeat:im:dly:psh MS")
+    field(LNK1, "$(PREFIX)offbeat:im:cnt:psh MS")
+}
+
+record(longout, "$(PREFIX)offbeat:im:cnt:psh")
+{
+    field(DESC, "push offbeat count to python")
+    field(DTYP, "pydev")
+    field(OMSL, "closed_loop")
+    field(DOL, "$(PREFIX)offbeat:im:cnt MS")
+    field(OUT, "@update(dev_name=None, offbeat=%VAL%, type='tick')")
+    field(TPRO, 0)
+}
+
+record(ao, "$(PREFIX)offbeat:im:dly:psh")
+{
+    field(DESC, "push offbeat count to python")
+    field(DTYP, "pydev")
+    field(OMSL, "closed_loop")
+    field(DOL, "$(PREFIX)offbeat:im:dly:fwd MS")
+    field(OUT, "@update(dev_name=None, offbeat=%VAL%, type='delay')")
+    field(TPRO, 0)
+}

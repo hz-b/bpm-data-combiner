@@ -12,15 +12,20 @@ Question:
    how long of a queue to preserve
 """
 import functools
+import logging
 from typing import Sequence, Hashable, Dict
 import numpy as np
 import numpy.ma as ma
 from pandas import Index
 
-from ..errors import DoubleSubmissionError
+from ..data_model.collection_item import CollectionItem
+from ..errors import DoubleSubmissionError, UnknownDeviceNameError
 from .event import Event
 from ..data_model.bpm_data_reading import BPMReading
 from ..data_model.bpm_data_collection import BPMDataCollection, BPMDataCollectionPlane
+
+
+logger = logging.getLogger("bpm-data-combiner")
 
 
 def _combine_collections_by_device_names(
@@ -69,12 +74,14 @@ class ReadingsCollection:
     use :meth:`ready` to see if sufficient data is here
     """
 
-    def __init__(self, *, device_names: Sequence, threshold: int = None):
+    def __init__(self, *, name: str, device_names: Sequence, threshold: int = None):
+        self.name = name
         self.collection = dict()
         self.device_names = set(device_names)
 
         if threshold is None:
-            self.threshold = max(1, len(device_names) // 2)
+            threshold = max(1, len(device_names) // 2)
+        self.threshold = threshold
 
         self._ready = False
         self._above_threshold = False
@@ -83,7 +90,10 @@ class ReadingsCollection:
     def add_reading(self, val: BPMReading):
         dev_name = val.dev_name
         # data from known / expected device
-        assert dev_name in self.device_names
+        if dev_name not in self.device_names:
+            logger.warning("Collector %s: expecting following device names %s",
+                          self.name, self.device_names)
+            raise UnknownDeviceNameError(f"Unknown device {dev_name}")
         # not one device sending twice
         if dev_name in self.collection:
             raise DoubleSubmissionError(f"{dev_name=} already in collection")
@@ -133,7 +143,8 @@ class Collector:
         arrive far too late?
     """
 
-    def __init__(self, *, devices_names: Sequence[str], max_collections: int = 50):
+    def __init__(self, *, name: str, devices_names: Sequence[str], threshold : float = None, max_collections: int = 50):
+        self.name = name
         self.device_names = devices_names
         self.on_new_collection = Event(name="on_new_collection")
         self.on_above_threshold = Event(name="reading_collection_on_threshold")
@@ -141,7 +152,7 @@ class Collector:
 
         @functools.lru_cache(maxsize=max_collections)
         def _get_collection(cnt: Hashable):
-            r = ReadingsCollection(device_names=self.device_names)
+            r = ReadingsCollection(name=self.name, device_names=self.device_names, threshold=threshold)
             self.on_new_collection.trigger(r)
             return r
 
@@ -153,7 +164,7 @@ class Collector:
         assert col.active or col.ready
         return col
 
-    def new_reading(self, val: BPMReading):
+    def new_reading(self, val: CollectionItem):
         rc = self._get_collection(val.cnt)
         rc.add_reading(val)
         if rc.ready:

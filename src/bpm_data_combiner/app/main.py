@@ -1,14 +1,18 @@
+import io
 import itertools
 import logging
+import traceback
 
 from ..data_model.monitored_device import MonitoredDevice
 from ..bl.accumulator import Accumulator
 from ..bl.dispatcher import DispatcherCollection
 from ..bl.collector import Collector, collection_to_bpm_data_collection
 from ..bl.monitor_devices import MonitorDevices
+from ..bl.offbeat import OffBeatDelay
 from .viewer import Viewer
 from pandas import Index
 
+from ..data_model.timestamp import DataArrived
 
 logger = logging.getLogger("bpm-data-combiner")
 
@@ -24,8 +28,8 @@ dev_names = [
     for sec in range(1, 8 + 1)
 ]
 
-dev_names = list(itertools.chain(*itertools.chain(*itertools.chain(*dev_names))))
-dev_names = Index(dev_names)
+_dev_names = list(itertools.chain(*itertools.chain(*itertools.chain(*dev_names))))
+dev_names = Index(_dev_names)
 # Now connect all the different objects together
 # ToDo: would a proper message bus simplify the code
 #       I think  I would do it for the part of describing
@@ -34,12 +38,13 @@ dispatcher_collection = DispatcherCollection()
 monitor_devices = MonitorDevices([MonitoredDevice(name) for name in dev_names])
 # ToDo: Collector should get / retrieve an updated set of valid
 #       device names every time a new reading collections is created
-col = Collector(devices_names=dev_names)
+col = Collector(name="data_collector", devices_names=dev_names)
+# Off beat treats each plane as separate device
+offbeat_delay = OffBeatDelay(name="offbeat_delay_collector", device_names=list(itertools.chain(*[(name + ":x", name + ":y") for name in _dev_names])))
 
 
 def cb(val):
     col.new_reading(val)
-
 
 dispatcher_collection.subscribe(cb)
 
@@ -67,10 +72,12 @@ def process_cnt(*, dev_name, cnt):
 
 
 def process_x_val(*, dev_name, x):
+    offbeat_delay.data_arrived(name=f"{dev_name}:x")
     return dispatcher_collection.get_dispatcher(dev_name).update_x_val(x)
 
 
 def process_y_val(*, dev_name, y):
+    offbeat_delay.data_arrived(name=f"{dev_name}:y")
     return dispatcher_collection.get_dispatcher(dev_name).update_y_val(y)
 
 
@@ -86,6 +93,23 @@ def process_enabled(*, dev_name, enabled):
     return monitor_devices.set_enabled(dev_name, enabled)
 
 
+def process_offbeat(*, dev_name, metronom, type):
+    """
+
+    Todo:
+        fix offbeat_delay
+    """
+    assert dev_name is None
+    key, val = type, metronom
+
+    if key == "tick":
+        offbeat_delay.set_counter(val)
+    elif key == "delay":
+        offbeat_delay.set_delay(val)
+    else:
+        raise ValueError(f"Unknown {key=} with {val=}")
+
+
 cmds = dict(
     # handling a single reading
     cnt=process_cnt,
@@ -95,6 +119,9 @@ cmds = dict(
     # handling device status monitoring
     enabled=process_enabled,
     active=process_active,
+    # metronom: used to derive appropriate delay
+    # to wait for all data
+    metronom=process_offbeat,
 )
 
 class UpdateContex:
@@ -103,6 +130,7 @@ class UpdateContex:
         self.method = method
         self.dev_name = dev_name
         self.kwargs = kwargs
+
     def __enter__(self):
         pass
 
@@ -114,7 +142,10 @@ class UpdateContex:
             f"{self.method=} {self.dev_name=} {self.kwargs=}: {exc_type}({exc_val})"
         )
         marker = "-" * 78
-        logger.error("%s\nTraceback:\n%s\n%s\n", marker, exc_tb, marker)
+        tb_buf = io.StringIO()
+        traceback.print_tb(exc_tb, file=tb_buf)
+        tb_buf.seek(0)
+        logger.error("%s\nTraceback:\n%s\n%s\n", marker, tb_buf.read(), marker)
 
 
 def update(*, dev_name, **kwargs):
