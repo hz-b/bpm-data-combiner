@@ -145,6 +145,7 @@ class UpdateContex:
 
 
 
+
 def update(*, dev_name, **kwargs):
     """Inform the dispatcher associated to the device that new data is available"""
     # just to get the cmd: first kwarg
