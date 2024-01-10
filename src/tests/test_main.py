@@ -18,18 +18,20 @@ def test_main_behaved():
     N = 3
     for cnt in range(N):
         for dev_name in dev_names:
-            update(dev_name=dev_name, cnt=cnt)
+            update(dev_name=None, cnt=cnt)
             update(dev_name=dev_name, x=cnt)
             update(dev_name=dev_name, y=-cnt)
-            update(dev_name=dev_name, ctl=cnt)
 
     for cnt in range(N):
         readings = col.get_collection(cnt)
         assert readings.is_ready()
 
-
+@pytest.mark.skip
 def test_main_interleaving():
-    """Test that data are combined if the data of the devices are interleaved"""
+    """Test that data are combined if the data of the devices are interleaved
+
+    This test makes only sense if cnt is part of the data package
+    """
 
     cnt = 4
     for dev_name in dev_names:
@@ -44,8 +46,12 @@ def test_main_interleaving():
     assert readings.is_ready()
 
 
+@pytest.mark.skip
 def test_reading_single_device_misbehaved():
-    """the first device sending second data set before first is finished"""
+    """the first device sending second data set before first is finished
+
+    This test makes only sense if cnt is part of the transmitted data set
+    """
     dev_name = dev_names[0]
     cnt = 5
     update(dev_name=dev_name, cnt=cnt)
