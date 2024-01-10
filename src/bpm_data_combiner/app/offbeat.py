@@ -55,7 +55,7 @@ class OffBeatDelay:
             return
 
         self.col.new_reading(
-            DataArrived(cnt=self.counter, timestamp=_now(), name=dev_name, plane="x")
+            DataArrived(cnt=self.counter, timestamp=_now(), name=dev_name, plane=plane)
         )
 
     def set_counter(self, cnt):
@@ -63,7 +63,7 @@ class OffBeatDelay:
         Todo: need to fix "new_reading"
         """
         self.counter = cnt
-        nd = DataArrived(cnt=self.counter, timestamp=_now(), name=reference_stamp_name, plane="x")
+        nd = DataArrived(cnt=self.counter, timestamp=_now(), name=reference_stamp_name, plane="all")
         return
         self.col.new_reading(nd)
 
