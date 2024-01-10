@@ -80,11 +80,6 @@ def process_y_val(*, dev_name, y):
     offbeat_delay.data_arrived(name=f"{dev_name}:y")
     return dispatcher_collection.get_dispatcher(dev_name).update_y_val(y)
 
-
-def process_chk_cnt(*, dev_name, ctl):
-    return dispatcher_collection.get_dispatcher(dev_name).update_check(ctl)
-
-
 def process_active(*, dev_name, active):
     return monitor_devices.set_active(dev_name, active)
 
@@ -111,11 +106,11 @@ def process_offbeat(*, dev_name, metronom, type):
 
 
 cmds = dict(
-    # handling a single reading
+    # handling global counter
     cnt=process_cnt,
+    # handling a single reading
     x=process_x_val,
     y=process_y_val,
-    ctl=process_chk_cnt,
     # handling device status monitoring
     enabled=process_enabled,
     active=process_active,

@@ -14,8 +14,8 @@ class BPMReadingBeingProcessed:
     #: y position in nano meter
     y: Optional[int] = None
 
-    def ready(self, chk_cnt):
-        return self.x is not None and self.y is not None and self.cnt == chk_cnt
+    def ready(self):
+        return self.x is not None and self.y is not None
 
 
 # used to be sent further around:
