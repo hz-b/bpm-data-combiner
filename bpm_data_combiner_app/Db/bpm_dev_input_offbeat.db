@@ -58,7 +58,6 @@ record(calcout, "$(PREFIX)metrnm:im:cnt")
     field(ODLY, 0)
     field(SCAN, "1 second")
     field(FLNK, "$(PREFIX)metrnm:im:cnt:fan MS")
-    field(TPRO, 1)
 }
 
 record(fanout, "$(PREFIX)metrnm:im:cnt:fan")
@@ -68,13 +67,6 @@ record(fanout, "$(PREFIX)metrnm:im:cnt:fan")
     field(LNK0, "$(PREFIX)metrnm:im:dly:psh MS")
     field(LNK1, "$(PREFIX)metrnm:im:cnt:psh MS")
 }
-
-record(fanout, "$(PREFIX)metrnm:im:cnt:fan")
-{
-    # Todo: Order crucial: so that collector cnt will know which
-    #       delay was used
-    field(LNK0, "$(PREFIX)metrnm:im:dly:psh MS")
-    field(LNK1, "$(PREFIX)metrnm:im:cnt:psh MS")
 
 record(longout, "$(PREFIX)metrnm:im:cnt:psh")
 {
