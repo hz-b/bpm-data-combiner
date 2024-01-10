@@ -17,6 +17,7 @@ bpm_data_combiner_registerRecordDeviceDriver pdbbase
 
 ## Load record instances
 dbLoadTemplate("db/bpm_dev_input.db", "REMOTE=$(REMOTE),PREFIX=$(PREFIX)")
+dbLoadRecords("db/bpm_dev_input_metronom.db", "PREFIX=$(PREFIX)")
 dbLoadTemplate("db/bpm.db", "PREFIX=$(PREFIX)")
 dbLoadRecords "db/bpm_data_combinerVersion.db", "user=mfp"
 

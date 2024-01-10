@@ -6,9 +6,11 @@ from ..bl.accumulator import Accumulator
 from ..bl.dispatcher import DispatcherCollection
 from ..bl.collector import Collector, collection_to_bpm_data_collection
 from ..bl.monitor_devices import MonitorDevices
+from .offbeat import OffBeatDelay
 from .viewer import Viewer
 from pandas import Index
 
+from ..data_model.timestamp import DataArrived
 
 logger = logging.getLogger("bpm-data-combiner")
 
@@ -24,8 +26,8 @@ dev_names = [
     for sec in range(1, 8 + 1)
 ]
 
-dev_names = list(itertools.chain(*itertools.chain(*itertools.chain(*dev_names))))
-dev_names = Index(dev_names)
+_dev_names = list(itertools.chain(*itertools.chain(*itertools.chain(*dev_names))))
+dev_names = Index(_dev_names)
 # Now connect all the different objects together
 # ToDo: would a proper message bus simplify the code
 #       I think  I would do it for the part of describing
@@ -35,11 +37,11 @@ monitor_devices = MonitorDevices([MonitoredDevice(name) for name in dev_names])
 # ToDo: Collector should get / retrieve an updated set of valid
 #       device names every time a new reading collections is created
 col = Collector(devices_names=dev_names)
+offbeat_delay = OffBeatDelay(device_names=_dev_names)
 
 
 def cb(val):
     col.new_reading(val)
-
 
 dispatcher_collection.subscribe(cb)
 
@@ -67,10 +69,12 @@ def process_cnt(*, dev_name, cnt):
 
 
 def process_x_val(*, dev_name, x):
+    offbeat_delay.data_arrived(dev_name=dev_name, plane="x")
     return dispatcher_collection.get_dispatcher(dev_name).update_x_val(x)
 
 
 def process_y_val(*, dev_name, y):
+    offbeat_delay.data_arrived(dev_name=dev_name, plane="x")
     return dispatcher_collection.get_dispatcher(dev_name).update_y_val(y)
 
 
@@ -86,6 +90,17 @@ def process_enabled(*, dev_name, enabled):
     return monitor_devices.set_enabled(dev_name, enabled)
 
 
+def process_metronom(*, dev_name, metronom, type):
+    assert dev_name is None
+    key, val = type, metronom
+    if key == "tick":
+        offbeat_delay.counter(val)
+    elif key == "delay":
+        offbeat_delay.set_delay(val)
+    else:
+        raise ValueError(f"Unknown {key=} with {val=}")
+
+
 cmds = dict(
     # handling a single reading
     cnt=process_cnt,
@@ -95,6 +110,9 @@ cmds = dict(
     # handling device status monitoring
     enabled=process_enabled,
     active=process_active,
+    # metronom: used to derive appropriate delay
+    # to wait for all data
+    metronom=process_metronom,
 )
 
 class UpdateContex:
