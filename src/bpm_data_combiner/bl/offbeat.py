@@ -26,16 +26,26 @@ Todo:
 """
 from datetime import datetime
 
-from typing import Sequence
+from typing import Sequence, Dict
 
+import numpy as np
 from pandas import Index
 
+from .event import Event
 from ..bl.collector import Collector
 from ..data_model.timestamp import DataArrived
 
 _now = datetime.now
 
-reference_stamp_name = "reference_stamp"
+
+def compute_median_delay_from_timestamps(data : Dict[str, DataArrived], *, reference_stamp_name) -> float:
+    """returns the median of the time difference between reference and all other data
+    """
+    ref = data[reference_stamp_name].timestamp
+    stamps = np.array([d.timestamp for key, d in data.items() if key != reference_stamp_name])
+    dt = stamps - ref
+    delay = np.median(dt)
+    return delay
 
 class OffBeatDelay:
     """Find out how much delay to create an offbeat
@@ -45,17 +55,31 @@ class OffBeatDelay:
     Todo:
         Finalise implementation
     """
-    def __init__(self, device_names: Sequence[str]):
-        assert reference_stamp_name not in device_names
-        self.col = Collector(devices_names=Index([reference_stamp_name] + device_names))
-        self.counter = None
+    def __init__(self, name: str, device_names: Sequence[str],
+                 reference_stamp_name="reference_stamp"):
 
-    def data_arrived(self, *, dev_name, plane):
+        assert reference_stamp_name not in device_names
+        self.reference_stamp_name = reference_stamp_name
+        idx = Index([self.reference_stamp_name] + device_names)
+
+        self.col = Collector(name=name, devices_names=idx)
+        self.counter = None
+        self.delay = None
+        self.on_new_delay = Event(name="offset_beat_delay_new_delay")
+
+        def cb(data : Dict[str, DataArrived]):
+            delay = compute_median_delay_from_timestamps(data, reference_stamp_name=self.reference_stamp_name)
+            self.on_new_delay.trigger(delay)
+
+        self.col.on_above_threshold.add_subscriber(cb)
+
+
+    def data_arrived(self, *, name):
         if self.counter is None:
             return
 
         self.col.new_reading(
-            DataArrived(cnt=self.counter, timestamp=_now(), name=dev_name, plane=plane)
+            DataArrived(cnt=self.counter, timestamp=_now(), dev_name=name)
         )
 
     def set_counter(self, cnt):
@@ -63,12 +87,16 @@ class OffBeatDelay:
         Todo: need to fix "new_reading"
         """
         self.counter = cnt
-        nd = DataArrived(cnt=self.counter, timestamp=_now(), name=reference_stamp_name, plane="all")
-        return
-        self.col.new_reading(nd)
+        self.col.new_reading(
+            DataArrived(cnt=self.counter, timestamp=_now(), dev_name=self.reference_stamp_name)
+        )
 
     def set_delay(self, delay):
         """
         Todo:
              implement using delay
         """
+        self.delay = delay
+
+
+__all__ = ["OffBeatDelay"]

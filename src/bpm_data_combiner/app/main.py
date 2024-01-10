@@ -1,12 +1,14 @@
+import io
 import itertools
 import logging
+import traceback
 
 from ..data_model.monitored_device import MonitoredDevice
 from ..bl.accumulator import Accumulator
 from ..bl.dispatcher import DispatcherCollection
 from ..bl.collector import Collector, collection_to_bpm_data_collection
 from ..bl.monitor_devices import MonitorDevices
-from .offbeat import OffBeatDelay
+from ..bl.offbeat import OffBeatDelay
 from .viewer import Viewer
 from pandas import Index
 
@@ -36,8 +38,9 @@ dispatcher_collection = DispatcherCollection()
 monitor_devices = MonitorDevices([MonitoredDevice(name) for name in dev_names])
 # ToDo: Collector should get / retrieve an updated set of valid
 #       device names every time a new reading collections is created
-col = Collector(devices_names=dev_names)
-offbeat_delay = OffBeatDelay(device_names=_dev_names)
+col = Collector(name="data_collector", devices_names=dev_names)
+# Off beat treats each plane as separate device
+offbeat_delay = OffBeatDelay(name="offbeat_delay_collector", device_names=list(itertools.chain(*[(name + ":x", name + ":y") for name in _dev_names])))
 
 
 def cb(val):
@@ -69,12 +72,12 @@ def process_cnt(*, dev_name, cnt):
 
 
 def process_x_val(*, dev_name, x):
-    offbeat_delay.data_arrived(dev_name=dev_name, plane="x")
+    offbeat_delay.data_arrived(name=f"{dev_name}:x")
     return dispatcher_collection.get_dispatcher(dev_name).update_x_val(x)
 
 
 def process_y_val(*, dev_name, y):
-    offbeat_delay.data_arrived(dev_name=dev_name, plane="x")
+    offbeat_delay.data_arrived(name=f"{dev_name}:y")
     return dispatcher_collection.get_dispatcher(dev_name).update_y_val(y)
 
 
@@ -94,12 +97,10 @@ def process_offbeat(*, dev_name, metronom, type):
     """
 
     Todo:
-        fix offbead_delay
+        fix offbeat_delay
     """
     assert dev_name is None
     key, val = type, metronom
-    # return
-    # print(f"          metronom {key=} with {val=}")
 
     if key == "tick":
         offbeat_delay.set_counter(val)
@@ -107,7 +108,6 @@ def process_offbeat(*, dev_name, metronom, type):
         offbeat_delay.set_delay(val)
     else:
         raise ValueError(f"Unknown {key=} with {val=}")
-    # print(f"processed metronom {key=} with {val=}")
 
 
 cmds = dict(
@@ -130,6 +130,7 @@ class UpdateContex:
         self.method = method
         self.dev_name = dev_name
         self.kwargs = kwargs
+
     def __enter__(self):
         pass
 
@@ -141,10 +142,10 @@ class UpdateContex:
             f"{self.method=} {self.dev_name=} {self.kwargs=}: {exc_type}({exc_val})"
         )
         marker = "-" * 78
-        logger.error("%s\nTraceback:\n%s\n%s\n", marker, exc_tb, marker)
-
-
-
+        tb_buf = io.StringIO()
+        traceback.print_tb(exc_tb, file=tb_buf)
+        tb_buf.seek(0)
+        logger.error("%s\nTraceback:\n%s\n%s\n", marker, tb_buf.read(), marker)
 
 
 def update(*, dev_name, **kwargs):

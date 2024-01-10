@@ -5,10 +5,5 @@ from datetime import datetime
 @dataclass(frozen=True)
 class DataArrived:
     cnt:int
-    name: str
-    plane: str
+    dev_name: str
     timestamp: datetime
-
-    @property
-    def dev_name(self):
-        return self.name + ":" + self.plane

@@ -7,7 +7,7 @@ from bpm_data_combiner.data_model.bpm_data_reading import BPMReading
 def test_collector_behaving():
     dev_names = ["BPMZ1D1R", "BPMZ2D1R", "BPMZ4D1R", "BPMZ1T2R"]
 
-    col = Collector(devices_names=dev_names)
+    col = Collector(name="test_collector", devices_names=dev_names)
 
     chk = 0
 
@@ -41,7 +41,7 @@ def test_collector_behaving():
 
 def test_collector_double_submission():
     dev_names = ["BPMZ1D1R", "BPMZ2D1R", "BPMZ4D1R", "BPMZ1T2R"]
-    col = Collector(devices_names=dev_names)
+    col = Collector(name="test_collector", devices_names=dev_names)
     cnt = -19
     col.new_reading(BPMReading(cnt=cnt, x=3, y=4, dev_name=dev_names[0]))
 
@@ -51,7 +51,7 @@ def test_collector_double_submission():
 
 def test_collector_invalid_submission():
     dev_names = ["BPMZ1D1R", "BPMZ2D1R", "BPMZ4D1R", "BPMZ1T2R"]
-    col = Collector(devices_names=dev_names)
+    col = Collector(name="test_collector", devices_names=dev_names)
     cnt = 23
 
     with pytest.raises(AssertionError):
