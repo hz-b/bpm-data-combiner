@@ -2,9 +2,9 @@ record(ai, "$(PREFIX)metrnm:im:dly")
 {
     field(DESC, "Make adjustable delay")
     field(EGU, "s")
-    # field(DTYP, "pydev")
-    # field(INP,  "@pydev.iointr('$(PREFIX)metrnm:im:dly')")
-    # field(SCAN, "I/O Intr")
+    field(DTYP, "pydev")
+    field(INP,  "@pydev.iointr('$(PREFIX)metrnm:im:dly')")
+    field(SCAN, "I/O Intr")
     field(VAL, 0)
     field(PREC, 3)
     field(PINI, "YES")
@@ -30,6 +30,9 @@ record(ao, "$(PREFIX)metrnm:im:dly:fwd")
     # roughly 1ms. update in 5 to 10 ms should be enough
     field(MDEL, 5e-3)
     field(ADEL, 5e-3)
+    field(DOL,  "$(PREFIX)metrnm:im:dly")
+    field(OUT,  "$(PREFIX)metrnm:im:cnt.ODLY MS")
+    field(FLNK, "$(PREFIX)metrnm:im:dly:psh MS")
     # delay can not be less than a second
     # todo: adjust operation range as soon as UI is designed
     field(LOPR, -0.05)
@@ -67,7 +70,6 @@ record(fanout, "$(PREFIX)metrnm:im:cnt:fan")
     #       delay was used
     field(LNK0, "$(PREFIX)metrnm:im:dly:psh MS")
     field(LNK1, "$(PREFIX)metrnm:im:cnt:psh MS")
-}
 
 record(longout, "$(PREFIX)metrnm:im:cnt:psh")
 {
