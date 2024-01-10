@@ -38,14 +38,15 @@ from ..data_model.timestamp import DataArrived
 _now = datetime.now
 
 
-def compute_median_delay_from_timestamps(data : Dict[str, DataArrived], *, reference_stamp_name) -> float:
+def compute_median_delay_from_timestamps(data : Dict[str, DataArrived], *, reference_stamp_name : str, exclude_keys : Sequence[str]) -> float:
     """returns the median of the time difference between reference and all other data
     """
     ref = data[reference_stamp_name].timestamp
-    stamps = np.array([d.timestamp for key, d in data.items() if key != reference_stamp_name])
+    stamps = np.array([d.timestamp for key, d in data.items() if key not in exclude_keys])
     dt = stamps - ref
     delay = np.median(dt)
     return delay
+
 
 class OffBeatDelay:
     """Find out how much delay to create an offbeat
@@ -56,19 +57,28 @@ class OffBeatDelay:
         Finalise implementation
     """
     def __init__(self, name: str, device_names: Sequence[str],
-                 reference_stamp_name="reference_stamp"):
+                 threshold : float = None,
+                 reference_stamp_name="reference_stamp",
+                 delay_name="delay_stamp"):
 
+        assert reference_stamp_name != delay_name
         assert reference_stamp_name not in device_names
-        self.reference_stamp_name = reference_stamp_name
-        idx = Index([self.reference_stamp_name] + device_names)
+        assert delay_name not in device_names
 
-        self.col = Collector(name=name, devices_names=idx)
+        self.reference_stamp_name = reference_stamp_name
+        self.delay_name = delay_name
+        idx = Index([self.reference_stamp_name, self.delay_name] + device_names)
+
+        self.col = Collector(name=name, devices_names=idx, threshold=threshold)
         self.counter = None
         self.delay = None
         self.on_new_delay = Event(name="offset_beat_delay_new_delay")
 
         def cb(data : Dict[str, DataArrived]):
-            delay = compute_median_delay_from_timestamps(data, reference_stamp_name=self.reference_stamp_name)
+            delay = compute_median_delay_from_timestamps(data, reference_stamp_name=self.reference_stamp_name,
+                                                         exclude_keys=[self.reference_stamp_name, self.delay_name])
+            # what a hack: should correct Data.Arrived.timestamp to payload?
+            delay = delay.total_seconds() + data[self.delay_name].timestamp
             self.on_new_delay.trigger(delay)
 
         self.col.on_above_threshold.add_subscriber(cb)
@@ -87,8 +97,12 @@ class OffBeatDelay:
         Todo: need to fix "new_reading"
         """
         self.counter = cnt
+        assert(self.delay is not None)
         self.col.new_reading(
             DataArrived(cnt=self.counter, timestamp=_now(), dev_name=self.reference_stamp_name)
+        )
+        self.col.new_reading(
+            DataArrived(cnt=self.counter, timestamp=self.delay, dev_name=self.delay_name)
         )
 
     def set_delay(self, delay):

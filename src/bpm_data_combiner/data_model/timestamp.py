@@ -6,4 +6,4 @@ from datetime import datetime
 class DataArrived:
     cnt:int
     dev_name: str
-    timestamp: datetime
+    timestamp: datetime | float

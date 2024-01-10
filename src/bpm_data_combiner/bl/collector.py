@@ -18,6 +18,7 @@ import numpy as np
 import numpy.ma as ma
 from pandas import Index
 
+from ..data_model.collection_item import CollectionItem
 from ..errors import DoubleSubmissionError, UnknownDeviceNameError
 from .event import Event
 from ..data_model.bpm_data_reading import BPMReading
@@ -79,7 +80,8 @@ class ReadingsCollection:
         self.device_names = set(device_names)
 
         if threshold is None:
-            self.threshold = max(1, len(device_names) // 2)
+            threshold = max(1, len(device_names) // 2)
+        self.threshold = threshold
 
         self._ready = False
         self._above_threshold = False
@@ -141,7 +143,7 @@ class Collector:
         arrive far too late?
     """
 
-    def __init__(self, *, name: str, devices_names: Sequence[str], max_collections: int = 50):
+    def __init__(self, *, name: str, devices_names: Sequence[str], threshold : float = None, max_collections: int = 50):
         self.name = name
         self.device_names = devices_names
         self.on_new_collection = Event(name="on_new_collection")
@@ -150,7 +152,7 @@ class Collector:
 
         @functools.lru_cache(maxsize=max_collections)
         def _get_collection(cnt: Hashable):
-            r = ReadingsCollection(name=self.name, device_names=self.device_names)
+            r = ReadingsCollection(name=self.name, device_names=self.device_names, threshold=threshold)
             self.on_new_collection.trigger(r)
             return r
 
@@ -162,7 +164,7 @@ class Collector:
         assert col.active or col.ready
         return col
 
-    def new_reading(self, val: BPMReading):
+    def new_reading(self, val: CollectionItem):
         rc = self._get_collection(val.cnt)
         rc.add_reading(val)
         if rc.ready:

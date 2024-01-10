@@ -21,7 +21,7 @@ def test_offbeat_not_initalised():
 
 def test_offbeat_behaved():
     dev_names = ["test0", "test1"]
-    off_beat = OffBeatDelay(name="test", device_names=dev_names)
+    off_beat = OffBeatDelay(name="test", device_names=dev_names, threshold=len(dev_names)-1)
 
     n_new_cols = 0
     def cb_col_chk(obj):
@@ -34,12 +34,13 @@ def test_offbeat_behaved():
         nonlocal  delay_arrived
         delay_arrived += 1
         
-        assert isinstance(delay, datetime.timedelta)
-        assert delay.total_seconds() > 0
+        assert isinstance(delay, float)
+        assert delay > 0
 
 
     off_beat.on_new_delay.add_subscriber(cb_delay)
 
+    off_beat.set_delay(0.0)
     off_beat.set_counter(1)
     for name in dev_names:
         off_beat.data_arrived(name=name)

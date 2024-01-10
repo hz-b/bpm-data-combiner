@@ -1,26 +1,33 @@
-record(ai, "$(PREFIX)metrnm:im:dly")
+# the epics database part of an PPL loop
+# assumes that the delay to get into an offbeat is provided to it
+# by other means: here I assume the data is provided by
+# `$(PREFIX)offbeat:im:dly`
+# the delay used in this record is pushed to the "other" side by
+# the record $(PREFIX)offbeat:im:dly:psh
+# the count is pushed too
+record(ai, "$(PREFIX)offbeat:im:dly")
 {
     field(DESC, "Make adjustable delay")
     field(EGU, "s")
     # field(DTYP, "pydev")
-    # field(INP,  "@pydev.iointr('$(PREFIX)metrnm:im:dly')")
+    # field(INP,  "@pydev.iointr('$(PREFIX)offbeat:im:dly')")
     # field(SCAN, "I/O Intr")
     field(VAL, 0)
     field(PREC, 3)
     field(PINI, "YES")
-    field(FLNK, "$(PREFIX)metrnm:im:dly:fwd")
+    field(FLNK, "$(PREFIX)offbeat:im:dly:fwd")
     field(TPRO, 1)
 }
 
-record(ao, "$(PREFIX)metrnm:im:dly:fwd")
+record(ao, "$(PREFIX)offbeat:im:dly:fwd")
 {
     field(DESC, "forward delay to calc")
     field(EGU, "s")
     field(PREC, 3)
 
     field(OMSL, "closed_loop")
-    field(DOL,  "$(PREFIX)metrnm:im:dly")
-    field(OUT,  "$(PREFIX)metrnm:im:cnt.ODLY MS")
+    field(DOL,  "$(PREFIX)offbeat:im:dly")
+    field(OUT,  "$(PREFIX)offbeat:im:cnt.ODLY MS")
 
     # enforce range
     field(DRVL, 0)
@@ -49,7 +56,7 @@ record(ao, "$(PREFIX)metrnm:im:dly:fwd")
     field(HHSV, "MAJOR")
 }
 
-record(calcout, "$(PREFIX)metrnm:im:cnt")
+record(calcout, "$(PREFIX)offbeat:im:cnt")
 {
     field(DESC, "periodic 100 ms cntr")
     field(VAL, 0)
@@ -57,33 +64,33 @@ record(calcout, "$(PREFIX)metrnm:im:cnt")
     field(CALC, "VAL + 1")
     field(ODLY, 0)
     field(SCAN, "1 second")
-    field(FLNK, "$(PREFIX)metrnm:im:cnt:fan MS")
+    field(FLNK, "$(PREFIX)offbeat:im:cnt:fan MS")
 }
 
-record(fanout, "$(PREFIX)metrnm:im:cnt:fan")
+record(fanout, "$(PREFIX)offbeat:im:cnt:fan")
 {
     # Todo: Order crucial: so that collector cnt will know which
     #       delay was used
-    field(LNK0, "$(PREFIX)metrnm:im:dly:psh MS")
-    field(LNK1, "$(PREFIX)metrnm:im:cnt:psh MS")
+    field(LNK0, "$(PREFIX)offbeat:im:dly:psh MS")
+    field(LNK1, "$(PREFIX)offbeat:im:cnt:psh MS")
 }
 
-record(longout, "$(PREFIX)metrnm:im:cnt:psh")
+record(longout, "$(PREFIX)offbeat:im:cnt:psh")
 {
-    field(DESC, "push metronom count to python")
+    field(DESC, "push offbeat count to python")
     field(DTYP, "pydev")
     field(OMSL, "closed_loop")
-    field(DOL, "$(PREFIX)metrnm:im:cnt MS")
-    field(OUT, "@update(dev_name=None, metronom=%VAL%, type='tick')")
+    field(DOL, "$(PREFIX)offbeat:im:cnt MS")
+    field(OUT, "@update(dev_name=None, offbeat=%VAL%, type='tick')")
     field(TPRO, 0)
 }
 
-record(ao, "$(PREFIX)metrnm:im:dly:psh")
+record(ao, "$(PREFIX)offbeat:im:dly:psh")
 {
-    field(DESC, "push metronom count to python")
+    field(DESC, "push offbeat count to python")
     field(DTYP, "pydev")
     field(OMSL, "closed_loop")
-    field(DOL, "$(PREFIX)metrnm:im:dly:fwd MS")
-    field(OUT, "@update(dev_name=None, metronom=%VAL%, type='delay')")
+    field(DOL, "$(PREFIX)offbeat:im:dly:fwd MS")
+    field(OUT, "@update(dev_name=None, offbeat=%VAL%, type='delay')")
     field(TPRO, 0)
 }
