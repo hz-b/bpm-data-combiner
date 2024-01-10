@@ -2,7 +2,7 @@ Combine data from beam position monitor sources
 ===============================================
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 4
    :caption: Contents:
 
 
