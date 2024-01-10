@@ -97,6 +97,25 @@ cmds = dict(
     active=process_active,
 )
 
+class UpdateContex:
+    def __init__(self, *, cmd, method, dev_name, kwargs):
+        self.cmd = cmd
+        self.method = method
+        self.dev_name = dev_name
+        self.kwargs = kwargs
+    def __enter__(self):
+        pass
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        if exc_type is None:
+            return
+        logger.error(
+            f"Could not process command {self.cmd=}:"
+            f"{self.method=} {self.dev_name=} {self.kwargs=}: {exc_type}({exc_val})"
+        )
+        marker = "-" * 78
+        logger.error("%s\nTraceback:\n%s\n%s\n", marker, exc_tb, marker)
+
 
 def update(*, dev_name, **kwargs):
     """Inform the dispatcher associated to the device that new data is available"""
@@ -105,10 +124,5 @@ def update(*, dev_name, **kwargs):
     # that code says it
     cmd = next(iter(kwargs))
     method = cmds[cmd]
-    try:
+    with UpdateContex(cmd=cmd, method=method, dev_name=dev_name, kwargs=kwargs):
         method(dev_name=dev_name, **kwargs)
-    except Exception as exc:
-        logger.error(
-            f"Could not process command {cmd=} {method=} {dev_name=} {kwargs=}: {exc}"
-        )
-        raise exc
