@@ -51,12 +51,24 @@ class OffBeatDelay:
         self.counter = None
 
     def data_arrived(self, *, dev_name, plane):
+        if self.counter is None:
+            return
+
         self.col.new_reading(
             DataArrived(cnt=self.counter, timestamp=_now(), name=dev_name, plane="x")
         )
 
     def set_counter(self, cnt):
+        """
+        Todo: need to fix "new_reading"
+        """
         self.counter = cnt
-        self.col.new_reading(
-            DataArrived(cnt=self.counter, timestamp=_now(), name=reference_stamp_name, plane="x")
-        )
+        nd = DataArrived(cnt=self.counter, timestamp=_now(), name=reference_stamp_name, plane="x")
+        return
+        self.col.new_reading(nd)
+
+    def set_delay(self, delay):
+        """
+        Todo:
+             implement using delay
+        """
