@@ -5,6 +5,9 @@
 # the delay used in this record is pushed to the "other" side by
 # the record $(PREFIX)offbeat:im:dly:psh
 # the count is pushed too
+#
+# Todo: not working yet: delay in calc seems to delay all
+#       computation within this record.
 
 record(ai, "$(PREFIX)offbeat:im:dly")
 {
