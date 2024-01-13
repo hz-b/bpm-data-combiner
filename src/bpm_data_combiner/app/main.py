@@ -39,14 +39,18 @@ monitor_devices = MonitorDevices([MonitoredDevice(name) for name in dev_names])
 # ToDo: Collector should get / retrieve an updated set of valid
 #       device names every time a new reading collections is created
 col = Collector(name="data_collector", devices_names=dev_names)
+dispatcher_collection.subscribe(col.new_reading)
+def update_device_names(device_names):
+    """
+
+    Todo:
+        Do I need to mangle the names for a real device
+    """
+    col.device_names = device_names
+monitor_devices.on_status_change.add_subscriber(update_device_names)
 # Off beat treats each plane as separate device
 offbeat_delay = OffBeatDelay(name="offbeat_delay_collector", device_names=list(itertools.chain(*[(name + ":x", name + ":y") for name in _dev_names])))
 
-
-def cb(val):
-    col.new_reading(val)
-
-dispatcher_collection.subscribe(cb)
 
 
 #: accumulate data above threshold
@@ -56,16 +60,15 @@ col.on_above_threshold.add_subscriber(acc_abv_th.add)
 acc_ready = Accumulator(dev_names)
 # col.on_ready.add_subscriber(acc_ready.add)
 
+# fmt:off
 viewer = Viewer(prefix="Pierre:COM")
-
-
 def cb(collection):
+    # Here we need to use dev_names and not the active ones
+    # I guss there should be an exporter
     data = collection_to_bpm_data_collection(collection, dev_names)
     viewer.ready_data.update(data)
-
-
 col.on_ready.add_subscriber(cb)
-
+# fmt:on
 
 def process_cnt(*, dev_name, cnt):
     return dispatcher_collection.get_dispatcher(dev_name).new_reading(cnt)
