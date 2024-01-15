@@ -40,6 +40,7 @@ def _combine_collections_by_device_names(
     res = ma.array(res, fill_value=0, mask=True)
 
     # now fill data at appropriate place
+    # todo: handle that x and y plane can be enabled separately
     for cnt, data_collection in enumerate(collections):
         for name, bpm_data in data_collection.items():
             idx = dev_names_index.get_loc(name)
@@ -59,11 +60,10 @@ def collection_to_bpm_data_collection(
     for _, reading in collection.items():
         break
     return BPMDataCollection(
-        x=BPMDataCollectionPlane(values=ma[:, 0]),
-        y=BPMDataCollectionPlane(values=ma[:, 1]),
+        x=BPMDataCollectionPlane(values=ma[:, 0], valid=~ma.mask[:,0]),
+        y=BPMDataCollectionPlane(values=ma[:, 1], valid=~ma.mask[:,1]),
         names=dev_names_index.values,
         # assuming to be the same for both planes
-        active=ma.mask[:, 0],
         cnt=reading.cnt,
     )
 

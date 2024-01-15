@@ -12,6 +12,16 @@ import pydev
 logger = logging.getLogger("bpm-data-combiner")
 
 
+def test_main_dev_monitor():
+    for dev_name in dev_names:
+        update(dev_name=dev_name, enabled=False, plane="x")
+        update(dev_name=dev_name, enabled=False, plane="y")
+
+    for dev_name in dev_names:
+        update(dev_name=dev_name, enabled=True, plane="x")
+        update(dev_name=dev_name, enabled=True, plane="y")
+
+
 def test_main_behaved():
     """test that data stream is assembled to combined data"""
 

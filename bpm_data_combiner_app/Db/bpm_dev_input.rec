@@ -198,7 +198,7 @@ record(bo, "$(PREFIX)$(DEV_NAME):active")
     field(TPRO, 1)
 }
 
-record(bo, "$(PREFIX)$(DEV_NAME):enabled")
+record(bo, "$(PREFIX)$(DEV_NAME):enabled:x")
 {
     field(DTYP, "pydev")
     field(ZNAM, "inactive")
@@ -206,5 +206,16 @@ record(bo, "$(PREFIX)$(DEV_NAME):enabled")
     field(VAL, 1)
     field(PINI, "YES")
     field(TPRO, 1)
-    field(OUT, "@update(dev_name='$(DEV_NAME)', enabled=%VAL%)")
+    field(OUT, "@update(dev_name='$(DEV_NAME)', enabled=%VAL%, plane='x')")
+}
+
+record(bo, "$(PREFIX)$(DEV_NAME):enabled:y")
+{
+    field(DTYP, "pydev")
+    field(ZNAM, "inactive")
+    field(ONAM, "active")
+    field(VAL, 1)
+    field(PINI, "YES")
+    field(TPRO, 1)
+    field(OUT, "@update(dev_name='$(DEV_NAME)', enabled=%VAL%, plane='y')")
 }

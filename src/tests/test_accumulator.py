@@ -100,8 +100,12 @@ def test_accumulator_devices_always_missing():
         acc.add(d)
 
     r = acc.get()
-    assert len(r.active) == len(dev_names)
-    assert np.sum(r.active) == len(names)
+
+    assert len(r.x.valid) == len(dev_names)
+    assert len(r.y.valid) == len(dev_names)
+
+    assert np.sum(r.x.valid) == len(names)
+    assert np.sum(r.y.valid) == len(names)
 
     assert (np.isinf(r.x.weights) == ~selection).all()
     assert (np.isinf(r.x.weights) == ~selection).all()
