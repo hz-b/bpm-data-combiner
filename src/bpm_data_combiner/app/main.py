@@ -40,6 +40,9 @@ monitor_devices = MonitorDevices([MonitoredDevice(name) for name in dev_names])
 #       device names every time a new reading collections is created
 col = Collector(name="data_collector", devices_names=dev_names)
 dispatcher_collection.subscribe(col.new_reading)
+
+
+# fmt:off
 def update_device_names(device_names):
     """
 
@@ -48,9 +51,15 @@ def update_device_names(device_names):
     """
     col.device_names = device_names
 monitor_devices.on_status_change.add_subscriber(update_device_names)
-# Off beat treats each plane as separate device
-offbeat_delay = OffBeatDelay(name="offbeat_delay_collector", device_names=list(itertools.chain(*[(name + ":x", name + ":y") for name in _dev_names])))
+# fmt:on
 
+# Off beat treats each plane as separate device
+offbeat_delay = OffBeatDelay(
+    name="offbeat_delay_collector",
+    device_names=list(
+        itertools.chain(*[(name + ":x", name + ":y") for name in _dev_names])
+    ),
+)
 
 
 #: accumulate data above threshold
@@ -69,6 +78,7 @@ def cb(collection):
     viewer.ready_data.update(data)
 col.on_ready.add_subscriber(cb)
 # fmt:on
+
 
 def process_cnt(*, dev_name, cnt):
     return dispatcher_collection.get_dispatcher(dev_name).new_reading(cnt)
@@ -92,8 +102,8 @@ def process_active(*, dev_name, active):
     return monitor_devices.set_active(dev_name, active)
 
 
-def process_enabled(*, dev_name, enabled):
-    return monitor_devices.set_enabled(dev_name, enabled)
+def process_enabled(*, dev_name, enabled, plane):
+    return monitor_devices.set_enabled(dev_name, enabled, plane)
 
 
 def process_offbeat(*, dev_name, metronom, type):
@@ -126,6 +136,7 @@ cmds = dict(
     # to wait for all data
     metronom=process_offbeat,
 )
+
 
 class UpdateContext:
     def __init__(self, *, cmd, method, dev_name, kwargs):
