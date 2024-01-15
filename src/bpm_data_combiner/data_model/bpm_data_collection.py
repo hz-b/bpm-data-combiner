@@ -35,5 +35,4 @@ class BPMDataCollectionStatsPlane:
 class BPMDataCollectionStats:
     x: BPMDataCollectionStatsPlane
     y: BPMDataCollectionStatsPlane
-    active : Sequence[bool]
     names : Sequence[str]

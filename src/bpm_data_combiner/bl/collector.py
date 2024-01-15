@@ -60,11 +60,10 @@ def collection_to_bpm_data_collection(
     for _, reading in collection.items():
         break
     return BPMDataCollection(
-        x=BPMDataCollectionPlane(values=ma[:, 0]),
-        y=BPMDataCollectionPlane(values=ma[:, 1]),
+        x=BPMDataCollectionPlane(values=ma[:, 0], valid=~ma.mask[:,0]),
+        y=BPMDataCollectionPlane(values=ma[:, 1], valid=~ma.mask[:,1]),
         names=dev_names_index.values,
         # assuming to be the same for both planes
-        active=ma.mask[:, 0],
         cnt=reading.cnt,
     )
 

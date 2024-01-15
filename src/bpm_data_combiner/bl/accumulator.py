@@ -69,10 +69,8 @@ class Accumulator:
 
         xm, xw = compute_mean_weight(tmp[..., 0])
         ym, yw = compute_mean_weight(tmp[..., 1])
-        active = ~(xm.mask & ym.mask)
         return BPMDataCollectionStats(
-            x=BPMDataCollectionStatsPlane(values=xm, weights=xw),
-            y=BPMDataCollectionStatsPlane(values=ym, weights=yw),
+            x=BPMDataCollectionStatsPlane(values=xm, weights=xw, valid=~xm.mask),
+            y=BPMDataCollectionStatsPlane(values=ym, weights=yw, valid=~ym.mask),
             names=self.dev_names_index.values,
-            active=active,
         )
