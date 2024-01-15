@@ -74,7 +74,7 @@ record(fanout, "$(PREFIX)$(DEV_NAME):im:psh")
     field(LNK1, "$(PREFIX)$(DEV_NAME):im:x")
     field(LNK2, "$(PREFIX)$(DEV_NAME):im:y")
     field(LNK3, "$(PREFIX)$(DEV_NAME):im:ctl")
-    field(LNK3, "$(PREFIX)$(DEV_NAME):im:monitor")
+    field(LNK4, "$(PREFIX)$(DEV_NAME):im:monitor")
 }
 
 record(longout, "$(PREFIX)$(DEV_NAME):im:x")
@@ -187,9 +187,9 @@ record(bo, "$(PREFIX)$(DEV_NAME):active")
 {
     field(DESC, "motr stat: active -> py")
     field(DTYP, "pydev")
-    field(ZNAM, "not responding")
-    field(ONAM, "active")
-    # assume not responding by default
+    field(ZNAM, "not sending")
+    field(ONAM, "sending")
+    # assume not sending by default
     field(VAL, 0)
     field(PINI, "YES")
     field(DOL, "$(PREFIX)$(DEV_NAME):im:active")
@@ -201,7 +201,7 @@ record(bo, "$(PREFIX)$(DEV_NAME):active")
 record(bo, "$(PREFIX)$(DEV_NAME):enabled")
 {
     field(DTYP, "pydev")
-    field(ZNAM, "not responding")
+    field(ZNAM, "inactive")
     field(ONAM, "active")
     field(VAL, 1)
     field(PINI, "YES")

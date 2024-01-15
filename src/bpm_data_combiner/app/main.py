@@ -127,7 +127,7 @@ cmds = dict(
     metronom=process_offbeat,
 )
 
-class UpdateContex:
+class UpdateContext:
     def __init__(self, *, cmd, method, dev_name, kwargs):
         self.cmd = cmd
         self.method = method
@@ -158,5 +158,5 @@ def update(*, dev_name, **kwargs):
     # that code says it
     cmd = next(iter(kwargs))
     method = cmds[cmd]
-    with UpdateContex(cmd=cmd, method=method, dev_name=dev_name, kwargs=kwargs):
+    with UpdateContext(cmd=cmd, method=method, dev_name=dev_name, kwargs=kwargs):
         method(dev_name=dev_name, **kwargs)
