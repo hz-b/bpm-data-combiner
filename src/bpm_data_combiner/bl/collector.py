@@ -145,7 +145,7 @@ class Collector:
 
     def __init__(self, *, name: str, devices_names: Sequence[str], threshold : float = None, max_collections: int = 50):
         self.name = name
-        self.device_names = devices_names
+        self._device_names = devices_names
         self.on_new_collection = Event(name="on_new_collection")
         self.on_above_threshold = Event(name="reading_collection_on_threshold")
         self.on_ready = Event(name="reading_collection_on_ready")
@@ -171,3 +171,11 @@ class Collector:
             self.on_ready.trigger(rc.data())
         if rc.above_threshold:
             self.on_above_threshold.trigger(rc.data())
+
+    @property
+    def device_names(self):
+        return self._device_names
+
+    @device_names.setter
+    def device_names(self, device_names: Sequence[str]):
+        self._device_names = device_names
