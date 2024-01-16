@@ -5,11 +5,13 @@ import traceback
 
 from ..data_model.monitored_device import MonitoredDevice
 from ..bl.accumulator import Accumulator
-from ..bl.dispatcher import DispatcherCollection
 from ..bl.collector import Collector, collection_to_bpm_data_collection
+from ..bl.dispatcher import DispatcherCollection
 from ..bl.monitor_devices import MonitorDevices
 from ..bl.offbeat import OffBeatDelay
+from ..bl.preprocessor import PreProcessor
 from .viewer import Viewer
+
 from pandas import Index
 
 from ..data_model.timestamp import DataArrived
@@ -35,11 +37,13 @@ dev_names = Index(_dev_names)
 #       I think  I would do it for the part of describing
 #       interaction of collection further down
 dispatcher_collection = DispatcherCollection()
-monitor_devices = MonitorDevices([MonitoredDevice(name) for name in dev_names])
+devices_status=[MonitoredDevice(name) for name in dev_names]
+monitor_devices = MonitorDevices(devices_status=devices_status)
 # ToDo: Collector should get / retrieve an updated set of valid
 #       device names every time a new reading collections is created
+preprocessor = PreProcessor(devices_status=devices_status)
 col = Collector(name="data_collector", devices_names=dev_names)
-dispatcher_collection.subscribe(col.new_reading)
+dispatcher_collection.subscribe(lambda reading: col.new_reading(preprocessor.preprocess(reading)))
 
 
 # fmt:off

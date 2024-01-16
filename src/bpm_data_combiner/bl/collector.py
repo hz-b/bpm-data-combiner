@@ -19,6 +19,7 @@ import numpy.ma as ma
 from pandas import Index
 
 from ..data_model.collection_item import CollectionItem
+from ..data_model.monitored_device import MonitoredDevice
 from ..errors import DoubleSubmissionError, UnknownDeviceNameError
 from .event import Event
 from ..data_model.bpm_data_reading import BPMReading
@@ -29,30 +30,35 @@ logger = logging.getLogger("bpm-data-combiner")
 
 
 def _combine_collections_by_device_names(
-    collections: Sequence[Dict[str, BPMReading]], dev_names_index: Index
+    collections: Sequence[Dict[str, BPMReading]], dev_names_index: Index, fill_value=-2**63
 ) -> ma.masked_array:
     """use the name to stuff data into correct location
 
     Todo:
-        Should it return a masked array
+        Should it return a masked array? Is there a better
+        representation?
     """
     res = np.zeros([len(collections), len(dev_names_index), 2], dtype=np.int64)
-    res = ma.array(res, fill_value=0, mask=True)
+    res = ma.array(res, fill_value=fill_value, mask=True)
 
     # now fill data at appropriate place
     # todo: handle that x and y plane can be enabled separately
-    for cnt, data_collection in enumerate(collections):
+    for row, data_collection in enumerate(collections):
         for name, bpm_data in data_collection.items():
-            idx = dev_names_index.get_loc(name)
-            res.mask[cnt, idx, :] = False
-            res[cnt, idx, 0] = bpm_data.x
-            res[cnt, idx, 1] = bpm_data.y
+            col = dev_names_index.get_loc(name)
+            res.mask[row, col, :] = False
+            for plane, val in enumerate([bpm_data.x, bpm_data.y]):
+                if val is None:
+                    res[row, col, plane].mask = True
+                else:
+                    res[row, col, plane] = val
+
     return res
 
 
 def collection_to_bpm_data_collection(
     collection: Dict[str, BPMReading], dev_names_index: Index
-):
+) -> BPMDataCollection:
     ma = _combine_collections_by_device_names([collection], dev_names_index)
     # only one collection -> first dimension one entry
     (ma,) = ma
@@ -74,7 +80,7 @@ class ReadingsCollection:
     use :meth:`ready` to see if sufficient data is here
     """
 
-    def __init__(self, *, name: str, device_names: Sequence, threshold: int = None):
+    def __init__(self, *, name: str, device_names: Sequence[str], threshold: int = None):
         self.name = name
         self.collection = dict()
         self.device_names = set(device_names)
@@ -88,15 +94,20 @@ class ReadingsCollection:
         self._is_active = True
 
     def add_reading(self, val: BPMReading):
+        """
+
+        Todo: should disabled data be discarded?
+        """
         dev_name = val.dev_name
         # data from known / expected device
         if dev_name not in self.device_names:
             logger.warning("Collector %s: expecting following device names %s",
-                          self.name, self.device_names)
+                           self.name, list(self.device_names))
             raise UnknownDeviceNameError(f"Unknown device {dev_name}")
         # not one device sending twice
         if dev_name in self.collection:
             raise DoubleSubmissionError(f"{dev_name=} already in collection")
+
         # data expected
         assert self.active
         self.collection[dev_name] = val

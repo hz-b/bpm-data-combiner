@@ -16,4 +16,4 @@ identifier.
 *Code reuse*: at current stage only the dispatcher depends on
 :class:`BPMReading`
 """
-__all__ = ["accumulator", "collector", "dispatcher", "event", "monitor_devices"]
+__all__ = ["accumulator", "collector", "dispatcher", "preprocessor", "event", "monitor_devices", "statistics"]

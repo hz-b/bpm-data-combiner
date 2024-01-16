@@ -28,7 +28,7 @@ class MonitorDevices:
         self.devices_status = {dev.name: dev for dev in devices_status}
         self.on_status_change = Event(name="monitor_devices_on_status_change")
 
-    def get_devicenames(self):
+    def get_devicenames(self) -> Sequence[str]:
         devs = [
             ds.name for _, ds in self.devices_status.items() if ds.active and ds.enabled
         ]

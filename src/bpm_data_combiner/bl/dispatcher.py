@@ -28,7 +28,7 @@ class Dispatcher:
 
     def new_reading(self, cnt):
         assert self.reading is None
-        self.reading = BPMReadingBeingProcessed(cnt=cnt)
+        self.reading = BPMReadingBeingProcessed(cnt=cnt, dev_name=self.dev_name)
 
     def update_x_val(self, x_val):
         assert self.reading is not None
@@ -44,13 +44,7 @@ class Dispatcher:
             find a better name?
         """
         assert self.reading.ready(chk)
-        r = BPMReading(
-            cnt=self.reading.cnt,
-            x=self.reading.x,
-            y=self.reading.y,
-            dev_name=self.dev_name,
-        )
-        self.reading = None
+        r, self.reading = self.reading, None
         self.on_ready.trigger(r)
 
     def update(self, **kwargs):

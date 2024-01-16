@@ -1,33 +1,17 @@
 """Accumulate collected readings: to provide mean data
 """
 from typing import Sequence, Dict
+
 import numpy as np
 import numpy.ma as ma
 
 # could be also based on a list, index does more internal checks
 # that's why it is used here
 from pandas import Index
+
+from ..data_model.bpm_data_accumulation import BPMDataAccumulation, BPMDataAccumulationForPlane
 from ..data_model.bpm_data_reading import BPMReading
-from ..data_model.bpm_data_collection import (
-    BPMDataCollectionStats,
-    BPMDataCollectionStatsPlane,
-)
 from .collector import _combine_collections_by_device_names
-
-#  collections, #,
-#  dev_names_index# : Index
-
-
-def compute_mean_weight(values: ma.masked_array) -> (ma.masked_array, ma.masked_array):
-    """compute mean and weighted std of first axis,
-
-    Weights are the standard deviation times the number of readings found
-    """
-    n, _ = values.shape
-    mean = values.mean(axis=0)
-    n_readings = np.sum(~values.mask, axis=0)
-    weights = np.where(n_readings, n_readings / n * values.std(axis=0), np.inf)
-    return mean, weights
 
 
 class Accumulator:
@@ -52,7 +36,7 @@ class Accumulator:
         collections, self.collections = self.collections, list()
         return collections
 
-    def get(self, swap=True) -> BPMDataCollectionStats:
+    def get(self, swap=True) -> BPMDataAccumulation:
         """
 
         Warning:
@@ -66,11 +50,18 @@ class Accumulator:
             collections = self.collections
 
         tmp = _combine_collections_by_device_names(collections, self.dev_names_index)
+        counts = np.zeros(len(collections), dtype=np.int64)
+        for row, data_collection in enumerate(collections):
+            for _, bpm_data in data_collection.items():
+                counts[row] = bpm_data.cnt
+                break
 
-        xm, xw = compute_mean_weight(tmp[..., 0])
-        ym, yw = compute_mean_weight(tmp[..., 1])
-        return BPMDataCollectionStats(
-            x=BPMDataCollectionStatsPlane(values=xm, weights=xw, valid=~xm.mask),
-            y=BPMDataCollectionStatsPlane(values=ym, weights=yw, valid=~ym.mask),
-            names=self.dev_names_index.values,
+        x, y = tmp[..., 0], tmp[..., 1]
+
+
+        return BPMDataAccumulation(
+            x=BPMDataAccumulationForPlane(values=x.data, valid=~x.mask),
+            y=BPMDataAccumulationForPlane(values=y.data, valid=~y.mask),
+            names=self.dev_names_index.to_numpy(),
+            counts=counts
         )
