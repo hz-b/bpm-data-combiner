@@ -43,7 +43,11 @@ class Dispatcher:
         Todo:
             find a better name?
         """
-        assert self.reading.ready(chk)
+        if not self.reading.ready(chk):
+            # dispose it and go further
+            r, self.reading = self.reading, None
+            raise AssertionError(f"Reading {r} not ready")
+
         r = BPMReading(
             cnt=self.reading.cnt,
             x=self.reading.x,

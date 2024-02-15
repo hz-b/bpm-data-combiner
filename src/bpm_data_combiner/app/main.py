@@ -11,7 +11,6 @@ from ..bl.monitor_devices import MonitorDevices
 from ..bl.offbeat import OffBeatDelay
 from .viewer import Viewer
 
-
 import numpy as np
 from pandas import Index
 
@@ -165,9 +164,14 @@ class UpdateContext:
         if exc_type is None:
             return
         logger.error(
+            f"Could not process command {self.cmd:6s} dev name  {self.dev_name} kwargs {self.kwargs20s}: {exc_type}"
+        )
+        return
+        logger.error(
             f"Could not process command {self.cmd=}:"
             f"{self.method=} {self.dev_name=} {self.kwargs=}: {exc_type}({exc_val})"
         )
+
         marker = "-" * 78
         tb_buf = io.StringIO()
         traceback.print_tb(exc_tb, file=tb_buf)
