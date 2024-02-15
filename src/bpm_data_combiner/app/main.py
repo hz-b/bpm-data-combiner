@@ -10,6 +10,9 @@ from ..bl.collector import Collector, collection_to_bpm_data_collection
 from ..bl.monitor_devices import MonitorDevices
 from ..bl.offbeat import OffBeatDelay
 from .viewer import Viewer
+
+
+import numpy as np
 from pandas import Index
 
 from ..data_model.timestamp import DataArrived
@@ -18,7 +21,15 @@ logger = logging.getLogger("bpm-data-combiner")
 
 #: Todo where to get the device names from
 _dev_names = [
-    "BPMZ5D8R"
+    "BPMZ5D8R",
+    "BPMZ6D8R",
+    "BPMZ7D8R",
+
+    "BPMZ1T8R",
+    "BPMZ2T8R",
+    "BPMZ3T8R",
+    "BPMZ4T8R",
+
 ]
 
 # _dev_names = list(itertools.chain(*itertools.chain(*itertools.chain(*dev_names))))
@@ -61,7 +72,7 @@ acc_abv_th = Accumulator(dev_names)
 col.on_above_threshold.add_subscriber(acc_abv_th.add)
 #: accumulate data only using items that a ready
 acc_ready = Accumulator(dev_names)
-# col.on_ready.add_subscriber(acc_ready.add)
+col.on_ready.add_subscriber(acc_ready.add)
 
 # fmt:off
 viewer = Viewer(prefix="Pierre:COM")
@@ -72,6 +83,11 @@ def cb(collection):
     viewer.ready_data.update(data)
 col.on_ready.add_subscriber(cb)
 # fmt:on
+def cb(names):
+    logger.debug("Monitoring devics, active ones: %s", names)
+    viewer.monitor_bpms.update(names, np.ones(len(names), bool))
+
+monitor_devices.on_status_change.add_subscriber(cb)
 
 
 def process_cnt(*, dev_name, cnt):
@@ -140,6 +156,9 @@ class UpdateContext:
         self.kwargs = kwargs
 
     def __enter__(self):
+        logger.debug(
+            "Processing method=%s, dev_name=%s, kwargs = %s", self.method, self.dev_name, self.kwargs
+        )
         pass
 
     def __exit__(self, exc_type, exc_val, exc_tb):

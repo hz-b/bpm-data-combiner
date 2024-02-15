@@ -1,6 +1,28 @@
 from ..data_model.bpm_data_collection import BPMDataCollection, BPMDataCollectionStats
 import pydev
 
+import logging
+from typing import Sequence
+
+logger = logging.getLogger("bpm-data-combiner")
+
+
+
+class ViewBPMMonitoring:
+    def __init__(self, prefix: str):
+        self.prefix = prefix
+
+    def update(self, names : Sequence[str], active: Sequence[bool]):
+        names = [bytes(name, "utf8") for name in names]
+        active = [bool(v) for v in active]
+        label = self.prefix + ":" + "names"
+        logger.warning("Update active view label %s, values %s", label, names)
+        pydev.iointr(label, names)
+        label = self.prefix + ":" + "active"
+        logger.warning("Update active view label %s, values %s", label, active)
+        pydev.iointr(label, active)
+
+
 class ViewBPMDataCollection:
     def __init__(self, prefix: str):
         self.prefix = prefix
@@ -30,3 +52,4 @@ class Viewer:
     def __init__(self, prefix: str):
         self.ready_data = ViewBPMDataCollection(prefix + ":ready")
         self.periodic_data = ViewBPMDataCollectionStats(prefix + ":periodic")
+        self.monitor_bpms = ViewBPMMonitoring(prefix + ":mon")

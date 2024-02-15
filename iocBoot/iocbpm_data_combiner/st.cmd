@@ -19,6 +19,7 @@ bpm_data_combiner_registerRecordDeviceDriver pdbbase
 dbLoadTemplate("db/bpm_dev_input.db", "PREFIX=$(PREFIX)")
 dbLoadRecords("db/bpm_dev_input_offbeat.db", "PREFIX=$(PREFIX)")
 dbLoadTemplate("db/bpm.db", "PREFIX=$(PREFIX)")
+dbLoadRecords("db/bpm_monitor_overview.db", "PREFIX=$(PREFIX),VIEW=mon")
 dbLoadRecords "db/bpm_data_combinerVersion.db", "user=mfp"
 
 pydev("from bpm_data_combiner.app.main import update")
