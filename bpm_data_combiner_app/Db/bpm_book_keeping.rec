@@ -3,7 +3,6 @@
 record(waveform, "$(PREFIX)$(VIEW):active")
 {
     field(DESC, "BPM active")
-    field(EGU, "nm")
     field(DTYP, "pydev")
     field(FTVL, "CHAR")
     field(SCAN, "I/O Intr")
