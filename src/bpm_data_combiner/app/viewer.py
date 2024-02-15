@@ -16,10 +16,12 @@ class ViewBPMMonitoring:
         names = [bytes(name, "utf8") for name in names]
         active = [bool(v) for v in active]
         label = self.prefix + ":" + "names"
-        logger.warning("Update active view label %s, values %s", label, names)
+        logger.debug("Update active view label %s, values %s", label, names)
         pydev.iointr(label, names)
+
+        # int number wrong by a factor of 2: why?
         label = self.prefix + ":" + "active"
-        logger.warning("Update active view label %s, values %s", label, active)
+        logger.debug("Update active view label %s, values %s", label, active)
         pydev.iointr(label, active)
 
 
