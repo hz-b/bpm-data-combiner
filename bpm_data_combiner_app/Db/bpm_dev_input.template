@@ -2,4 +2,12 @@ file "db/bpm_dev_input.rec"
 {
 	pattern { DEV_NAME  }
 	        { BPMZ5D8R  }
+	        { BPMZ6D8R  }
+	        { BPMZ6D8R  }
+		
+	        { BPMZ1T8R  }
+	        { BPMZ2T8R  }
+	        { BPMZ3T8R  }
+	        { BPMZ4T8R  }
+
 }

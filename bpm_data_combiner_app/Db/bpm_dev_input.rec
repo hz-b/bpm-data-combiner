@@ -10,7 +10,7 @@ record(longin, "$(PREFIX)$(DEV_NAME):x")
     field(EGU, "nm")
     field(INP, {pva:{
         pv:"$(DEV_NAME):pos",
-        field:"x",
+        field:"X",
         proc:true,
         }}
     )
@@ -26,7 +26,7 @@ record(longin, "$(PREFIX)$(DEV_NAME):y")
     field(EGU, "nm")
     field(INP, {pva:{
         pv:"$(DEV_NAME):pos",
-        field:"y",
+        field:"Y",
         proc:true,
         }}
     )
@@ -41,7 +41,7 @@ record(longin, "$(PREFIX)$(DEV_NAME):cnt")
     field(DESC, "mirror: (time) cnt")
     field(INP, {pva:{
         pv:"$(DEV_NAME):pos",
-        field:"cnt",
+        field:"lmt_l",
         proc:true
         }}
     )
@@ -86,7 +86,7 @@ record(longout, "$(PREFIX)$(DEV_NAME):im:x")
     field(OUT, "@update(dev_name='$(DEV_NAME)', x=%VAL%)")
     field(VAL, -1)
     # field(PINI, "YES")
-    field(TPRO, 1)
+    # field(TPRO, 1)
 }
 
 record(longout, "$(PREFIX)$(DEV_NAME):im:y")
@@ -98,7 +98,7 @@ record(longout, "$(PREFIX)$(DEV_NAME):im:y")
     field(OUT, "@update(dev_name='$(DEV_NAME)', y=%VAL%)")
     field(VAL, -1)
     # field(PINI, "YES")
-    field(TPRO, 1)
+    # field(TPRO, 1)
 }
 
 record(longout, "$(PREFIX)$(DEV_NAME):im:cnt")
@@ -110,7 +110,7 @@ record(longout, "$(PREFIX)$(DEV_NAME):im:cnt")
     field(OUT, "@update(dev_name='$(DEV_NAME)', cnt=%VAL%)")
     field(VAL, -1)
     # field(PINI, "YES")
-    field(TPRO, 1)
+    # field(TPRO, 1)
 }
 
 
@@ -124,7 +124,7 @@ record(longout, "$(PREFIX)$(DEV_NAME):im:ctl")
     field(OUT, "@update(dev_name='$(DEV_NAME)', ctl=%VAL%)")
     field(VAL, -1)
     # field(PINI, "YES")
-   field(TPRO, 1)
+    # field(TPRO, 1)
 }
 
 # This is forwarded to python solely to be able to check that the
@@ -198,24 +198,42 @@ record(bo, "$(PREFIX)$(DEV_NAME):active")
     field(TPRO, 1)
 }
 
+# pydevice does not yet honor VAL at default
+# need to get malte's patch into main
 record(bo, "$(PREFIX)$(DEV_NAME):enabled:x")
 {
-    field(DTYP, "pydev")
     field(ZNAM, "inactive")
     field(ONAM, "active")
     field(VAL, 1)
     field(PINI, "YES")
     field(TPRO, 1)
-    field(OUT, "@update(dev_name='$(DEV_NAME)', enabled=%VAL%, plane='x')")
+    field(OUT, "$(PREFIX)$(DEV_NAME):enabled:im:x PP")
 }
 
 record(bo, "$(PREFIX)$(DEV_NAME):enabled:y")
 {
-    field(DTYP, "pydev")
     field(ZNAM, "inactive")
     field(ONAM, "active")
     field(VAL, 1)
     field(PINI, "YES")
+    field(TPRO, 1)
+    field(OUT, "$(PREFIX)$(DEV_NAME):enabled:im:y PP")
+}
+
+record(bo, "$(PREFIX)$(DEV_NAME):enabled:im:x")
+{
+    field(DTYP, "pydev")
+    field(ZNAM, "inactive")
+    field(ONAM, "active")
+    field(TPRO, 1)
+    field(OUT, "@update(dev_name='$(DEV_NAME)', enabled=%VAL%, plane='x')")
+}
+
+record(bo, "$(PREFIX)$(DEV_NAME):enabled:im:y")
+{
+    field(DTYP, "pydev")
+    field(ZNAM, "inactive")
+    field(ONAM, "active")
     field(TPRO, 1)
     field(OUT, "@update(dev_name='$(DEV_NAME)', enabled=%VAL%, plane='y')")
 }
