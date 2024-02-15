@@ -6,10 +6,10 @@
 # so one can check what the IOC uses
 record(longin, "$(PREFIX)$(DEV_NAME):x")
 {
-    field(DESC, "mirror: x value $(REMOTE)")
+    field(DESC, "mirror: $(DEV_NAME) x value")
     field(EGU, "nm")
     field(INP, {pva:{
-        pv:"$(REMOTE)$(DEV_NAME)",
+        pv:"$(DEV_NAME):pos",
         field:"x",
         proc:true,
         }}
@@ -25,7 +25,7 @@ record(longin, "$(PREFIX)$(DEV_NAME):y")
     field(DESC, "mirror: y value")
     field(EGU, "nm")
     field(INP, {pva:{
-        pv:"$(REMOTE)$(DEV_NAME)",
+        pv:"$(DEV_NAME):pos",
         field:"y",
         proc:true,
         }}
@@ -40,7 +40,7 @@ record(longin, "$(PREFIX)$(DEV_NAME):cnt")
 {
     field(DESC, "mirror: (time) cnt")
     field(INP, {pva:{
-        pv:"$(REMOTE)$(DEV_NAME)",
+        pv:"$(DEV_NAME):pos",
         field:"cnt",
         proc:true
         }}
@@ -53,7 +53,7 @@ record(stringin, "$(PREFIX)$(DEV_NAME):name")
 {
     field(DESC, "mirror: name")
     field(INP, {pva:{
-        pv:"$(REMOTE)$(DEV_NAME)",
+        pv:"$(DEV_NAME):pos",
         field:"cfg.name",
         proc:true,
         }}
