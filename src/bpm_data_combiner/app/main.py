@@ -17,19 +17,13 @@ from ..data_model.timestamp import DataArrived
 logger = logging.getLogger("bpm-data-combiner")
 
 #: Todo where to get the device names from
-dev_names = [
-    [
-        [
-            [f"BPM{cnt}Z{child}{sec_type}{sec}R" for cnt in range(1, 4 + 1)]
-            for child in range(1, 4 + 1)
-        ]
-        for sec_type in ("D", "T")
-    ]
-    for sec in range(1, 8 + 1)
+_dev_names = [
+    "BPMZ5D8R"
 ]
 
-_dev_names = list(itertools.chain(*itertools.chain(*itertools.chain(*dev_names))))
+# _dev_names = list(itertools.chain(*itertools.chain(*itertools.chain(*dev_names))))
 dev_names = Index(_dev_names)
+print(f"Known devices {dev_names=}")
 # Now connect all the different objects together
 # ToDo: would a proper message bus simplify the code
 #       I think  I would do it for the part of describing
@@ -47,7 +41,7 @@ def update_device_names(device_names):
     """
 
     Todo:
-        Do I need to mangle the names for a real device
+=        Do I need to mangle the names for a real device
     """
     col.device_names = device_names
 monitor_devices.on_status_change.add_subscriber(update_device_names)
