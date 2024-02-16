@@ -1,1 +1,1 @@
-__all__ = ["viewer", "main"]
+__all__ = ["view.py", "main"]

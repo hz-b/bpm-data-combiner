@@ -14,7 +14,7 @@ from ..bl.dispatcher import DispatcherCollection
 from ..bl.collector import Collector, collection_to_bpm_data_collection
 from ..bl.monitor_devices import MonitorDevices
 from ..bl.offbeat import OffBeatDelay
-from .viewer import Viewer
+from .view import Views
 
 import numpy as np
 from pandas import Index
@@ -79,7 +79,7 @@ acc_ready = Accumulator(dev_names)
 
 
 # fmt:off
-viewer = Viewer(prefix="Pierre:COM")
+viewer = Views(prefix="Pierre:COM")
 def cb(collection):
     # Here we need to use dev_names and not the active ones
     # I guss there should be an exporter

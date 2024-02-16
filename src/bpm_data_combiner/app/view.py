@@ -76,7 +76,7 @@ class ViewBPMDataCollectionStats:
             pydev.iointr(label, var)
 
 
-class Viewer:
+class Views:
     def __init__(self, prefix: str):
         self.ready_data = ViewBPMDataCollection(prefix + ":out:100ms")
         self.periodic_data = ViewBPMDataCollectionStats(prefix + ":periodic")
