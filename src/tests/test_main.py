@@ -12,7 +12,7 @@ import pydev
 logger = logging.getLogger("bpm-data-combiner")
 
 
-def test_main_dev_monitor():
+def test10_main_dev_monitor():
     for dev_name in dev_names:
         update(dev_name=dev_name, enabled=False, plane="x")
         update(dev_name=dev_name, enabled=False, plane="y")
@@ -22,7 +22,7 @@ def test_main_dev_monitor():
         update(dev_name=dev_name, enabled=True, plane="y")
 
 
-def test_main_behaved():
+def test20_main_behaved():
     """test that data stream is assembled to combined data"""
 
     N = 3
@@ -38,7 +38,7 @@ def test_main_behaved():
         assert readings.is_ready()
 
 
-def test_main_interleaving():
+def test30_main_interleaving():
     """Test that data are combined if the data of the devices are interleaved"""
 
     cnt = 4
@@ -53,20 +53,7 @@ def test_main_interleaving():
     readings = col.get_collection(cnt)
     assert readings.is_ready()
 
-
-def test_reading_single_device_misbehaved():
-    """the first device sending second data set before first is finished"""
-    dev_name = dev_names[0]
-    cnt = 5
-    update(dev_name=dev_name, cnt=cnt)
-    update(dev_name=dev_name, x=-10 * cnt)
-    update(dev_name=dev_name, y=-100 * cnt)
-
-    with pytest.raises(AssertionError) as ae:
-        update(dev_name=dev_name, cnt=cnt + 1)
-
-
-def test_monitor_collector_interaction():
+def test40_monitor_collector_interaction():
     """Test that collector will give ready data if devices are makred a inacrtive
     """
 
@@ -99,7 +86,21 @@ def test_monitor_collector_interaction():
 
     # All data sent.. so the callback should have been
     # triggered a second time
-    assert chk == 1
+    assert chk == 2
+
+
+def test50_reading_single_device_misbehaved():
+    """the first device sending second data set before first is finished
+    """
+    dev_name = dev_names[0]
+    cnt = 5
+    update(dev_name=dev_name, cnt=cnt)
+    update(dev_name=dev_name, x=-10 * cnt)
+    update(dev_name=dev_name, y=-100 * cnt)
+
+    with pytest.raises(AssertionError) as ae:
+        update(dev_name=dev_name, cnt=cnt + 1)
+
 
 
 class ComputeDelay:

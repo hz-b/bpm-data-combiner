@@ -1,3 +1,8 @@
+"""
+
+Todo:
+   add a reset command
+"""
 import io
 import itertools
 import logging
@@ -49,9 +54,8 @@ dispatcher_collection.subscribe(col.new_reading)
 # fmt:off
 def update_device_names(device_names):
     """
-
     Todo:
-=        Do I need to mangle the names for a real device
+        Do I need to mangle the names for a real device
     """
     col.device_names = device_names
 monitor_devices.on_status_change.add_subscriber(update_device_names)
