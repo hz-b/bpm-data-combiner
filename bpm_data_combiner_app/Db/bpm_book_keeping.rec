@@ -1,6 +1,6 @@
 # BPM data collected
 
-record(waveform, "$(PREFIX)$(VIEW):active")
+record(waveform, "$(PREFIX):$(VIEW):active")
 {
     field(DESC, "BPM active")
     field(DTYP, "pydev")
@@ -15,7 +15,7 @@ record(waveform, "$(PREFIX)$(VIEW):active")
     })
 }
 
-record(waveform, "$(PREFIX)$(VIEW):names")
+record(waveform, "$(PREFIX):$(VIEW):names")
 {
     field(DESC, "names of bpms")
     field(EGU, "nm")
@@ -31,7 +31,7 @@ record(waveform, "$(PREFIX)$(VIEW):names")
     })
 }
 
-record(longin, "$(PREFIX)$(VIEW):cnt")
+record(longin, "$(PREFIX):$(VIEW):cnt")
 {
     field(DESC, "Data counter")
     field(DTYP, "pydev")

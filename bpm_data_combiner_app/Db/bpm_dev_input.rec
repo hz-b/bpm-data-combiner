@@ -4,7 +4,7 @@
 # Input of one record device ... collect them here
 # locally (again)
 # so one can check what the IOC uses
-record(longin, "$(PREFIX)$(DEV_NAME):x")
+record(longin, "$(PREFIX):inp:$(DEV_NAME):x")
 {
     field(DESC, "mirror: $(DEV_NAME) x value")
     field(EGU, "nm")
@@ -20,7 +20,7 @@ record(longin, "$(PREFIX)$(DEV_NAME):x")
     field(VAL, -100000000)
 }
 
-record(longin, "$(PREFIX)$(DEV_NAME):y")
+record(longin, "$(PREFIX):inp:$(DEV_NAME):y")
 {
     field(DESC, "mirror: y value")
     field(EGU, "nm")
@@ -36,7 +36,7 @@ record(longin, "$(PREFIX)$(DEV_NAME):y")
 
 # I assume that I can rely on cnt to be updated when ever
 # x or y are updated
-record(longin, "$(PREFIX)$(DEV_NAME):cnt")
+record(longin, "$(PREFIX):inp:$(DEV_NAME):cnt")
 {
     field(DESC, "mirror: (time) cnt")
     field(INP, {pva:{
@@ -45,11 +45,11 @@ record(longin, "$(PREFIX)$(DEV_NAME):cnt")
         proc:true
         }}
     )
-    field(FLNK, "$(PREFIX)$(DEV_NAME):im:psh")
+    field(FLNK, "$(PREFIX):im:$(DEV_NAME):psh")
     field(VAL, -1)
 }
 
-record(stringin, "$(PREFIX)$(DEV_NAME):name")
+record(stringin, "$(PREFIX):inp:$(DEV_NAME):name")
 {
     field(DESC, "mirror: name")
     field(INP, {pva:{
@@ -60,28 +60,28 @@ record(stringin, "$(PREFIX)$(DEV_NAME):name")
     )
     field(VAL, "unknown")
     field(PINI, "YES")
-    field(FLNK, "$(PREFIX)$(DEV_NAME):im:name")
+    field(FLNK, "$(PREFIX):im:$(DEV_NAME):name")
     field(VAL, "unknown")
     field(PINI, "YES")
 }
 
 # Now the records to push the info further to python
-record(fanout, "$(PREFIX)$(DEV_NAME):im:psh")
+record(fanout, "$(PREFIX):im:$(DEV_NAME):psh")
 {
     # should call to python ... python should start building the
     # internal data structure ... not a way yet to push directly
-    field(LNK0, "$(PREFIX)$(DEV_NAME):im:cnt")
-    field(LNK1, "$(PREFIX)$(DEV_NAME):im:x")
-    field(LNK2, "$(PREFIX)$(DEV_NAME):im:y")
-    field(LNK3, "$(PREFIX)$(DEV_NAME):im:ctl")
-    field(LNK4, "$(PREFIX)$(DEV_NAME):im:monitor")
+    field(LNK0, "$(PREFIX):im:$(DEV_NAME):cnt")
+    field(LNK1, "$(PREFIX):im:$(DEV_NAME):x")
+    field(LNK2, "$(PREFIX):im:$(DEV_NAME):y")
+    field(LNK3, "$(PREFIX):im:$(DEV_NAME):ctl")
+    field(LNK4, "$(PREFIX):im:$(DEV_NAME):mon:trg")
 }
 
-record(longout, "$(PREFIX)$(DEV_NAME):im:x")
+record(longout, "$(PREFIX):im:$(DEV_NAME):x")
 {
     field(DESC, "push to py: x")
     field(DTYP, "pydev")
-    field(DOL, "$(PREFIX)$(DEV_NAME):x")
+    field(DOL, "$(PREFIX):inp:$(DEV_NAME):x")
     field(OMSL, "closed_loop")
     field(OUT, "@update(dev_name='$(DEV_NAME)', x=%VAL%)")
     field(VAL, -1)
@@ -89,11 +89,11 @@ record(longout, "$(PREFIX)$(DEV_NAME):im:x")
     # field(TPRO, 1)
 }
 
-record(longout, "$(PREFIX)$(DEV_NAME):im:y")
+record(longout, "$(PREFIX):im:$(DEV_NAME):y")
 {
     field(DESC, "push to py: y")
     field(DTYP, "pydev")
-    field(DOL, "$(PREFIX)$(DEV_NAME):y")
+    field(DOL, "$(PREFIX):inp:$(DEV_NAME):y")
     field(OMSL, "closed_loop")
     field(OUT, "@update(dev_name='$(DEV_NAME)', y=%VAL%)")
     field(VAL, -1)
@@ -101,11 +101,11 @@ record(longout, "$(PREFIX)$(DEV_NAME):im:y")
     # field(TPRO, 1)
 }
 
-record(longout, "$(PREFIX)$(DEV_NAME):im:cnt")
+record(longout, "$(PREFIX):im:$(DEV_NAME):cnt")
 {
     field(DESC, "push to py: cnt")
     field(DTYP, "pydev")
-    field(DOL, "$(PREFIX)$(DEV_NAME):cnt")
+    field(DOL, "$(PREFIX):inp:$(DEV_NAME):cnt")
     field(OMSL, "closed_loop")
     field(OUT, "@update(dev_name='$(DEV_NAME)', cnt=%VAL%)")
     field(VAL, -1)
@@ -115,11 +115,11 @@ record(longout, "$(PREFIX)$(DEV_NAME):im:cnt")
 
 
 # informs python side: a new measurement hand over finished
-record(longout, "$(PREFIX)$(DEV_NAME):im:ctl")
+record(longout, "$(PREFIX):im:$(DEV_NAME):ctl")
 {
     field(DESC, "push to py: ctl")
     field(DTYP, "pydev")
-    field(DOL, "$(PREFIX)$(DEV_NAME):cnt")
+    field(DOL, "$(PREFIX):inp:$(DEV_NAME):cnt")
     field(OMSL, "closed_loop")
     field(OUT, "@update(dev_name='$(DEV_NAME)', ctl=%VAL%)")
     field(VAL, -1)
@@ -133,7 +133,7 @@ record(longout, "$(PREFIX)$(DEV_NAME):im:ctl")
 # It seems to be updated everytime  new beam position measurement
 # data arrive. Need to check how to avoid that this record is
 # updated.
-record(stringout, "$(PREFIX)$(DEV_NAME):im:name")
+record(stringout, "$(PREFIX):im:$(DEV_NAME):name")
 {
     field(DTYP, "pydev")
     field(DOL, "$(PREFIX)$(DEV_NAME):name")
@@ -148,42 +148,41 @@ record(stringout, "$(PREFIX)$(DEV_NAME):im:name")
 # Reason: cont down is easy to see when it expirces: credit Fritz Lang
 # if required: could be an upcount with an countdown implemented by
 # difference to threshold value
-record(longout, "$(PREFIX)$(DEV_NAME):im:monitor")
+record(longout, "$(PREFIX):im:$(DEV_NAME):mon:trg")
 {
     field(DESC, "start of count down")
     field(VAL, 20)
     # set to yes for debug purposes
     # field(PINI, "YES")
-    field(OUT, "$(PREFIX)$(DEV_NAME):im:cnt_dwn.VAL PP")
+    field(OUT, "$(PREFIX):im:$(DEV_NAME):mon:cnt_dwn.VAL PP")
     field(OMSL, "closed_loop")
-    # field(FLNK, "$(PREFIX)$(DEV_NAME):im:cnt_dwn")
 }
 
-record(calcout, "$(PREFIX)$(DEV_NAME):im:cnt_dwn")
+record(calcout, "$(PREFIX):im:$(DEV_NAME):mon:cnt_dwn")
 {
 
     field(DESC, "motr stat: counting down")
-    field(INPA, "$(PREFIX)$(DEV_NAME):im:monitor NPP")
+    field(INPA, "$(PREFIX):im:(DEV_NAME):mon:trg NPP")
     field(CALC, "(VAL > 0) ? (VAL - 1) : 0")
     field(SCAN, ".5 second")
     field(DOPT, "Use CALC")
-    field(FLNK, "$(PREFIX)$(DEV_NAME):im:active")
+    field(FLNK, "$(PREFIX):im:$(DEV_NAME):mon:is_act")
 }
 
-record(calcout, "$(PREFIX)$(DEV_NAME):im:active")
+record(calcout, "$(PREFIX):im:$(DEV_NAME):mon:is_act")
 {
     field(DESC, "motr stat: active?")
-    field(INPA, "$(PREFIX)$(DEV_NAME):im:cnt_dwn")
+    field(INPA, "$(PREFIX):im:$(DEV_NAME):mon:cnt_dwn")
     # to provoke a active change at first arrival
     # of data
     field(VAL, 0)
     field(CALC, "A > 0")
     field(OOPT, "On Change")
     field(DOPT, "Use CALC")
-    field(OUT, "$(PREFIX)$(DEV_NAME):active PP")
+    field(OUT, "$(PREFIX):im:$(DEV_NAME):mon:active PP")
 }
 
-record(bo, "$(PREFIX)$(DEV_NAME):active")
+record(bo, "$(PREFIX):im:$(DEV_NAME):mon:active")
 {
     field(DESC, "motr stat: active -> py")
     field(DTYP, "pydev")
@@ -192,7 +191,7 @@ record(bo, "$(PREFIX)$(DEV_NAME):active")
     # assume not sending by default
     field(VAL, 0)
     field(PINI, "YES")
-    field(DOL, "$(PREFIX)$(DEV_NAME):im:active")
+    # field(DOL, "$(PREFIX):im:$(DEV_NAME):mon:is_act")
     field(OMSL, "closed_loop")
     field(OUT, "@update(dev_name='$(DEV_NAME)', active=%VAL%)")
     field(TPRO, 1)
@@ -200,27 +199,27 @@ record(bo, "$(PREFIX)$(DEV_NAME):active")
 
 # pydevice does not yet honor VAL at default
 # need to get malte's patch into main
-record(bo, "$(PREFIX)$(DEV_NAME):enabled:x")
+record(bo, "$(PREFIX):$(DEV_NAME):enabled:x")
 {
     field(ZNAM, "inactive")
     field(ONAM, "active")
     field(VAL, 1)
     field(PINI, "YES")
     field(TPRO, 1)
-    field(OUT, "$(PREFIX)$(DEV_NAME):enabled:im:x PP")
+    field(OUT, "$(PREFIX):im:$(DEV_NAME):enabled:x PP")
 }
 
-record(bo, "$(PREFIX)$(DEV_NAME):enabled:y")
+record(bo, "$(PREFIX):$(DEV_NAME):enabled:y")
 {
     field(ZNAM, "inactive")
     field(ONAM, "active")
     field(VAL, 1)
     field(PINI, "YES")
     field(TPRO, 1)
-    field(OUT, "$(PREFIX)$(DEV_NAME):enabled:im:y PP")
+    field(OUT, "$(PREFIX):im:$(DEV_NAME):enabled:y PP")
 }
 
-record(bo, "$(PREFIX)$(DEV_NAME):enabled:im:x")
+record(bo, "$(PREFIX):im:$(DEV_NAME):enabled:x")
 {
     field(DTYP, "pydev")
     field(ZNAM, "inactive")
@@ -229,7 +228,7 @@ record(bo, "$(PREFIX)$(DEV_NAME):enabled:im:x")
     field(OUT, "@update(dev_name='$(DEV_NAME)', enabled=%VAL%, plane='x')")
 }
 
-record(bo, "$(PREFIX)$(DEV_NAME):enabled:im:y")
+record(bo, "$(PREFIX):im:$(DEV_NAME):enabled:y")
 {
     field(DTYP, "pydev")
     field(ZNAM, "inactive")

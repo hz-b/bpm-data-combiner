@@ -1,12 +1,12 @@
 # which bpm"s does the python side consider active
 
-record(waveform, "$(PREFIX)$(VIEW):active")
+record(waveform, "$(PREFIX):$(VIEW):active")
 {
     field(DESC, "BPM monitored as active")
     field(DTYP, "pydev")
     field(FTVL, "CHAR")
     field(SCAN, "I/O Intr")
-    field(INP,  "@pydev.iointr('$(PREFIX)$(VIEW):active')")
+    field(INP,  "@pydev.iointr('$(PREFIX):$(VIEW):active')")
     field(NELM, 128)
     info(Q:group, {
          "$(PREFIX)$(VIEW)": {
@@ -16,13 +16,13 @@ record(waveform, "$(PREFIX)$(VIEW):active")
     field(TPRO, 1)
 }
 
-record(waveform, "$(PREFIX)$(VIEW):names")
+record(waveform, "$(PREFIX):$(VIEW):names")
 {
     field(DESC, "BPM monitored names. ")
     field(DTYP, "pydev")
     field(FTVL, "STRING")
     field(SCAN, "I/O Intr")
-    field(INP,  "@pydev.iointr('$(PREFIX)$(VIEW):names')")
+    field(INP,  "@pydev.iointr('$(PREFIX):$(VIEW):names')")
     field(NELM, 128)
     info(Q:group, {
          "$(PREFIX)$(VIEW)": {

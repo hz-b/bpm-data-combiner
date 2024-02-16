@@ -1,11 +1,11 @@
-record(waveform, "$(PREFIX)$(VIEW):values")
+record(waveform, "$(PREFIX):$(VIEW):values")
 {
     field(DESC, "values of bpm")
     field(DTYP, "pydev")
     field(EGU, "nm")
     field(FTVL, "DOUBLE")
     field(SCAN, "I/O Intr")
-    field(INP,  "@pydev.iointr('$(PREFIX)$(VIEW):values')")
+    field(INP,  "@pydev.iointr('$(PREFIX):$(VIEW):values')")
     field(NELM, 128)
     # todo: how to make sure that it is a group of
     #       x or y
@@ -17,14 +17,14 @@ record(waveform, "$(PREFIX)$(VIEW):values")
     })
 }
 
-record(waveform, "$(PREFIX)$(VIEW):weights")
+record(waveform, "$(PREFIX):$(VIEW):weights")
 {
     field(DESC, "values of bpm (roughly std)")
     field(DTYP, "pydev")
     field(EGU, "nm")
     field(FTVL, "DOUBLE")
     field(SCAN, "I/O Intr")
-    field(INP,  "@pydev.iointr('$(PREFIX)$(VIEW):weights')")
+    field(INP,  "@pydev.iointr('$(PREFIX):$(VIEW):weights')")
     field(NELM, 128)
     info(Q:group, {
          "$(PREFIX)$(VIEW)": {

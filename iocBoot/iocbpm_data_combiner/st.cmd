@@ -7,7 +7,7 @@
 
 cd "${TOP}"
 
-epicsEnvSet("PREFIX","Pierre:COM:")
+epicsEnvSet("PREFIX","Pierre:COM")
 epicsEnvSet("REMOTE","Pierre:SIM:")
 epicsEnvSet("PYTHONPATH","$(TOP)/src")
 
@@ -17,10 +17,10 @@ bpm_data_combiner_registerRecordDeviceDriver pdbbase
 
 ## Load record instances
 dbLoadTemplate("db/bpm_dev_input.db", "PREFIX=$(PREFIX)")
-dbLoadRecords("db/bpm_dev_input_offbeat.db", "PREFIX=$(PREFIX)")
+# dbLoadRecords("db/bpm_dev_input_offbeat.db", "PREFIX=$(PREFIX)")
 dbLoadTemplate("db/bpm.db", "PREFIX=$(PREFIX)")
 dbLoadRecords("db/bpm_monitor_overview.db", "PREFIX=$(PREFIX),VIEW=mon")
-dbLoadRecords "db/bpm_data_combinerVersion.db", "user=mfp"
+dbLoadRecords "db/bpm_data_combinerVersion.db", "user=$(PREFIX)"
 
 pydev("from bpm_data_combiner.app.main import update")
 
