@@ -165,7 +165,7 @@ class UpdateContext:
         if exc_type is None:
             return
         logger.error(
-            f"Could not process command {self.cmd:6s} dev name  {self.dev_name} kwargs {self.kwargs:20s}: {exc_type}"
+            f"Could not process command {self.cmd:6s} dev name  {self.dev_name} kwargs {repr(self.kwargs):20s}: {exc_type}"
         )
         return
         logger.error(

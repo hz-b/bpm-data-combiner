@@ -44,7 +44,7 @@ class ViewBPMDataCollection:
             logger.debug("Update label %s, values %s", label, vals)
             pydev.iointr(label, vals)
 
-        label = self.prefix + ":" + names
+        label = self.prefix + ":names"
         names = [bytes(name, "utf8") for name in data.names]
         pydev.iointr(label, names)
 
