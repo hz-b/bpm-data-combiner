@@ -34,15 +34,27 @@ class ViewBPMDataCollection:
         for suffix, var in [("x", data.x), ("y", data.y)]:
             logger.debug("viewer updating data for %s: suffix %s", self.prefix, suffix)
 
-            label = f"{self.prefix}:{suffix}:values"
-            vals = [int(v) for v in var.values]
-            logger.debug("Update label %s, values %s", label, vals)
-            pydev.iointr(label, vals)
-
             label = f"{self.prefix}:{suffix}:active"
             vals = [int(v) for v in var.valid]
             logger.debug("Update label %s, values %s", label, vals)
             pydev.iointr(label, vals)
+
+            # How to treat masked values?
+            values = var.values
+            if not (~values.mask).all():
+                # unmaks them and assume that the default value
+                # will tell the user something is wrong
+                # furthermore there is still the mask
+                values = values.copy()
+                values.mask = False
+
+            label = f"{self.prefix}:{suffix}:values"
+            # Todo: check if the conversion is still required given that
+            # ints are now used
+            vals = [int(v) for v in values]
+            logger.debug("Update label %s, values %s", label, vals)
+            pydev.iointr(label, vals)
+
 
         label = self.prefix + ":names"
         names = [bytes(name, "utf8") for name in data.names]

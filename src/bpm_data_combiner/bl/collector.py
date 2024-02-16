@@ -30,15 +30,16 @@ logger = logging.getLogger("bpm-data-combiner")
 
 
 def _combine_collections_by_device_names(
-    collections: Sequence[Dict[str, BPMReading]], dev_names_index: Index
+    collections: Sequence[Dict[str, BPMReading]], dev_names_index: Index, *, default_value
 ) -> ma.masked_array:
     """use the name to stuff data into correct location
 
     Todo:
         Should it return a masked array
     """
-    res = np.zeros([len(collections), len(dev_names_index), 2], dtype=np.int64)
-    res = ma.array(res, fill_value=0, mask=True)
+    res = np.empty([len(collections), len(dev_names_index), 2], dtype=np.int32)
+    res.fill(default_value)
+    res = ma.array(res, mask=True)
 
     # now fill data at appropriate place
     # todo: handle that x and y plane can be enabled separately
@@ -52,9 +53,10 @@ def _combine_collections_by_device_names(
 
 
 def collection_to_bpm_data_collection(
-    collection: Dict[str, BPMReading], dev_names_index: Index
+    collection: Dict[str, BPMReading], dev_names_index: Index, default_value=2**31-1
 ):
-    ma = _combine_collections_by_device_names([collection], dev_names_index)
+    ma = _combine_collections_by_device_names([collection], dev_names_index,
+                                              default_value=default_value)
     # only one collection -> first dimension one entry
     (ma,) = ma
     # need one reading to get its count

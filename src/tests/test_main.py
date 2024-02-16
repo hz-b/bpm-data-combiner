@@ -5,7 +5,7 @@ from time import sleep
 from sys import stdout
 import logging
 
-from bpm_data_combiner.app.main import update, dev_names, col
+from bpm_data_combiner.app.main import update, dev_names, col, monitor_devices
 
 import pydev
 
@@ -64,6 +64,42 @@ def test_reading_single_device_misbehaved():
 
     with pytest.raises(AssertionError) as ae:
         update(dev_name=dev_name, cnt=cnt + 1)
+
+
+def test_monitor_collector_interaction():
+    """Test that collector will give ready data if devices are makred a inacrtive
+    """
+
+    for dev_name in dev_names:
+        # Make sure that all are active
+        update(dev_name=dev_name, active=True)
+
+    chk = 0
+    def cnt_called(*args, **kwargs):
+        nonlocal chk
+        chk += 1
+
+    col.on_ready.add_subscriber(cnt_called)
+    # Send data properly
+    def send_data(dev_name, cnt, val):
+        update(dev_name=dev_name, cnt=cnt)
+        update(dev_name=dev_name, x=val)
+        update(dev_name=dev_name, y=-val)
+        update(dev_name=dev_name, ctl=cnt)
+
+
+    for val, dev_name in enumerate(dev_names):
+        send_data(dev_name, 42, val)
+    # All data sent.. so this should be now 1, cb evaluated once
+    assert chk == 1
+
+    update(dev_name=dev_names[0], active=False)
+    for cnt, dev_name in enumerate(dev_names[1:]):
+        send_data(dev_name, 23, cnt)
+
+    # All data sent.. so the callback should have been
+    # triggered a second time
+    assert chk == 1
 
 
 class ComputeDelay:
