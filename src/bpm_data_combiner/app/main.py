@@ -2,8 +2,12 @@ import io
 import itertools
 import logging
 import traceback
+from typing import Optional
 
+from ..bl.statistics import compute_mean_weights_for_planes
+from ..data_model.bpm_data_accumulation import BPMDataAccumulation
 from ..data_model.monitored_device import MonitoredDevice
+from ..bl.event import Event
 from ..bl.accumulator import Accumulator
 from ..bl.collector import Collector, collection_to_bpm_data_collection
 from ..bl.dispatcher import DispatcherCollection
@@ -39,23 +43,17 @@ dev_names = Index(_dev_names)
 dispatcher_collection = DispatcherCollection()
 devices_status=[MonitoredDevice(name) for name in dev_names]
 monitor_devices = MonitorDevices(devices_status=devices_status)
-# ToDo: Collector should get / retrieve an updated set of valid
-#       device names every time a new reading collections is created
 preprocessor = PreProcessor(devices_status=devices_status)
 col = Collector(name="data_collector", devices_names=dev_names)
-dispatcher_collection.subscribe(lambda reading: col.new_reading(preprocessor.preprocess(reading)))
-
-
 # fmt:off
 def update_device_names(device_names):
-    """
-
-    Todo:
-        Do I need to mangle the names for a real device
-    """
+    """update collector on valid device names"""
     col.device_names = device_names
 monitor_devices.on_status_change.add_subscriber(update_device_names)
 # fmt:on
+
+# preprocessor: set x or y to None if disabled
+dispatcher_collection.subscribe(lambda reading: col.new_reading(preprocessor.preprocess(reading)))
 
 # Off beat treats each plane as separate device
 offbeat_delay = OffBeatDelay(
@@ -71,7 +69,7 @@ acc_abv_th = Accumulator(dev_names)
 col.on_above_threshold.add_subscriber(acc_abv_th.add)
 #: accumulate data only using items that a ready
 acc_ready = Accumulator(dev_names)
-# col.on_ready.add_subscriber(acc_ready.add)
+col.on_ready.add_subscriber(acc_ready.add)
 
 # fmt:off
 viewer = Viewer(prefix="Pierre:COM")
@@ -82,6 +80,19 @@ def cb(collection):
     viewer.ready_data.update(data)
 col.on_ready.add_subscriber(cb)
 # fmt:on
+
+
+def cb_periodic_update_accumulated_above_threshold(cnt : Optional[int]):
+    """
+    """
+    viewer.periodic_data.update(compute_mean_weights_for_planes(acc_abv_th.get()))
+
+
+# could do that directly too ... but appetite comes with eating
+# so let's have a common point to see what all shall be processed
+# at this point
+periodic_event = Event(name="periodic_update_2sec")
+periodic_event.add_subscriber(cb_periodic_update_accumulated_above_threshold)
 
 
 def process_cnt(*, dev_name, cnt):
@@ -126,6 +137,9 @@ def process_offbeat(*, dev_name, metronom, type):
     else:
         raise ValueError(f"Unknown {key=} with {val=}")
 
+def process_periodic_trigger(*, dev_name, periodic):
+    periodic_event.trigger(periodic)
+
 
 cmds = dict(
     # handling a single reading
@@ -139,6 +153,7 @@ cmds = dict(
     # metronom: used to derive appropriate delay
     # to wait for all data
     metronom=process_offbeat,
+    periodic=process_periodic_trigger
 )
 
 

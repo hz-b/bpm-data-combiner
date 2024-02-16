@@ -22,8 +22,8 @@ class BPMDataCollection:
 class BPMDataCollectionStatsPlane:
     #: typically the mean value of the measurements
     values : Sequence[float]
-    #: typically the std values of the measurements
-    #: time the number of measurements
+    #: typically the inverse of the standard deviation of the
+    #: values of the measurements times the number of measurements
     #: Todo: check is that the variance?
     weights : Sequence[float]
     # invalid given that no data were available or

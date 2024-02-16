@@ -1,6 +1,7 @@
 import pytest
 import numpy as np
 from bpm_data_combiner.bl.accumulator import Accumulator
+from bpm_data_combiner.bl.statistics import compute_mean_weights_for_planes
 from bpm_data_combiner.data_model.bpm_data_reading import BPMReading
 
 
@@ -33,11 +34,13 @@ def test_accumulator_add():
 
     rc = acc.get()
     assert (rc.names == dev_names).all()
-    # (1/2 * n * (n + 1) ) / n
-    ref_val = (n + 1) / 2
     assert (rc.x.values == test_data).all()
     assert (rc.y.values == -test_data).all()
 
+    # check stats too
+    # (1/2 * n * (n + 1) ) / n
+    ref_val = (n + 1) / 2
+    data = compute_mean_weights_for_planes(rc)
 
 def test_accumulator_entry_missing():
     """Simple data, all from same devices"""
