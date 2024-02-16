@@ -1,0 +1,17 @@
+record(calc, "$(PREFIX)$(VIEW):periodic:cnt")
+{
+     field(DESC, "trigger periodic update")
+     field(VAL, 0)
+     field(PINI, 1)
+     field(CALC, "VAL + 1")
+}
+
+record(longout, "$(PREFIX)$(VIEW):periodic:psh")
+{
+     field(DESC, "trigger periodic update to python")
+     field(DTYP, "pydev")
+     field(OUT, "@update(dev_name=None, periodic=%VAL%)")
+     field(DOL, "$(PREFIX)$(VIEW):periodic:psh PP")
+     field(OMSL, "closed_loop")
+     field(SCAN, "2 second)
+}
