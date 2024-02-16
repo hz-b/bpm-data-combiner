@@ -29,6 +29,7 @@ class ViewBPMDataCollection:
         self.prefix = prefix
 
     def update(self, data: BPMDataCollection):
+        logger.debug("viewer updating data for %s", self.prefix)
         logger.debug("viewer updating data for %s: data %s", self.prefix, data)
         for suffix, var in [("x", data.x), ("y", data.y)]:
             logger.debug("viewer updating data for %s: suffix %s", self.prefix, suffix)

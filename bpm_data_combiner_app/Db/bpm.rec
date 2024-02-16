@@ -8,7 +8,7 @@ record(waveform, "$(PREFIX):$(VIEW):x:values")
     field(SCAN, "I/O Intr")
     field(INP,  "@pydev.iointr('$(PREFIX):$(VIEW):x:values')")
     field(NELM, 128)
-    field(TPRO, 1)
+    field(TPRO, 0)
     info(Q:group, {
          "$(PREFIX)$(VIEW)": {
             "x.values": {+channel:"VAL"}
@@ -24,7 +24,7 @@ record(waveform, "$(PREFIX):$(VIEW):x:active")
     field(SCAN, "I/O Intr")
     field(INP,  "@pydev.iointr('$(PREFIX):$(VIEW):x:')")
     field(NELM, 128)
-    field(TPRO, 1)
+    field(TPRO, 0)
     info(Q:group, {
          "$(PREFIX)$(VIEW)": {
             "x.active": {+channel:"VAL"}
@@ -42,7 +42,7 @@ record(waveform, "$(PREFIX):$(VIEW):y:values")
     field(SCAN, "I/O Intr")
     field(INP,  "@pydev.iointr('$(PREFIX):$(VIEW):y:values')")
     field(NELM, 128)
-    field(TPRO, 1)
+    field(TPRO, 0)
     info(Q:group, {
          "$(PREFIX)$(VIEW)": {
             "y.values": {+channel:"VAL"}
@@ -59,7 +59,7 @@ record(waveform, "$(PREFIX):$(VIEW):y:active")
     field(SCAN, "I/O Intr")
     field(INP,  "@pydev.iointr('$(PREFIX):$(VIEW):y:active')")
     field(NELM, 128)
-    field(TPRO, 1)
+    field(TPRO, 0)
     info(Q:group, {
          "$(PREFIX)$(VIEW)": {
             "y.active": {+channel:"VAL"}
