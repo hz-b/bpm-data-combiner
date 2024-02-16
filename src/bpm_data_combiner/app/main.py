@@ -68,10 +68,11 @@ offbeat_delay = OffBeatDelay(
 
 #: accumulate data above threshold
 acc_abv_th = Accumulator(dev_names)
-col.on_above_threshold.add_subscriber(acc_abv_th.add)
+# col.on_above_threshold.add_subscriber(acc_abv_th.add)
 #: accumulate data only using items that a ready
 acc_ready = Accumulator(dev_names)
-col.on_ready.add_subscriber(acc_ready.add)
+# col.on_ready.add_subscriber(acc_ready.add)
+
 
 # fmt:off
 viewer = Viewer(prefix="Pierre:COM")
@@ -164,7 +165,7 @@ class UpdateContext:
         if exc_type is None:
             return
         logger.error(
-            f"Could not process command {self.cmd:6s} dev name  {self.dev_name} kwargs {self.kwargs20s}: {exc_type}"
+            f"Could not process command {self.cmd:6s} dev name  {self.dev_name} kwargs {self.kwargs:20s}: {exc_type}"
         )
         return
         logger.error(

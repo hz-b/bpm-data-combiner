@@ -1,3 +1,4 @@
+
 """
 Combine the data to common sets
 
@@ -91,8 +92,8 @@ class ReadingsCollection:
         dev_name = val.dev_name
         # data from known / expected device
         if dev_name not in self.device_names:
-            logger.warning("Collector %s: expecting following device names %s",
-                          self.name, self.device_names)
+            # logger.error("Collector %s: expecting following device names %s; unknown name %s",
+            #              self.name, self.device_names, dev_name)
             raise UnknownDeviceNameError(f"Unknown device {dev_name}")
         # not one device sending twice
         if dev_name in self.collection:
