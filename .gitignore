@@ -11,6 +11,8 @@ bin/
 db/
 dbd/
 
+# history of ioc's
+.iocsh_history
 #epics env build during make after a make clean
 envPaths
 
