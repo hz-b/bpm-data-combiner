@@ -14,6 +14,7 @@ from ..bl.dispatcher import DispatcherCollection
 from ..bl.collector import Collector, collection_to_bpm_data_collection
 from ..bl.monitor_devices import MonitorDevices
 from ..bl.offbeat import OffBeatDelay
+from ..bl.command_round_buffer import CommandRoundBuffer, Command
 from .view import Views
 
 import numpy as np
@@ -152,25 +153,30 @@ cmds = dict(
 )
 
 
+
 class UpdateContext:
-    def __init__(self, *, cmd, method, dev_name, kwargs):
-        self.cmd = cmd
+    def __init__(self, *, method, rbuffer):
         self.method = method
-        self.dev_name = dev_name
-        self.kwargs = kwargs
+        self.roundbuffer = rbuffer
 
     def __enter__(self):
-        logger.debug(
-            "Processing method=%s, dev_name=%s, kwargs = %s", self.method, self.dev_name, self.kwargs
+        last = self.roundbuffer.last()
+        logger.info(
+            "Processing dev_name %8s, command %4s, kwargs = %s", last.dev_name,  last.cmd, last.kwargs
         )
         pass
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         if exc_type is None:
             return
+
+        last = self.roundbuffer.last()
+        logger.error(self.roundbuffer)
+        
         logger.error(
-            f"Could not process command {self.cmd:6s} dev name  {self.dev_name} kwargs {repr(self.kwargs):20s}: {exc_type}"
+            f"Could not process command {last.cmd:6s} dev name  {last.dev_name} kwargs {repr(last.kwargs):20s}: {exc_type}({exc_val})"
         )
+        
         return
         logger.error(
             f"Could not process command {self.cmd=}:"
@@ -183,13 +189,17 @@ class UpdateContext:
         tb_buf.seek(0)
         logger.error("%s\nTraceback:\n%s\n%s\n", marker, tb_buf.read(), marker)
 
+rbuffer = CommandRoundBuffer()
 
 def update(*, dev_name, **kwargs):
     """Inform the dispatcher associated to the device that new data is available"""
     # just to get the cmd: first kwarg
     # for cmd in kwargs: break;
     # that code says it
+    
     cmd = next(iter(kwargs))
     method = cmds[cmd]
-    with UpdateContext(cmd=cmd, method=method, dev_name=dev_name, kwargs=kwargs):
+    dc = Command(cmd=cmd, dev_name=dev_name, kwargs=kwargs)
+    rbuffer.append(dc)
+    with UpdateContext(method=method, rbuffer=rbuffer):
         method(dev_name=dev_name, **kwargs)
