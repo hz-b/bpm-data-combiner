@@ -9,16 +9,18 @@ import logging
 import traceback
 
 from ..data_model.monitored_device import MonitoredDevice
+from ..data_model.command import Command
 from ..bl.accumulator import Accumulator
 from ..bl.dispatcher import DispatcherCollection
 from ..bl.collector import Collector, collection_to_bpm_data_collection
 from ..bl.monitor_devices import MonitorDevices
 from ..bl.offbeat import OffBeatDelay
-from ..bl.command_round_buffer import CommandRoundBuffer, Command
+from ..bl.command_round_buffer import CommandRoundBuffer
 from .view import Views
 
 import numpy as np
 from pandas import Index
+from datetime import datetime
 
 from ..data_model.timestamp import DataArrived
 
@@ -199,7 +201,7 @@ def update(*, dev_name, **kwargs):
     
     cmd = next(iter(kwargs))
     method = cmds[cmd]
-    dc = Command(cmd=cmd, dev_name=dev_name, kwargs=kwargs)
+    dc = Command(cmd=cmd, dev_name=dev_name, kwargs=kwargs, timestamp=datetime.now())
     rbuffer.append(dc)
     with UpdateContext(method=method, rbuffer=rbuffer):
         method(dev_name=dev_name, **kwargs)

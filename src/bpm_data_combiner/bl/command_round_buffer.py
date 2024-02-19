@@ -1,6 +1,5 @@
 from collections import deque
-from datetime import datetime
-from .data_model.command import Command
+from ..data_model.command import Command
 
 
 class CommandRoundBuffer:
@@ -17,5 +16,5 @@ class CommandRoundBuffer:
         return self.roundbuffer[-1]
 
     def __repr__(self):
-        header = "cnt device   ctl  kwargs"
-        return "\n".join([header] + [f"{cnt:2d}  {c.dev_name:8s} {c.cmd:4s} {repr(c.kwargs):s} " for cnt, c in enumerate(self.roundbuffer)])
+        header = "timestamp cnt device   ctl  kwargs"
+        return "\n".join([header] + [f"{c.timestamp.hour}:{c.timestamp.minute}:{c.timestamp.second} {cnt:2d}  {c.dev_name:8s} {c.cmd:4s} {repr(c.kwargs):s} " for cnt, c in enumerate(self.roundbuffer)])
