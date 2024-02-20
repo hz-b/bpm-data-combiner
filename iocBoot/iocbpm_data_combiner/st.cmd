@@ -21,6 +21,7 @@ dbLoadTemplate("db/bpm_dev_input.db", "PREFIX=$(PREFIX)")
 dbLoadTemplate("db/bpm.db", "PREFIX=$(PREFIX)")
 dbLoadRecords("db/bpm_monitor_overview.db", "PREFIX=$(PREFIX),VIEW=mon")
 dbLoadRecords "db/bpm_data_combinerVersion.db", "user=$(PREFIX)"
+dbLoadRecords("db/view.db", "PREFIX=$(PREFIX)")
 
 pydev("from bpm_data_combiner.app.main import update")
 

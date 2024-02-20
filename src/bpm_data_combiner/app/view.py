@@ -76,8 +76,18 @@ class ViewBPMDataCollectionStats:
             pydev.iointr(label, var)
 
 
+class ViewStringBuffer:
+    def __init__(self, label: str):
+        self.label = label
+
+    def update(self, buf: Sequence[str]):
+        # logger.warning(f'View string {self.label}:"{t_str}"')
+        pydev.iointr(self.label, [bytes(t_str, "utf8") for t_str in buf])
+
+
 class Views:
     def __init__(self, prefix: str):
         self.ready_data = ViewBPMDataCollection(prefix + ":out:100ms")
         self.periodic_data = ViewBPMDataCollectionStats(prefix + ":periodic")
         self.monitor_bpms = ViewBPMMonitoring(prefix + ":mon")
+        self.monitor_update_cmd_errors =  ViewStringBuffer(prefix + ":im:cmd_err")

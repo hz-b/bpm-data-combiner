@@ -114,6 +114,11 @@ def process_y_val(*, dev_name, y):
 def process_chk_cnt(*, dev_name, ctl):
     return dispatcher_collection.get_dispatcher(dev_name).update_check(ctl)
 
+def process_guard(*, dev_name, guard):
+    """Does it help to remove double calls to ctl
+    """
+    pass
+
 
 def process_active(*, dev_name, active):
     return monitor_devices.set_active(dev_name, active)
@@ -146,6 +151,7 @@ cmds = dict(
     x=process_x_val,
     y=process_y_val,
     ctl=process_chk_cnt,
+    guard=process_guard,
     # handling device status monitoring
     enabled=process_enabled,
     active=process_active,
@@ -155,6 +161,19 @@ cmds = dict(
 )
 
 
+def dict_to_string(d: dict):
+    tmp = ", ".join([f"{k}:{v}" for k,v in d.items()])
+    return "{" + tmp + "}"
+
+
+def round_buffer_to_string(rb: CommandRoundBuffer):
+    def stringify_command(cmd):
+        tmp = dict_to_string(cmd.kwargs)
+        tmp = f"{cmd.dev_name:8s} {tmp}"
+        return  f"{tmp:39s}"
+    return [stringify_command(cmd) for cmd in list(rb.roundbuffer)[::-1]]
+
+
 
 class UpdateContext:
     def __init__(self, *, method, rbuffer):
@@ -162,24 +181,29 @@ class UpdateContext:
         self.roundbuffer = rbuffer
 
     def __enter__(self):
+        return
+
         last = self.roundbuffer.last()
-        logger.info(
+
+        cmd = " %8s: cmd %4s, kw%s" %( last.dev_name,  last.cmd, dict_to_string(last.kwargs))
+        logger.warning(
             "Processing dev_name %8s, command %4s, kwargs = %s", last.dev_name,  last.cmd, last.kwargs
         )
-        pass
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         if exc_type is None:
             return
 
         last = self.roundbuffer.last()
-        logger.error(self.roundbuffer)
-        
-        logger.error(
-            f"Could not process command {last.cmd:6s} dev name  {last.dev_name} kwargs {repr(last.kwargs):20s}: {exc_type}({exc_val})"
+        txt = f" {last.cmd:6s} {dict_to_string(last.kwargs)}: {exc_type}({exc_val})"
+        viewer.monitor_update_cmd_errors.update(
+            [f"ERR: {exc_type}", f"ERR {exc_val})"] + round_buffer_to_string(self.roundbuffer)
         )
-        
         return
+
+        # logger.error(self.roundbuffer)
+        logger.error("Could not process command:" + txt)
+
         logger.error(
             f"Could not process command {self.cmd=}:"
             f"{self.method=} {self.dev_name=} {self.kwargs=}: {exc_type}({exc_val})"
@@ -191,14 +215,16 @@ class UpdateContext:
         tb_buf.seek(0)
         logger.error("%s\nTraceback:\n%s\n%s\n", marker, tb_buf.read(), marker)
 
-rbuffer = CommandRoundBuffer()
+
+rbuffer = CommandRoundBuffer(maxsize=50)
+
 
 def update(*, dev_name, **kwargs):
     """Inform the dispatcher associated to the device that new data is available"""
     # just to get the cmd: first kwarg
     # for cmd in kwargs: break;
     # that code says it
-    
+
     cmd = next(iter(kwargs))
     method = cmds[cmd]
     dc = Command(cmd=cmd, dev_name=dev_name, kwargs=kwargs, timestamp=datetime.now())

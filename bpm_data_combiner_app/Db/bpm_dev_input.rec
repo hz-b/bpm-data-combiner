@@ -4,7 +4,7 @@
 # Input of one record device ... collect them here
 # locally (again)
 # so one can check what the IOC uses
-record(longin, "$(PREFIX):inp:$(DEV_NAME):x")
+record(longin, "$(PREFIX):inp:7:$(DEV_NAME):x")
 {
     field(DESC, "mirror: $(DEV_NAME) x value")
     field(EGU, "nm")
@@ -20,7 +20,7 @@ record(longin, "$(PREFIX):inp:$(DEV_NAME):x")
     field(VAL, -100000000)
 }
 
-record(longin, "$(PREFIX):inp:$(DEV_NAME):y")
+record(longin, "$(PREFIX):inp:7:$(DEV_NAME):y")
 {
     field(DESC, "mirror: y value")
     field(EGU, "nm")
@@ -36,7 +36,7 @@ record(longin, "$(PREFIX):inp:$(DEV_NAME):y")
 
 # I assume that I can rely on cnt to be updated when ever
 # x or y are updated
-record(longin, "$(PREFIX):inp:$(DEV_NAME):cnt")
+record(longin, "$(PREFIX):inp:7:$(DEV_NAME):cnt")
 {
     field(DESC, "mirror: (time) cnt")
     field(INP, {pva:{
@@ -45,9 +45,78 @@ record(longin, "$(PREFIX):inp:$(DEV_NAME):cnt")
         proc:true
         }}
     )
-    field(FLNK, "$(PREFIX):im:$(DEV_NAME):psh")
+    # done by epics 3 record currenty
+    # field(FLNK, "$(PREFIX):im:$(DEV_NAME):psh")
     field(VAL, -1)
 }
+
+# Input data collected from the different bpm devices
+# First get the data into here ...
+# Pydevice needs to support aao
+record(aai, "$(PREFIX):inp:$(DEV_NAME):posv")
+{
+     field(DESC, "mirror: $(DEV_NAME) posv")
+     field(INP,  "$(DEV_NAME):posv CPP")
+     field(NELM, 3)
+     field(FLNK, "$(PREFIX):inp:$(DEV_NAME):trg")
+}
+
+record(fanout, "$(PREFIX):inp:$(DEV_NAME):trg")
+{
+    field(DESC, "mirror: $(DEV_NAME) trigger on new data")
+    field(LNK0, "$(PREFIX):inp:$(DEV_NAME):x")
+    field(LNK1, "$(PREFIX):inp:$(DEV_NAME):y")
+    field(LNK2, "$(PREFIX):inp:$(DEV_NAME):cnt")
+}
+
+record(subArray, "$(PREFIX):inp:$(DEV_NAME):x")
+{
+    field(DESC, "mirror: $(DEV_NAME) x value")
+    field(EGU, "nm")
+    field(INP, "$(PREFIX):inp:$(DEV_NAME):posv")
+    field(FTVL, "LONG")
+    field(MALM, 3)
+    field(NELM, 1)
+    field(INDX, 1)
+    # Forwarding data handled by separate fanout to ensure that
+    # data are pushed in desired order to python
+    # field(FLNK, "$(PREFIX)$(DEV_NAME):im:x")
+    # field(VAL, -100000000)
+}
+
+record(subArray, "$(PREFIX):inp:$(DEV_NAME):y")
+{
+    field(DESC, "mirror: $(DEV_NAME) y value")
+    field(EGU, "nm")
+    field(INP, "$(PREFIX):inp:$(DEV_NAME):posv")
+    field(INP, "$(DEV_NAME):posv")
+    field(FTVL, "LONG")
+    field(MALM, 3)
+    field(NELM, 1)
+    field(INDX, 2)
+    # Forwarding data handled by separate fanout to ensure that
+    # data are pushed in desired order to python
+    # field(FLNK, "$(PREFIX)$(DEV_NAME):im:y")
+    # field(VAL, -100000000)
+}
+
+record(subArray, "$(PREFIX):inp:$(DEV_NAME):cnt")
+{
+    field(DESC, "mirror: $(DEV_NAME) cnt")
+    field(EGU, "nm")
+    field(INP, "$(PREFIX):inp:$(DEV_NAME):posv")
+    field(INP, "$(DEV_NAME):posv")
+    field(FTVL, "LONG")
+    field(MALM, 3)
+    field(NELM, 1)
+    field(INDX, 0)
+    # Forwarding data handled by separate fanout to ensure that
+    # data are pushed in desired order to python
+    # field(FLNK, "$(PREFIX)$(DEV_NAME):im:cnt")
+    field(FLNK, "$(PREFIX):im:$(DEV_NAME):psh")
+    # field(VAL, -100000000)
+}
+
 
 record(stringin, "$(PREFIX):inp:$(DEV_NAME):name")
 {
@@ -74,6 +143,8 @@ record(fanout, "$(PREFIX):im:$(DEV_NAME):psh")
     field(LNK1, "$(PREFIX):im:$(DEV_NAME):x")
     field(LNK2, "$(PREFIX):im:$(DEV_NAME):y")
     field(LNK3, "$(PREFIX):im:$(DEV_NAME):ctl")
+    # deliberaty delayed
+    field(LNK5, "$(PREFIX):im:$(DEV_NAME):grd")
     field(LNK4, "$(PREFIX):im:$(DEV_NAME):mon:trg")
 }
 
@@ -108,6 +179,19 @@ record(longout, "$(PREFIX):im:$(DEV_NAME):cnt")
     field(DOL, "$(PREFIX):inp:$(DEV_NAME):cnt")
     field(OMSL, "closed_loop")
     field(OUT, "@update(dev_name='$(DEV_NAME)', cnt=%VAL%)")
+    field(VAL, -1)
+    # field(PINI, "YES")
+    # field(TPRO, 1)
+}
+
+# lets try if it fixes ist
+record(longout, "$(PREFIX):im:$(DEV_NAME):grd")
+{
+    field(DESC, "insert a guard")
+    field(DTYP, "pydev")
+    field(DOL, "$(PREFIX):inp:$(DEV_NAME):cnt")
+    field(OMSL, "closed_loop")
+    field(OUT, "@update(dev_name='$(DEV_NAME)', guard=%VAL%)")
     field(VAL, -1)
     # field(PINI, "YES")
     # field(TPRO, 1)

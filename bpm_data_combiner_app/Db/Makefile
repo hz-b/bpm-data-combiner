@@ -16,6 +16,7 @@ DB += bpm.db
 DB += bpm_monitor_overview.db
 # version of the bpm
 DB += bpm_data_combinerVersion.db
+DB += view.db
 
 # If <anyname>.db template is not named <anyname>*.template add
 # <anyname>_TEMPLATE = <templatename>

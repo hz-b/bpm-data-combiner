@@ -1,0 +1,11 @@
+
+record(waveform, "$(PREFIX):im:cmd_err")
+{
+    field(DESC, "cmds received python side")
+    field(DTYP, "pydev")
+    field(SCAN, "I/O Intr")
+    field(FTVL, "STRING")
+    field(NELM, 64)
+    field(INP,  "@pydev.iointr('$(PREFIX):im:cmd_err')")
+    field(TPRO, 0)
+}
