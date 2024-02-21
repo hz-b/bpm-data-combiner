@@ -112,7 +112,6 @@ record(subArray, "$(PREFIX):inp:$(DEV_NAME):cnt")
     field(INDX, 0)
     # Forwarding data handled by separate fanout to ensure that
     # data are pushed in desired order to python
-    # field(FLNK, "$(PREFIX)$(DEV_NAME):im:cnt")
     field(FLNK, "$(PREFIX):im:$(DEV_NAME):psh")
     # field(VAL, -100000000)
 }
@@ -143,8 +142,6 @@ record(fanout, "$(PREFIX):im:$(DEV_NAME):psh")
     field(LNK1, "$(PREFIX):im:$(DEV_NAME):x")
     field(LNK2, "$(PREFIX):im:$(DEV_NAME):y")
     field(LNK3, "$(PREFIX):im:$(DEV_NAME):ctl")
-    # deliberaty delayed
-    field(LNK5, "$(PREFIX):im:$(DEV_NAME):grd")
     field(LNK4, "$(PREFIX):im:$(DEV_NAME):mon:trg")
 }
 
@@ -183,20 +180,6 @@ record(longout, "$(PREFIX):im:$(DEV_NAME):cnt")
     # field(PINI, "YES")
     # field(TPRO, 1)
 }
-
-# lets try if it fixes ist
-record(longout, "$(PREFIX):im:$(DEV_NAME):grd")
-{
-    field(DESC, "insert a guard")
-    field(DTYP, "pydev")
-    field(DOL, "$(PREFIX):inp:$(DEV_NAME):cnt")
-    field(OMSL, "closed_loop")
-    field(OUT, "@update(dev_name='$(DEV_NAME)', guard=%VAL%)")
-    field(VAL, -1)
-    # field(PINI, "YES")
-    # field(TPRO, 1)
-}
-
 
 # informs python side: a new measurement hand over finished
 record(longout, "$(PREFIX):im:$(DEV_NAME):ctl")

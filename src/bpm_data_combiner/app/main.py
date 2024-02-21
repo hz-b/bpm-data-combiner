@@ -50,7 +50,7 @@ dispatcher_collection = DispatcherCollection()
 monitor_devices = MonitorDevices([MonitoredDevice(name) for name in dev_names])
 # ToDo: Collector should get / retrieve an updated set of valid
 #       device names every time a new reading collections is created
-col = Collector(name="data_collector", devices_names=dev_names)
+col = Collector(name="data_collector", devices_names=dev_names, max_collections=10)
 dispatcher_collection.subscribe(col.new_reading)
 
 
@@ -194,13 +194,13 @@ class UpdateContext:
         if exc_type is None:
             return
 
-        last = self.roundbuffer.last()
-        txt = f" {last.cmd:6s} {dict_to_string(last.kwargs)}: {exc_type}({exc_val})"
         viewer.monitor_update_cmd_errors.update(
             [f"ERR: {exc_type}", f"ERR {exc_val})"] + round_buffer_to_string(self.roundbuffer)
         )
         return
 
+        last = self.roundbuffer.last()
+        txt = f" {last.cmd:6s} {dict_to_string(last.kwargs)}: {exc_type}({exc_val})"
         # logger.error(self.roundbuffer)
         logger.error("Could not process command:" + txt)
 
