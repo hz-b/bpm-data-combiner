@@ -1,24 +1,24 @@
 file "db/bpm.rec"
 {
     pattern { VIEW  }
-            { cur }
+            { out:100ms }
 }
 
 file "db/bpm_book_keeping.rec"
 {
     pattern { VIEW  }
-            { cur   }
+            { out:100ms   }
 }
 
 file "db/bpm_with_stats.rec"
 {
     pattern { VIEW  }
-            { jiffy:x }
-            { jiffy:y }
+            { out:2s:x }
+            { out:2s:y }
 }
 
 file "db/bpm_book_keeping.rec"
 {
     pattern { VIEW  }
-            { jiffy }
+            { out:2s }
 }

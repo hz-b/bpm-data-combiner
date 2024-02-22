@@ -5,14 +5,14 @@ from time import sleep
 from sys import stdout
 import logging
 
-from bpm_data_combiner.app.main import update, dev_names, col
+from bpm_data_combiner.app.main import update, dev_names, col, monitor_devices
 
 import pydev
 
 logger = logging.getLogger("bpm-data-combiner")
 
 
-def test_main_dev_monitor():
+def test10_main_dev_monitor():
     for dev_name in dev_names:
         update(dev_name=dev_name, enabled=False, plane="x")
         update(dev_name=dev_name, enabled=False, plane="y")
@@ -22,7 +22,7 @@ def test_main_dev_monitor():
         update(dev_name=dev_name, enabled=True, plane="y")
 
 
-def test_main_behaved():
+def test20_main_behaved():
     """test that data stream is assembled to combined data"""
 
     N = 3
@@ -38,7 +38,7 @@ def test_main_behaved():
         assert readings.is_ready()
 
 
-def test_main_interleaving():
+def test30_main_interleaving():
     """Test that data are combined if the data of the devices are interleaved"""
 
     cnt = 4
@@ -53,9 +53,45 @@ def test_main_interleaving():
     readings = col.get_collection(cnt)
     assert readings.is_ready()
 
+def test40_monitor_collector_interaction():
+    """Test that collector will give ready data if devices are makred a inacrtive
+    """
 
-def test_reading_single_device_misbehaved():
-    """the first device sending second data set before first is finished"""
+    for dev_name in dev_names:
+        # Make sure that all are active
+        update(dev_name=dev_name, active=True)
+
+    chk = 0
+    def cnt_called(*args, **kwargs):
+        nonlocal chk
+        chk += 1
+
+    col.on_ready.add_subscriber(cnt_called)
+    # Send data properly
+    def send_data(dev_name, cnt, val):
+        update(dev_name=dev_name, cnt=cnt)
+        update(dev_name=dev_name, x=val)
+        update(dev_name=dev_name, y=-val)
+        update(dev_name=dev_name, ctl=cnt)
+
+
+    for val, dev_name in enumerate(dev_names):
+        send_data(dev_name, 42, val)
+    # All data sent.. so this should be now 1, cb evaluated once
+    assert chk == 1
+
+    update(dev_name=dev_names[0], active=False)
+    for cnt, dev_name in enumerate(dev_names[1:]):
+        send_data(dev_name, 23, cnt)
+
+    # All data sent.. so the callback should have been
+    # triggered a second time
+    assert chk == 2
+
+
+def test50_reading_single_device_misbehaved():
+    """the first device sending second data set before first is finished
+    """
     dev_name = dev_names[0]
     cnt = 5
     update(dev_name=dev_name, cnt=cnt)
@@ -64,6 +100,7 @@ def test_reading_single_device_misbehaved():
 
     with pytest.raises(AssertionError) as ae:
         update(dev_name=dev_name, cnt=cnt + 1)
+
 
 
 class ComputeDelay:

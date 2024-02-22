@@ -49,7 +49,7 @@ class Accumulator:
         else:
             collections = self.collections
 
-        tmp = _combine_collections_by_device_names(collections, self.dev_names_index)
+        tmp = _combine_collections_by_device_names(collections, self.dev_names_index, default_value=0)
         counts = np.zeros(len(collections), dtype=np.int64)
         for row, data_collection in enumerate(collections):
             for _, bpm_data in data_collection.items():

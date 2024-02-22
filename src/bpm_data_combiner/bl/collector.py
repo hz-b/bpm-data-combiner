@@ -1,3 +1,4 @@
+
 """
 Combine the data to common sets
 
@@ -30,7 +31,7 @@ logger = logging.getLogger("bpm-data-combiner")
 
 
 def _combine_collections_by_device_names(
-    collections: Sequence[Dict[str, BPMReading]], dev_names_index: Index, fill_value=-2**63
+    collections: Sequence[Dict[str, BPMReading]], dev_names_index: Index, *, default_value
 ) -> ma.masked_array:
     """use the name to stuff data into correct location
 
@@ -38,8 +39,9 @@ def _combine_collections_by_device_names(
         Should it return a masked array? Is there a better
         representation?
     """
-    res = np.zeros([len(collections), len(dev_names_index), 2], dtype=np.int64)
-    res = ma.array(res, fill_value=fill_value, mask=True)
+    res = np.empty([len(collections), len(dev_names_index), 2], dtype=np.int32)
+    res.fill(default_value)
+    res = ma.array(res, mask=True)
 
     # now fill data at appropriate place
     # todo: handle that x and y plane can be enabled separately
@@ -57,9 +59,10 @@ def _combine_collections_by_device_names(
 
 
 def collection_to_bpm_data_collection(
-    collection: Dict[str, BPMReading], dev_names_index: Index
-) -> BPMDataCollection:
-    ma = _combine_collections_by_device_names([collection], dev_names_index)
+    collection: Dict[str, BPMReading], dev_names_index: Index, default_value=2**31-1
+):
+    ma = _combine_collections_by_device_names([collection], dev_names_index,
+                                              default_value=default_value)
     # only one collection -> first dimension one entry
     (ma,) = ma
     # need one reading to get its count
@@ -101,8 +104,8 @@ class ReadingsCollection:
         dev_name = val.dev_name
         # data from known / expected device
         if dev_name not in self.device_names:
-            logger.warning("Collector %s: expecting following device names %s",
-                           self.name, list(self.device_names))
+            # logger.error("Collector %s: expecting following device names %s; unknown name %s",
+            #              self.name, self.device_names, dev_name)
             raise UnknownDeviceNameError(f"Unknown device {dev_name}")
         # not one device sending twice
         if dev_name in self.collection:
