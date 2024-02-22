@@ -65,7 +65,7 @@ class Accumulator:
         else:
             collections = self.collections
 
-        tmp = _combine_collections_by_device_names(collections, self.dev_names_index)
+        tmp = _combine_collections_by_device_names(collections, self.dev_names_index, default_value=0)
 
         xm, xw = compute_mean_weight(tmp[..., 0])
         ym, yw = compute_mean_weight(tmp[..., 1])

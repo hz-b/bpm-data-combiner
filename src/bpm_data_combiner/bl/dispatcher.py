@@ -27,23 +27,43 @@ class Dispatcher:
         self.on_ready = Event(name="dispatcher_data_ready")
 
     def new_reading(self, cnt):
+        if self.reading is not None:
+            raise AssertionError(
+                f"{self.__class__.__name__}: start new reading: already processing?"
+            )
         assert self.reading is None
         self.reading = BPMReadingBeingProcessed(cnt=cnt)
 
     def update_x_val(self, x_val):
+        if self.reading is None:
+            raise AssertionError(
+                f"{self.__class__.__name__}: adding to x to reading: processing not started?"
+            )
         assert self.reading is not None
         self.reading.x = x_val
 
     def update_y_val(self, y_val):
-        assert self.reading is not None
+        if self.reading is None:
+            raise AssertionError(
+                f"{self.__class__.__name__}: adding to y to reading: processing not started?"
+            )
         self.reading.y = y_val
 
     def update_check(self, chk):
         """
         Todo:
             find a better name?
-        """
-        assert self.reading.ready(chk)
+        """        
+        if self.reading is None:
+            raise AssertionError(
+                f"{self.__class__.__name__}: expected reading finished but not yet started?"
+            )
+            
+        if not self.reading.ready(chk):
+            # dispose it and go further
+            r, self.reading = self.reading, None
+            raise AssertionError(f"Reading {r} not ready")
+
         r = BPMReading(
             cnt=self.reading.cnt,
             x=self.reading.x,
