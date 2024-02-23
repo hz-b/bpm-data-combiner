@@ -20,10 +20,12 @@ bpm_data_combiner_DBD += base.dbd
 
 # bpm_data_combiner.dbd will include these files:
 bpm_data_combiner_DBD += pydev.dbd
+bpm_data_combiner_DBD += bpm_data_combiner.dbd
 bpm_data_combiner_LIBS += pydev
 
 # bpm_data_combiner_registerRecordDeviceDriver.cpp derives from bpm_data_combiner.dbd
 bpm_data_combiner_SRCS += bpm_data_combiner_registerRecordDeviceDriver.cpp
+bpm_data_combiner_SRCS += array_forward.cpp
 
 # Build the main IOC entry point where needed
 bpm_data_combiner_SRCS_DEFAULT += bpm_data_combinerMain.cpp

@@ -58,7 +58,26 @@ record(aai, "$(PREFIX):inp:$(DEV_NAME):posv")
      field(DESC, "mirror: $(DEV_NAME) posv")
      field(INP,  "$(DEV_NAME):posv CPP")
      field(NELM, 3)
-     field(FLNK, "$(PREFIX):inp:$(DEV_NAME):trg")
+     field(FLNK, "$(PREFIX):im:$(DEV_NAME):toposv")
+}
+
+record(aSub, "$(PREFIX):inp:$(DEV_NAME):toposv")
+{
+     field(DESC, "mirror: $(DEV_NAME) posv to aao")
+     field(INPA, "$(PREFIX):inp:$(DEV_NAME):posv")
+     field(OUTA, "$(PREFIX):im:$(DEV_NAME):posv PP")
+     field(NOA,  3)
+     field(NOVA, 3)
+     field(FTA,  "LONG")
+     field(FTVA,  "LONG")
+     field(SNAM, "array_forward")
+}
+
+record(aao, "$(PREFIX):im:$(DEV_NAME):posv")
+{
+     field(DESC, "mirror: $(DEV_NAME) posv to py")
+     field(NELM, 3)
+     field(OUT,  "@update(dev_name='$(DEV_NAME)', reading=%VAL%)")
 }
 
 record(fanout, "$(PREFIX):inp:$(DEV_NAME):trg")
