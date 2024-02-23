@@ -1,10 +1,13 @@
 from ..data_model.bpm_data_collection import BPMDataCollection, BPMDataCollectionStats
-import pydev
-
 import logging
 from typing import Sequence
 
+import pydev
+
 logger = logging.getLogger("bpm-data-combiner")
+
+def string_array_to_bytes(names: Sequence[str], *, encoding = "utf8"):
+    return [bytes(name, encoding) for name in names]
 
 
 class ViewBPMMonitoring:
@@ -12,13 +15,13 @@ class ViewBPMMonitoring:
         self.prefix = prefix
 
     def update(self, names : Sequence[str], active: Sequence[bool]):
-        names = [bytes(name, "utf8") for name in names]
-        active = [bool(v) for v in active]
+        names =  string_array_to_bytes(names)
         label = self.prefix + ":" + "names"
         logger.debug("Update active view label %s, values %s", label, names)
         pydev.iointr(label, names)
 
         # int number wrong by a factor of 2: why?
+        active = [bool(v) for v in active]
         label = self.prefix + ":" + "active"
         logger.debug("Update active view label %s, values %s", label, active)
         pydev.iointr(label, active)
@@ -35,7 +38,7 @@ class ViewBPMDataCollection:
             logger.debug("viewer updating data for %s: suffix %s", self.prefix, suffix)
 
             label = f"{self.prefix}:{suffix}:active"
-            vals = [int(v) for v in var.valid]
+            vals = [bool(v) for v in var.valid]
             logger.debug("Update label %s, values %s", label, vals)
             pydev.iointr(label, vals)
 
@@ -51,14 +54,16 @@ class ViewBPMDataCollection:
             label = f"{self.prefix}:{suffix}:values"
             # Todo: check if the conversion is still required given that
             # ints are now used
-            vals = [int(v) for v in values]
-            logger.debug("Update label %s, values %s", label, vals)
-            pydev.iointr(label, vals)
+            values = [int(v) for v in values]
+            logger.debug("Update label %s, values %s", label, values)
+            pydev.iointr(label, values)
 
 
         label = self.prefix + ":names"
-        names = [bytes(name, "utf8") for name in data.names]
-        pydev.iointr(label, names)
+        pydev.iointr(label, string_array_to_bytes(data.names))
+
+        label = self.prefix + ":cnt"
+        pydev.iointr(label, data.cnt)
 
 
 class ViewBPMDataCollectionStats:
@@ -67,11 +72,11 @@ class ViewBPMDataCollectionStats:
 
     def update(self, data: BPMDataCollectionStats):
         for plane, plane_var in [("x", data.x), ("y", data.y)]:
-            for suffix, var in [("values", plane_var.values), ("weights", plane_var.weights)]:
+            for suffix, var in [("values", plane_var.values), ("std", plane_var.std)]:
                 label = f"{self.prefix}:{plane}:{suffix}"
                 pydev.iointr(label, var)
 
-        for suffix, var in[("names", data.names), ("cnt", data.cnt)]:
+        for suffix, var in[("names", string_array_to_bytes(data.names)), ("cnt", data.cnt)]:
             label = self.prefix + ":" + suffix
             pydev.iointr(label, var)
 
@@ -82,7 +87,7 @@ class ViewStringBuffer:
 
     def update(self, buf: Sequence[str]):
         # logger.warning(f'View string {self.label}:"{t_str}"')
-        pydev.iointr(self.label, [bytes(t_str, "utf8") for t_str in buf])
+        pydev.iointr(self.label, string_array_to_bytes(buf))
 
 
 class Views:
