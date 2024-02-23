@@ -17,6 +17,17 @@ DB += bpm_monitor_overview.db
 DB += bpm_data_combinerVersion.db
 DB += view.db
 
+# follow description https://www.slac.stanford.edu/grp/ssrl/spear/epics/site/devIocStats/README_iocAdmin
+# IOCstats / admin
+# (soft    IOCs)
+# HOME_DEVEL=/home/mfp/Devel/github
+# IOCADMIN=$(HOME_DEVEL)/iocStats/iocAdmin/
+
+DB_INSTALLS += $(IOCADMIN)/db/iocAdminSoft.db
+# (if required by next step)
+DB_INSTALLS += $(IOCADMIN)/db/access.db
+# (optional - ONLY if SCAN monitoring is required)
+DB_INSTALLS += $(IOCADMIN)/db/iocAdminScanMon.db
 # If <anyname>.db template is not named <anyname>*.template add
 # <anyname>_TEMPLATE = <templatename>
 
