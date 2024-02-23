@@ -8,14 +8,6 @@ include $(PYDEVICE)/configure/CONFIG.PyDevice
 # Use typed rset structure (see 3.16.1 release notes)
 USR_CPPFLAGS += -DUSE_TYPED_RSET
 
-# Build an IOC support library
-LIBRARY_IOC += bpm_data_combinerSupport
-
-# Link locally-provided code into the support library,
-# rather than directly into the IOC application, that
-# causes problems on Windows DLL builds
-bpm_data_combinerSupport_LIBS += $(EPICS_BASE_IOC_LIBS)
-
 # Auto-generate a header file containing a version string.
 # Version comes from the VCS if available, else date+time.
 # Build the IOC application
