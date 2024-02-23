@@ -15,11 +15,11 @@ from .collector import _combine_collections_by_device_names
 
 
 class Accumulator:
-    def __init__(self, dev_names: Sequence[str]):
+    def __init__(self, dev_names_index: Dict[str, int]):
         # Need to know all dev_names
         # I am using pandas Index for looking up position and handling
         # filling data at correct place
-        self.dev_names_index = Index(dev_names)
+        self.dev_names_index = dev_names_index
         self.collections = None
         # so collections allocator are handled in a single place
         self.swap(check_collection_length=False)
@@ -62,6 +62,6 @@ class Accumulator:
         return BPMDataAccumulation(
             x=BPMDataAccumulationForPlane(values=x.data, valid=~x.mask),
             y=BPMDataAccumulationForPlane(values=y.data, valid=~y.mask),
-            names=self.dev_names_index.to_numpy(),
+            names=list(self.dev_names_index),
             counts=counts
         )

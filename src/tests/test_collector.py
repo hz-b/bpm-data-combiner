@@ -2,6 +2,7 @@ import pytest
 
 from bpm_data_combiner.bl.collector import Collector, ReadingsCollection
 from bpm_data_combiner.data_model.bpm_data_reading import BPMReading
+from bpm_data_combiner.errors import DoubleSubmissionError
 
 
 def test_collector_behaving():
@@ -45,9 +46,9 @@ def test_collector_double_submission():
     cnt = -19
     col.new_reading(BPMReading(cnt=cnt, x=3, y=4, dev_name=dev_names[0]))
 
-    with pytest.raises(AssertionError):
+    with pytest.raises(DoubleSubmissionError):
         col.new_reading(BPMReading(cnt=cnt, x=3, y=4, dev_name=dev_names[0]))
-
+    pass
 
 def test_collector_invalid_submission():
     dev_names = ["BPMZ1D1R", "BPMZ2D1R", "BPMZ4D1R", "BPMZ1T2R"]

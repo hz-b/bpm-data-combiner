@@ -101,3 +101,6 @@ class DispatcherCollection:
         dp.on_ready.add_subscriber(self.on_ready.trigger)
         self.dispatchers[dev_name] = dp
         return dp
+
+    def reset(self):
+        self.get_dispatcher.cache_clear()
