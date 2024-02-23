@@ -9,7 +9,7 @@ record(longin, "$(PREFIX)$(DEV_NAME):im:x")
     field(PINI, "YES")
     field(INP, "$(PREFIX)$(DEV_NAME):im:cnt:x")
     info(Q:group, {
-        "$(PREFIX)$(DEV_NAME)":{"x": {+channel:"VAL", +trigger:""}}
+        "$(DEV_NAME)":{"x": {+channel:"VAL", +trigger:""}}
     })
 }
 
@@ -21,7 +21,7 @@ record(longin, "$(PREFIX)$(DEV_NAME):im:y")
     field(PINI, "YES")
     field(INP, "$(PREFIX)$(DEV_NAME):im:cnt:y")
     info(Q:group, {
-        "$(PREFIX)$(DEV_NAME)":{"y": {+channel:"VAL", +trigger:""}}
+        "$(DEV_NAME)":{"y": {+channel:"VAL", +trigger:""}}
     })
 }
 
@@ -34,7 +34,7 @@ record(longin, "$(PREFIX)$(DEV_NAME):im:cnt")
     field(PINI, "YES")
     field(INP, "$(PREFIX)$(DEV_NAME):im:cnt:trg")
     info(Q:group, {
-        "$(PREFIX)$(DEV_NAME)":{"cnt": {+channel:"VAL", +trigger:"*"}}
+        "$(DEV_NAME)":{"cnt": {+channel:"VAL", +trigger:"*"}}
     })
 }
 
@@ -44,7 +44,7 @@ record(stringin, "$(PREFIX)$(DEV_NAME):im:name")
     field(VAL, "$(DEV_NAME)")
     field(PINI, "YES")
     info(Q:group, {
-        "$(PREFIX)$(DEV_NAME)":{"cfg.name": {+channel:"VAL"}}
+        "$(DEV_NAME)":{"cfg.name": {+channel:"VAL"}}
     })
 }
 
@@ -110,4 +110,16 @@ record(fanout, "$(PREFIX)$(DEV_NAME):im:fanout")
    # this triggered last: this update will
    # trigger the PV update
    field(LNK3, "$(PREFIX)$(DEV_NAME):im:cnt")
+   # trigger concat of the data
+   field(LNK4, "$(DEV_NAME):posv")
+}
+
+record(concat, "$(DEV_NAME):posv")
+{
+   field(DESC, "pos vec [cnt, x, y]")
+   field(NELM, "3")
+   field(IN00, "$(PREFIX)$(DEV_NAME):im:cnt")
+   field(IN01, "$(PREFIX)$(DEV_NAME):im:x")
+   field(IN02, "$(PREFIX)$(DEV_NAME):im:y")
+   field(EGU, "nm")
 }

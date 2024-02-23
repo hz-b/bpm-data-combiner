@@ -25,7 +25,9 @@
 #MODULES = /path/to/modules
 #MYMODULE = $(MODULES)/my-module
 PYDEVICE = /home/schnizer/Devel/github/PyDevice
+IOCADMIN = /home/schnizer/Devel/github/iocStats
 IOCSTATS = /home/schnizer/Devel/github/iocStats
+CONCATRECORD = /home/schnizer/Devel/github/concat-record
 
 # If using the sequencer, point SNCSEQ at its top directory:
 # SNCSEQ = $(MODULES)/seq-ver
