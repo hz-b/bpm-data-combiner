@@ -6,21 +6,27 @@
 < envPaths
 
 cd "${TOP}"
+epicsEnvSet("ENGINEER", "Pierre Schnizer")
+epicsEnvSet("LOCATION","Helmholtz Zentrum Berlin / BESSY II")
 
 epicsEnvSet("PREFIX","Pierre:COM")
 epicsEnvSet("REMOTE","Pierre:SIM:")
 epicsEnvSet("PYTHONPATH","$(TOP)/src")
+epicsEnvSet("IOC_NAME","nbdt002")
 
 ## Register all support components
 dbLoadDatabase "dbd/bpm_data_combiner.dbd"
 bpm_data_combiner_registerRecordDeviceDriver pdbbase
+
+## stats records
+dbLoadRecords("db/iocAdminSoft.db", "IOC=$(IOC_NAME)")
+dbLoadRecords("db/iocRelease.db", "IOC=$(IOC_NAME)")
 
 ## Load record instances
 dbLoadTemplate("db/bpm_dev_input.db", "PREFIX=$(PREFIX)")
 # dbLoadRecords("db/bpm_dev_input_offbeat.db", "PREFIX=$(PREFIX)")
 dbLoadTemplate("db/bpm.db", "PREFIX=$(PREFIX)")
 dbLoadRecords("db/bpm_monitor_overview.db", "PREFIX=$(PREFIX),VIEW=mon")
-dbLoadRecords "db/bpm_data_combinerVersion.db", "user=$(PREFIX)"
 dbLoadRecords("db/view.db", "PREFIX=$(PREFIX)")
 
 pydev("from bpm_data_combiner.app.main import update")
