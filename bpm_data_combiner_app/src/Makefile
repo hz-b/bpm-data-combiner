@@ -14,17 +14,10 @@ LIBRARY_IOC += bpm_data_combinerSupport
 # Link locally-provided code into the support library,
 # rather than directly into the IOC application, that
 # causes problems on Windows DLL builds
-bpm_data_combinerSupport_SRCS += devbpm_data_combinerVersion.c
-bpm_data_combinerSupport_SRCS += initTrace.c
-
 bpm_data_combinerSupport_LIBS += $(EPICS_BASE_IOC_LIBS)
 
 # Auto-generate a header file containing a version string.
 # Version comes from the VCS if available, else date+time.
-GENVERSION = bpm_data_combinerVersion.h
-# Macro name
-GENVERSIONMACRO = bpm_data_combinerVERSION
-
 # Build the IOC application
 PROD_IOC = bpm_data_combiner
 
@@ -34,9 +27,6 @@ DBD += bpm_data_combiner.dbd
 bpm_data_combiner_DBD += base.dbd
 
 # bpm_data_combiner.dbd will include these files:
-bpm_data_combiner_DBD += devbpm_data_combinerVersion.dbd
-bpm_data_combiner_DBD += initTrace.dbd
-
 bpm_data_combiner_DBD += pydev.dbd
 bpm_data_combiner_LIBS += pydev
 
@@ -49,26 +39,6 @@ bpm_data_combiner_SRCS_vxWorks += -nil-
 
 # Link in the code from our support library
 bpm_data_combiner_LIBS += bpm_data_combinerSupport
-
-# To build SNL programs, SNCSEQ must be defined
-# in the <top>/configure/RELEASE file
-ifneq ($(SNCSEQ),)
-    # Build sncExample into bpm_data_combinerSupport
-    sncExample_SNCFLAGS += +r
-    bpm_data_combiner_DBD += sncExample.dbd
-    # A .stt sequence program is *not* pre-processed:
-    bpm_data_combinerSupport_SRCS += sncExample.stt
-    bpm_data_combinerSupport_LIBS += seq pv
-    bpm_data_combiner_LIBS += seq pv
-
-    # Build sncProgram as a standalone program
-    PROD_HOST += sncProgram
-    sncProgram_SNCFLAGS += +m
-    # A .st sequence program *is* pre-processed:
-    sncProgram_SRCS += sncProgram.st
-    sncProgram_LIBS += seq pv
-    sncProgram_LIBS += $(EPICS_BASE_HOST_LIBS)
-endif
 
 # Link QSRV (pvAccess Server) if available
 ifdef EPICS_QSRV_MAJOR_VERSION
@@ -84,6 +54,3 @@ bpm_data_combiner_LIBS += $(EPICS_BASE_IOC_LIBS)
 include $(TOP)/configure/RULES
 #----------------------------------------
 #  ADD EXTRA GNUMAKE RULES BELOW HERE
-
-# Explicit dependency needed for generated header file
-devbpm_data_combinerVersion$(DEP): $(COMMON_DIR)/$(GENVERSION)
