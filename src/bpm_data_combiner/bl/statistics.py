@@ -1,8 +1,17 @@
 import numpy as np
 from numpy import ma
+from numpy.typing import ArrayLike
 
 from ..data_model.bpm_data_accumulation import BPMDataAccumulationForPlane, BPMDataAccumulation
 from ..data_model.bpm_data_collection import BPMDataCollectionStatsPlane, BPMDataCollectionStats
+
+def compute_weights_scaled(values: ArrayLike, *, n_readings: int) -> ArrayLike:
+    """Compute weights taking number of readings into account
+
+    Currently unused
+    """
+    n, _ = values.shape
+    return np.where(n_readings, n_readings / n * values.std(axis=0), np.inf)
 
 
 def compute_mean_weight(accumulated_data: BPMDataAccumulationForPlane) -> BPMDataCollectionStatsPlane:
@@ -10,12 +19,8 @@ def compute_mean_weight(accumulated_data: BPMDataAccumulationForPlane) -> BPMDat
 
     Weights are the standard deviation times the number of readings found
     """
-    n, _ = accumulated_data.values.shape
-    values = ma.masked_array(data=accumulated_data.values, mask=~accumulated_data.valid)
-    mean = values.mean(axis=0)
-    n_readings = np.sum(~values.mask, axis=0)
-    weights = np.where(n_readings, n_readings / n * values.std(axis=0), np.inf)
-    return BPMDataCollectionStatsPlane(values=mean, weights=weights, valid=~weights.mask)
+    val = accumulated_data.values
+    return BPMDataCollectionStatsPlane(values=val.mean(axis=0), std=val.std(axis=0), valid=accumulated_data.valid)
 
 
 def compute_mean_weights_for_planes(data : BPMDataAccumulation) -> BPMDataCollectionStats:

@@ -25,7 +25,7 @@ class BPMDataCollectionStatsPlane:
     #: typically the inverse of the standard deviation of the
     #: values of the measurements times the number of measurements
     #: Todo: check is that the variance?
-    weights : Sequence[float]
+    std: Sequence[float]
     # invalid given that no data were available or
     # it was marked as invalid
     valid : Sequence[bool]

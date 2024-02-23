@@ -1,7 +1,6 @@
 from bpm_data_combiner.bl.dispatcher import Dispatcher, DispatcherCollection
+from bpm_data_combiner.data_model.bpm_data_reading import BPMReading
 import pytest
-
-from bpm_data_combiner.data_model.bpm_data_reading import BPMReadingBeingProcessed
 
 
 def _run_disp_standard(*, cnt, x, y, disp=None):
@@ -44,7 +43,7 @@ def test_dispatcher_calls_subscribers():
     cnt = 0
 
     def cb(val):
-        assert isinstance(val, BPMReadingBeingProcessed)
+        assert isinstance(val, BPMReading)
         nonlocal cnt
         cnt += 1
 

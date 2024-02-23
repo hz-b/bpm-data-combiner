@@ -1,4 +1,3 @@
-
 """
 Combine the data to common sets
 
@@ -17,7 +16,6 @@ import logging
 from typing import Sequence, Hashable, Dict
 import numpy as np
 import numpy.ma as ma
-from pandas import Index
 
 from ..data_model.collection_item import CollectionItem
 from ..data_model.monitored_device import MonitoredDevice
@@ -31,7 +29,7 @@ logger = logging.getLogger("bpm-data-combiner")
 
 
 def _combine_collections_by_device_names(
-    collections: Sequence[Dict[str, BPMReading]], dev_names_index: Index, *, default_value
+    collections: Sequence[Dict[str, BPMReading]], dev_names_index: dict, *, default_value
 ) -> ma.masked_array:
     """use the name to stuff data into correct location
 
@@ -47,7 +45,7 @@ def _combine_collections_by_device_names(
     # todo: handle that x and y plane can be enabled separately
     for row, data_collection in enumerate(collections):
         for name, bpm_data in data_collection.items():
-            col = dev_names_index.get_loc(name)
+            col = dev_names_index[name]
             res.mask[row, col, :] = False
             for plane, val in enumerate([bpm_data.x, bpm_data.y]):
                 if val is None:
@@ -59,7 +57,7 @@ def _combine_collections_by_device_names(
 
 
 def collection_to_bpm_data_collection(
-    collection: Dict[str, BPMReading], dev_names_index: Index, default_value=2**31-1
+    collection: Dict[str, BPMReading], dev_names_index: Dict, default_value=2**31-1
 ):
     ma = _combine_collections_by_device_names([collection], dev_names_index,
                                               default_value=default_value)
@@ -71,7 +69,7 @@ def collection_to_bpm_data_collection(
     return BPMDataCollection(
         x=BPMDataCollectionPlane(values=ma[:, 0], valid=~ma.mask[:,0]),
         y=BPMDataCollectionPlane(values=ma[:, 1], valid=~ma.mask[:,1]),
-        names=dev_names_index.values,
+        names=list(dev_names_index),
         # assuming to be the same for both planes
         cnt=reading.cnt,
     )
@@ -97,7 +95,7 @@ class ReadingsCollection:
         self._is_active = True
 
     def add_reading(self, val: BPMReading):
-        """
+        """cmd.dev_name
 
         Todo: should disabled data be discarded?
         """
@@ -171,6 +169,9 @@ class Collector:
             return r
 
         self._get_collection = _get_collection
+
+    def reset(self):
+        self._get_collection.cache_clear()
 
     def get_collection(self, cnt: Hashable):
         col = self._get_collection(cnt)
