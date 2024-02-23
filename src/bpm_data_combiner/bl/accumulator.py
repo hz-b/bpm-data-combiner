@@ -1,17 +1,13 @@
 """Accumulate collected readings: to provide mean data
 """
-from typing import Sequence, Dict
-
-import numpy as np
-import numpy.ma as ma
-
-# could be also based on a list, index does more internal checks
-# that's why it is used here
-from pandas import Index
-
-from ..data_model.bpm_data_accumulation import BPMDataAccumulation, BPMDataAccumulationForPlane
+from ..data_model.bpm_data_accumulation import (
+    BPMDataAccumulation,
+    BPMDataAccumulationForPlane,
+)
 from ..data_model.bpm_data_reading import BPMReading
 from .collector import _combine_collections_by_device_names
+from typing import Dict
+import numpy as np
 
 
 class Accumulator:
@@ -49,7 +45,9 @@ class Accumulator:
         else:
             collections = self.collections
 
-        tmp = _combine_collections_by_device_names(collections, self.dev_names_index, default_value=0)
+        tmp = _combine_collections_by_device_names(
+            collections, self.dev_names_index, default_value=0
+        )
         counts = np.zeros(len(collections), dtype=np.int64)
         for row, data_collection in enumerate(collections):
             for _, bpm_data in data_collection.items():
@@ -58,10 +56,9 @@ class Accumulator:
 
         x, y = tmp[..., 0], tmp[..., 1]
 
-
         return BPMDataAccumulation(
             x=BPMDataAccumulationForPlane(values=x.data, valid=~x.mask),
             y=BPMDataAccumulationForPlane(values=y.data, valid=~y.mask),
             names=list(self.dev_names_index),
-            counts=counts
+            counts=counts,
         )

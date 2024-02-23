@@ -1,4 +1,3 @@
-
 """
 Combine the data to common sets
 
@@ -17,7 +16,6 @@ import logging
 from typing import Sequence, Hashable, Dict
 import numpy as np
 import numpy.ma as ma
-from pandas import Index
 
 from ..data_model.collection_item import CollectionItem
 from ..data_model.monitored_device import MonitoredDevice
@@ -59,7 +57,7 @@ def _combine_collections_by_device_names(
 
 
 def collection_to_bpm_data_collection(
-    collection: Dict[str, BPMReading], dev_names_index: Index, default_value=2**31-1
+    collection: Dict[str, BPMReading], dev_names_index: Dict, default_value=2**31-1
 ):
     ma = _combine_collections_by_device_names([collection], dev_names_index,
                                               default_value=default_value)
