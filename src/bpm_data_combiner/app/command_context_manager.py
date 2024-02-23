@@ -1,15 +1,20 @@
-from ..bl.command_round_buffer import CommandRoundBuffer, round_buffer_to_string
+from ..bl.command_round_buffer import CommandRoundBuffer, round_buffer_to_string, dict_to_string
 from .view import ViewStringBuffer
+
+
 import logging
+import io
+import traceback
 
 logger = logging.getLogger("bpm-data-combiner")
 
 
 class UpdateContext:
-    def __init__(self, *, method, rbuffer: CommandRoundBuffer, view: ViewStringBuffer):
+    def __init__(self, *, method, rbuffer: CommandRoundBuffer, view: ViewStringBuffer, only_buffer=True):
         self.method = method
         self.roundbuffer = rbuffer
         self.view = view
+        self.only_buffer = only_buffer
 
     def __enter__(self):
         return
@@ -28,16 +33,19 @@ class UpdateContext:
         self.view.update(
             [f"ERR: {exc_type}", f"ERR {exc_val})"] + round_buffer_to_string(self.roundbuffer)
         )
-        return
+        if self.only_buffer:
+             return
 
         last = self.roundbuffer.last()
+
         txt = f" {last.cmd:6s} {dict_to_string(last.kwargs)}: {exc_type}({exc_val})"
         # logger.error(self.roundbuffer)
+
         logger.error("Could not process command:" + txt)
 
         logger.error(
-            f"Could not process command {self.cmd=}:"
-            f"{self.method=} {self.dev_name=} {self.kwargs=}: {exc_type}({exc_val})"
+            f"Could not process command {last.cmd=}:"
+            f"{self.method=} {last.dev_name=} {last.kwargs=}: {exc_type}({exc_val})"
         )
 
         marker = "-" * 78
