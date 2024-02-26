@@ -61,9 +61,12 @@ record(aai, "$(PREFIX):inp:$(DEV_NAME):posv")
      field(FLNK, "$(PREFIX):im:$(DEV_NAME):toposv")
 }
 
-record(aSub, "$(PREFIX):inp:$(DEV_NAME):toposv")
+# push dat from input to pydev:aao
+# aao seems not to have an DOL entry
+record(aSub, "$(PREFIX):im:$(DEV_NAME):toposv")
 {
      field(DESC, "mirror: $(DEV_NAME) posv to aao")
+     # perhaps to read directly from network ?
      field(INPA, "$(PREFIX):inp:$(DEV_NAME):posv")
      field(OUTA, "$(PREFIX):im:$(DEV_NAME):posv PP")
      field(NOA,  3)
@@ -71,13 +74,18 @@ record(aSub, "$(PREFIX):inp:$(DEV_NAME):toposv")
      field(FTA,  "LONG")
      field(FTVA,  "LONG")
      field(SNAM, "array_forward")
+     field(TPRO, 0)
 }
 
 record(aao, "$(PREFIX):im:$(DEV_NAME):posv")
 {
      field(DESC, "mirror: $(DEV_NAME) posv to py")
+     field(DTYP, "pydev")
      field(NELM, 3)
-     field(OUT,  "@update(dev_name='$(DEV_NAME)', reading=%VAL%)")
+     field(FTVL,  "LONG")
+     field(OUT,  "@update(dev_name='$(DEV_NAME)', reading=%VAL%, tpro=%TPRO%)")
+     field(FLNK, "$(PREFIX):im:$(DEV_NAME):mon:trg")
+     field(TPRO, 0)
 }
 
 record(fanout, "$(PREFIX):inp:$(DEV_NAME):trg")
