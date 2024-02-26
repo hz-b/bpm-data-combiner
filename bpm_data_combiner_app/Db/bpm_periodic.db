@@ -1,17 +1,24 @@
-record(calc, "$(PREFIX)$(VIEW):periodic:cnt")
+
+# this record is now here to simulate the trigger
+# there should be a dedicated input trigger
+# that listens to the trigger common to all others
+record(calc, "$(PREFIX):inp:periodic:cnt")
 {
      field(DESC, "trigger periodic update")
      field(VAL, 0)
      field(PINI, 1)
      field(CALC, "VAL + 1")
+     field(SCAN, "1 second")
+     field(FLNK, "$(PREFIX):im:periodic:psh")
+
 }
 
-record(longout, "$(PREFIX)$(VIEW):periodic:psh")
+record(longout, "$(PREFIX):im:periodic:psh")
 {
      field(DESC, "trigger periodic update to python")
      field(DTYP, "pydev")
-     field(OUT, "@update(dev_name=None, periodic=%VAL%)")
-     field(DOL, "$(PREFIX)$(VIEW):periodic:psh PP")
+     field(OUT, "@update(dev_name=None, periodic=%VAL%, tpro=%TPRO%)")
+     field(DOL, "$(PREFIX):inp:periodic:psh PP")
      field(OMSL, "closed_loop")
-     field(SCAN, "2 second)
+     field(TPRO, 1)
 }
