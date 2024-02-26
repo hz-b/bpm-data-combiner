@@ -8,7 +8,7 @@ record(calc, "$(PREFIX):inp:periodic:cnt")
      field(VAL, 0)
      field(PINI, 1)
      field(CALC, "VAL + 1")
-     field(SCAN, "5 second")
+     field(SCAN, "2 second")
      field(FLNK, "$(PREFIX):im:periodic:psh")
 
 }
@@ -20,5 +20,5 @@ record(longout, "$(PREFIX):im:periodic:psh")
      field(OUT, "@update(dev_name=None, periodic=%VAL%, tpro=%TPRO%)")
      field(DOL, "$(PREFIX):inp:periodic:psh PP")
      field(OMSL, "closed_loop")
-     field(TPRO, 1)
+     field(TPRO, 0)
 }

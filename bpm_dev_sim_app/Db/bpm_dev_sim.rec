@@ -98,7 +98,7 @@ record(calc, "$(PREFIX)$(DEV_NAME):im:cnt:trg")
    field(VAL, 0)
    field(PINI, "YES")
    field(CALC, "A+1")
-   field(SCAN, "2 second")
+   field(SCAN, ".1 second")
    field(FLNK, "$(PREFIX)$(DEV_NAME):im:fanout")
 }
 
