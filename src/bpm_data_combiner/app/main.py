@@ -3,10 +3,7 @@
 Todo:
    add a reset command
 """
-import io
-import itertools
 import logging
-import traceback
 from typing import Optional, Sequence, Mapping
 
 from .command_context_manager import UpdateContext
@@ -18,7 +15,7 @@ from ..bl.event import Event
 from ..bl.monitor_devices import MonitorDevices
 from ..bl.preprocessor import PreProcessor
 from ..bl.statistics import compute_mean_weights_for_planes
-from ..data_model.bpm_data_accumulation import BPMDataAccumulation
+from ..data_model.bpm_data_reading import BPMReading
 from ..data_model.monitored_device import MonitoredDevice
 from ..data_model.command import Command
 from .view import Views
@@ -68,11 +65,10 @@ col = Collector(name="data_collector", devices_names=list(dev_name_index), max_c
 dispatcher_collection.subscribe(lambda reading: col.new_reading(preprocessor.preprocess(reading)))
 
 #: accumulate data above threshold
-acc_abv_th = Accumulator(dev_name_index)
+# acc_abv_th = Accumulator(dev_name_index)
 # col.on_above_threshold.add_subscriber(acc_abv_th.add)
 #: accumulate data only using items that a ready
 acc_ready = Accumulator(dev_name_index)
-col.on_ready.add_subscriber(acc_ready.add)
 
 
 # fmt:off
@@ -80,28 +76,42 @@ views = Views(prefix="Pierre:COM")
 def cb(collection):
     # Here we need to use dev_names and not the active ones
     # I guss there should be an exporter
+    for _, item in collection.items():
+        logger.debug("new ready collection %s", item.cnt)
+        break
     data = collection_to_bpm_data_collection(collection, dev_name_index)
+    logger.debug("adding data %s", data)
+    acc_ready.add(data)
     views.ready_data.update(data)
 col.on_ready.add_subscriber(cb)
+# col.on_ready.add_subscriber(acc_ready.add)
 # fmt:on
+
+
+# fmt:off
 def cb(names):
     logger.debug("Monitoring devics, active ones: %s", names)
     views.monitor_bpms.update(names, np.ones(len(names), bool))
-
 monitor_devices.on_status_change.add_subscriber(cb)
+# fmt:on
 
 
-def cb_periodic_update_accumulated_above_threshold(cnt : Optional[int]):
+# fmt:off
+def cb_periodic_update_accumulated_ready(cnt : Optional[int]):
     """
     """
-    views.periodic_data.update(compute_mean_weights_for_planes(acc_abv_th.get()))
-
+    stat_data = compute_mean_weights_for_planes(acc_ready.get())
+    views.periodic_data.update(stat_data)
+    logger.debug("pushing stat data to bdata_view")
+    views.bdata.update(stat_data)
+    logger.debug("pushing stat data to bdata_view done")
 
 # could do that directly too ... but appetite comes with eating
 # so let's have a common point to see what all shall be processed
 # at this point
 periodic_event = Event(name="periodic_update_2sec")
-periodic_event.add_subscriber(cb_periodic_update_accumulated_above_threshold)
+periodic_event.add_subscriber(cb_periodic_update_accumulated_ready)
+# fmt:on
 
 
 def process_cnt(*, dev_name, cnt):
@@ -120,6 +130,13 @@ def process_chk_cnt(*, dev_name, ctl):
     return dispatcher_collection.get_dispatcher(dev_name).update_check(ctl)
 
 
+def process_reading(*, dev_name, reading):
+    cnt, x, y = reading
+    return col.new_reading(
+        preprocessor.preprocess(BPMReading(dev_name=dev_name, x=x, y=y, cnt=cnt))
+    )
+
+
 def process_active(*, dev_name, active):
     return monitor_devices.set_active(dev_name, active)
 
@@ -135,6 +152,7 @@ def process_reset(*, dev_name, reset):
     dispatcher_collection.reset()
     col.reset()
 
+
 cmds = dict(
     # handling a single reading
     cnt=process_cnt,
@@ -148,13 +166,14 @@ cmds = dict(
     # to wait for all data
     periodic=process_periodic_trigger,
     # reset all internal states
-    reset=process_reset
+    reset=process_reset,
+    reading=process_reading
 )
 
 rbuffer = CommandRoundBuffer(maxsize=50)
 
 
-def update(*, dev_name, **kwargs):
+def update(*, dev_name, tpro=False, **kwargs):
     """Inform the dispatcher associated to the device that new data is available"""
     # just to get the cmd: first kwarg
     # for cmd in kwargs: break;

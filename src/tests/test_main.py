@@ -5,7 +5,7 @@ from time import sleep
 from sys import stdout
 import logging
 
-from bpm_data_combiner.app.main import update, dev_name_index, col, monitor_devices
+from bpm_data_combiner.app.main import update, dev_name_index, col, acc_ready
 
 import pydev
 
@@ -108,6 +108,30 @@ def test50_reading_single_device_misbehaved():
     with pytest.raises(AssertionError) as ae:
         update(dev_name=dev_name, cnt=cnt + 1)
 
+
+def test001_check_stats():
+    """test that data stream is assembled to combined data"""
+
+    update(dev_name=None, reset=True)
+
+    # ensure that all devices are active
+    for dev_name in list(dev_name_index):
+        update(dev_name=dev_name, active=True)
+
+    N = 3
+    for cnt in range(N):
+        for dev_name in list(dev_name_index):
+            update(dev_name=dev_name, cnt=cnt)
+            update(dev_name=dev_name, x=cnt)
+            update(dev_name=dev_name, y=-cnt)
+            print(f"{dev_name=} {cnt=} ")
+            update(dev_name=dev_name, ctl=cnt)
+
+    for cnt in range(N):
+        readings = col.get_collection(cnt)
+        assert readings.is_ready()
+
+    update(dev_name=None, periodic=True)
 
 
 class ComputeDelay:

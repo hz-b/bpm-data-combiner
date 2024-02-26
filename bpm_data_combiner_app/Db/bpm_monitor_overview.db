@@ -9,11 +9,11 @@ record(waveform, "$(PREFIX):$(VIEW):active")
     field(INP,  "@pydev.iointr('$(PREFIX):$(VIEW):active')")
     field(NELM, 128)
     info(Q:group, {
-         "$(PREFIX)$(VIEW)": {
-            "active": {+channel:"VAL"}
-        }
+          "$(PREFIX)$(VIEW)": {
+             "active": {+channel:"VAL"}
+         }
     })
-    field(TPRO, 1)
+    field(TPRO, 0)
 }
 
 record(waveform, "$(PREFIX):$(VIEW):names")
@@ -29,5 +29,20 @@ record(waveform, "$(PREFIX):$(VIEW):names")
             "names": {+channel:"VAL"}
         }
     })
+    field(TPRO, 0)
+}
+
+
+record(longin, "$(PREFIX):$(VIEW):cnt")
+{
+    field(DESC, "BPM cnt (id) of data")
+    field(DTYP, "pydev")
+    field(SCAN, "I/O Intr")
+    field(INP,  "@pydev.iointr('$(PREFIX):$(VIEW):cnt')")
+    #info(Q:group, {
+    #     "$(PREFIX)$(VIEW)": {
+    #        "names": {+channel:"VAL"}
+    #    }
+    #})
     field(TPRO, 1)
 }

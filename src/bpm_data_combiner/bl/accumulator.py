@@ -1,5 +1,7 @@
 """Accumulate collected readings: to provide mean data
 """
+import logging
+
 from ..data_model.bpm_data_accumulation import (
     BPMDataAccumulation,
     BPMDataAccumulationForPlane,
@@ -9,9 +11,11 @@ from .collector import _combine_collections_by_device_names
 from typing import Dict
 import numpy as np
 
+logger = logging.getLogger("bpm-data-combiner")
+
 
 class Accumulator:
-    def __init__(self, dev_names_index: Dict[str, int]):
+    def __init__(self, dev_names_index: Dict[str, int], max_entries: int = 100):
         # Need to know all dev_names
         # I am using pandas Index for looking up position and handling
         # filling data at correct place
@@ -21,6 +25,7 @@ class Accumulator:
         self.swap(check_collection_length=False)
 
     def add(self, col: Dict[str, BPMReading]):
+        logger.debug("Accumulator: adding collection!")
         self.collections.append(col)
 
     def swap(self, check_collection_length: bool = True):
@@ -45,20 +50,19 @@ class Accumulator:
         else:
             collections = self.collections
 
-        tmp = _combine_collections_by_device_names(
-            collections, self.dev_names_index, default_value=0
-        )
         counts = np.zeros(len(collections), dtype=np.int64)
-        for row, data_collection in enumerate(collections):
-            for _, bpm_data in data_collection.items():
-                counts[row] = bpm_data.cnt
-                break
+        for row, bpm_data in enumerate(collections):
+            counts[row] = bpm_data.cnt
 
-        x, y = tmp[..., 0], tmp[..., 1]
+        x_values = np.array([bpm_data.x.values for bpm_data in collections])
+        y_values = np.array([bpm_data.y.values for bpm_data in collections])
+        x_valid = np.array([~bpm_data.x.valid for bpm_data in collections])
+        y_valid = np.array([~bpm_data.y.valid for bpm_data in collections])
+
 
         return BPMDataAccumulation(
-            x=BPMDataAccumulationForPlane(values=x.data, valid=~x.mask),
-            y=BPMDataAccumulationForPlane(values=y.data, valid=~y.mask),
+            x=BPMDataAccumulationForPlane(values=x_values, valid=~x_valid),
+            y=BPMDataAccumulationForPlane(values=y_values, valid=~y_valid),
             names=list(self.dev_names_index),
             counts=counts,
         )

@@ -28,7 +28,10 @@ class BPMDataCollectionStatsPlane:
     std: Sequence[float]
     # invalid given that no data were available or
     # it was marked as invalid
-    valid : Sequence[bool]
+    # Todo: is this information still needed given that n_readings exists?
+    # valid : Sequence[bool]
+    # how many data points arrived
+    n_readings : Sequence[int]
 
 
 @dataclass

@@ -17,18 +17,34 @@ record(waveform, "$(PREFIX):$(VIEW):values")
     })
 }
 
-record(waveform, "$(PREFIX):$(VIEW):weights")
+record(waveform, "$(PREFIX):$(VIEW):std")
 {
     field(DESC, "values of bpm (roughly std)")
     field(DTYP, "pydev")
     field(EGU, "nm")
     field(FTVL, "DOUBLE")
     field(SCAN, "I/O Intr")
-    field(INP,  "@pydev.iointr('$(PREFIX):$(VIEW):weights')")
+    field(INP,  "@pydev.iointr('$(PREFIX):$(VIEW):std')")
     field(NELM, 128)
     info(Q:group, {
          "$(PREFIX)$(VIEW)": {
-            "values": {+channel:"VAL"}
+            "std": {+channel:"VAL"}
+        }
+    })
+}
+
+record(waveform, "$(PREFIX):$(VIEW):n_readings")
+{
+    field(DESC, "values of bpm n_readings?)")
+    field(DTYP, "pydev")
+    field(EGU, "nm")
+    field(FTVL, "LONG")
+    field(SCAN, "I/O Intr")
+    field(INP,  "@pydev.iointr('$(PREFIX):$(VIEW):n_readings')")
+    field(NELM, 128)
+    info(Q:group, {
+         "$(PREFIX)$(VIEW)": {
+            "n_readings": {+channel:"VAL"}
         }
     })
 }
