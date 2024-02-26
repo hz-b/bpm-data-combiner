@@ -8,7 +8,7 @@ record(calc, "$(PREFIX):inp:periodic:cnt")
      field(VAL, 0)
      field(PINI, 1)
      field(CALC, "VAL + 1")
-     field(SCAN, "1 second")
+     field(SCAN, "5 second")
      field(FLNK, "$(PREFIX):im:periodic:psh")
 
 }

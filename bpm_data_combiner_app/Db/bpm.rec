@@ -4,7 +4,7 @@ record(waveform, "$(PREFIX):$(VIEW):x:values")
     field(DESC, "x values")
     field(DTYP, "pydev")
     field(EGU, "nm")
-    field(FTVL, "DOUBLE")
+    field(FTVL, "LONG")
     field(SCAN, "I/O Intr")
     field(INP,  "@pydev.iointr('$(PREFIX):$(VIEW):x:values')")
     field(NELM, 128)
@@ -16,13 +16,13 @@ record(waveform, "$(PREFIX):$(VIEW):x:values")
     })
 }
 
-record(waveform, "$(PREFIX):$(VIEW):x:active")
+record(waveform, "$(PREFIX):$(VIEW):x:valid")
 {
-    field(DESC, "x values")
+    field(DESC, "x values (1 valid, 0, invalid)")
     field(DTYP, "pydev")
-    field(FTVL, "LONG")
+    field(FTVL, "CHAR")
     field(SCAN, "I/O Intr")
-    field(INP,  "@pydev.iointr('$(PREFIX):$(VIEW):x:')")
+    field(INP,  "@pydev.iointr('$(PREFIX):$(VIEW):x:valid')")
     field(NELM, 128)
     field(TPRO, 0)
     info(Q:group, {
@@ -32,13 +32,14 @@ record(waveform, "$(PREFIX):$(VIEW):x:active")
     })
 }
 
+
 # BPM data collected
 record(waveform, "$(PREFIX):$(VIEW):y:values")
 {
     field(DESC, "x values")
     field(DTYP, "pydev")
     field(EGU, "nm")
-    field(FTVL, "DOUBLE")
+    field(FTVL, "LONG")
     field(SCAN, "I/O Intr")
     field(INP,  "@pydev.iointr('$(PREFIX):$(VIEW):y:values')")
     field(NELM, 128)
@@ -50,14 +51,14 @@ record(waveform, "$(PREFIX):$(VIEW):y:values")
     })
 }
 
-record(waveform, "$(PREFIX):$(VIEW):y:active")
+record(waveform, "$(PREFIX):$(VIEW):y:valid")
 {
     field(DESC, "x values")
     field(DTYP, "pydev")
     field(EGU, "nm")
-    field(FTVL, "LONG")
+    field(FTVL, "CHAR")
     field(SCAN, "I/O Intr")
-    field(INP,  "@pydev.iointr('$(PREFIX):$(VIEW):y:active')")
+    field(INP,  "@pydev.iointr('$(PREFIX):$(VIEW):y:valid')")
     field(NELM, 128)
     field(TPRO, 0)
     info(Q:group, {
@@ -66,4 +67,3 @@ record(waveform, "$(PREFIX):$(VIEW):y:active")
         }
     })
 }
-
