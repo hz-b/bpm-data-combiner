@@ -3,10 +3,7 @@
 Todo:
    add a reset command
 """
-import io
-import itertools
 import logging
-import traceback
 from typing import Optional, Sequence, Mapping
 
 from .command_context_manager import UpdateContext
@@ -18,7 +15,6 @@ from ..bl.event import Event
 from ..bl.monitor_devices import MonitorDevices
 from ..bl.preprocessor import PreProcessor
 from ..bl.statistics import compute_mean_weights_for_planes
-from ..data_model.bpm_data_accumulation import BPMDataAccumulation
 from ..data_model.bpm_data_reading import BPMReading
 from ..data_model.monitored_device import MonitoredDevice
 from ..data_model.command import Command
@@ -89,30 +85,33 @@ def cb(collection):
     views.ready_data.update(data)
 col.on_ready.add_subscriber(cb)
 # col.on_ready.add_subscriber(acc_ready.add)
-
-
 # fmt:on
+
+
+# fmt:off
 def cb(names):
     logger.debug("Monitoring devics, active ones: %s", names)
     views.monitor_bpms.update(names, np.ones(len(names), bool))
-
 monitor_devices.on_status_change.add_subscriber(cb)
+# fmt:on
 
 
+# fmt:off
 def cb_periodic_update_accumulated_ready(cnt : Optional[int]):
     """
     """
     stat_data = compute_mean_weights_for_planes(acc_ready.get())
     views.periodic_data.update(stat_data)
-    # logger.warning("pushing stat data to bdata_view")
+    logger.debug("pushing stat data to bdata_view")
     views.bdata.update(stat_data)
-    logger.warning("pushing stat data to bdata_view done")
+    logger.debug("pushing stat data to bdata_view done")
 
 # could do that directly too ... but appetite comes with eating
 # so let's have a common point to see what all shall be processed
 # at this point
 periodic_event = Event(name="periodic_update_2sec")
 periodic_event.add_subscriber(cb_periodic_update_accumulated_ready)
+# fmt:on
 
 
 def process_cnt(*, dev_name, cnt):
@@ -129,6 +128,7 @@ def process_y_val(*, dev_name, y):
 
 def process_chk_cnt(*, dev_name, ctl):
     return dispatcher_collection.get_dispatcher(dev_name).update_check(ctl)
+
 
 def process_reading(*, dev_name, reading):
     cnt, x, y = reading
@@ -151,6 +151,7 @@ def process_periodic_trigger(*, dev_name, periodic: Mapping):
 def process_reset(*, dev_name, reset):
     dispatcher_collection.reset()
     col.reset()
+
 
 cmds = dict(
     # handling a single reading

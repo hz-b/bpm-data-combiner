@@ -127,7 +127,7 @@ class ViewBPMDataAsBData:
 
         label = f"{self.prefix}"
         bdata = [float(v) for v in bdata.ravel()]
-        logger.warning("view bdata: label %s,  %d n_entries", label, n_entries)
+        logger.debug("view bdata: label %s,  %d n_entries", label, n_entries)
         # logger.warning("view bdata: label %s bdata %s", label, bdata)
         pydev.iointr(label, bdata)
 
