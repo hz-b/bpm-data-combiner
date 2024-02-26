@@ -1,11 +1,11 @@
 import numpy as np
 from numpy import ma
-from numpy.typing import ArrayLike
+# from numpy.typing import ArrayLike
 
 from ..data_model.bpm_data_accumulation import BPMDataAccumulationForPlane, BPMDataAccumulation
 from ..data_model.bpm_data_collection import BPMDataCollectionStatsPlane, BPMDataCollectionStats
 
-def compute_weights_scaled(values: ArrayLike, *, n_readings: int) -> ArrayLike:
+def compute_weights_scaled(values, *, n_readings: int): # -> ArrayLike:
     """Compute weights taking number of readings into account
 
     Currently unused
