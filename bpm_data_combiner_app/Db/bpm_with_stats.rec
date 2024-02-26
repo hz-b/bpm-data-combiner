@@ -33,18 +33,18 @@ record(waveform, "$(PREFIX):$(VIEW):std")
     })
 }
 
-record(waveform, "$(PREFIX):$(VIEW):valid")
+record(waveform, "$(PREFIX):$(VIEW):n_readings")
 {
-    field(DESC, "values of bpm valid?)")
+    field(DESC, "values of bpm n_readings?)")
     field(DTYP, "pydev")
     field(EGU, "nm")
-    field(FTVL, "CHAR")
+    field(FTVL, "LONG")
     field(SCAN, "I/O Intr")
-    field(INP,  "@pydev.iointr('$(PREFIX):$(VIEW):valid')")
+    field(INP,  "@pydev.iointr('$(PREFIX):$(VIEW):n_readings')")
     field(NELM, 128)
     info(Q:group, {
          "$(PREFIX)$(VIEW)": {
-            "std": {+channel:"VAL"}
+            "n_readings": {+channel:"VAL"}
         }
     })
 }

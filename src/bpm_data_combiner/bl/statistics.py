@@ -20,7 +20,8 @@ def compute_mean_weight(accumulated_data: BPMDataAccumulationForPlane) -> BPMDat
     Weights are the standard deviation times the number of readings found
     """
     val = accumulated_data.values
-    return BPMDataCollectionStatsPlane(values=val.mean(axis=0), std=val.std(axis=0), valid=accumulated_data.valid)
+    n_readings = accumulated_data.valid.sum(axis=0)
+    return BPMDataCollectionStatsPlane(values=val.mean(axis=0), std=val.std(axis=0), n_readings=n_readings)
 
 
 def compute_mean_weights_for_planes(data : BPMDataAccumulation) -> BPMDataCollectionStats:

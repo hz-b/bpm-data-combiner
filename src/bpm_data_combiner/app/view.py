@@ -8,7 +8,8 @@ import pydev
 
 logger = logging.getLogger("bpm-data-combiner")
 
-def string_array_to_bytes(names: Sequence[str], *, encoding = "utf8"):
+
+def string_array_to_bytes(names: Sequence[str], *, encoding="utf8"):
     return [bytes(name, encoding) for name in names]
 
 
@@ -16,8 +17,8 @@ class ViewBPMMonitoring:
     def __init__(self, prefix: str):
         self.prefix = prefix
 
-    def update(self, names : Sequence[str], active: Sequence[bool]):
-        names =  string_array_to_bytes(names)
+    def update(self, names: Sequence[str], active: Sequence[bool]):
+        names = string_array_to_bytes(names)
         label = self.prefix + ":" + "names"
         logger.debug("Update active view label %s, values %s", label, names)
         pydev.iointr(label, names)
@@ -75,20 +76,26 @@ class ViewBPMDataCollection:
         pydev.iointr(label, names_byte_encoded)
 
 
-
 class ViewBPMDataCollectionStats:
     def __init__(self, prefix: str):
         self.prefix = prefix
 
     def update(self, data: BPMDataCollectionStats):
         for plane, plane_var in [("x", data.x), ("y", data.y)]:
-            for suffix, var in [("values", plane_var.values), ("std", plane_var.std), ("valid", plane_var.valid)]:
+            for suffix, var in [
+                ("values", [float(v) for v in plane_var.values]),
+                ("std", [float(v) for v in plane_var.std]),
+                ("n_readings", [int(v) for v in plane_var.n_readings]),
+            ]:
                 label = f"{self.prefix}:{plane}:{suffix}"
+                logger.warning("label %s var %s", label, var)
                 pydev.iointr(label, var)
 
         # which data count? not there yet
         # ("cnt", data.cnt)
-        for suffix, var in [("names", string_array_to_bytes(data.names)),]:
+        for suffix, var in [
+            ("names", string_array_to_bytes(data.names)),
+        ]:
             label = self.prefix + ":" + suffix
             pydev.iointr(label, var)
 
@@ -102,12 +109,12 @@ class ViewBPMDataAsBData:
     Todo:
        check necessary coordinate conversion
     """
+
     def __init__(self, prefix: str):
         self.prefix = prefix
 
     def update(self, data: BPMDataCollectionStats):
-        """
-        """
+        """ """
         n_entries = len(data.x.values)
         bdata = np.empty(8, n_entries, dtype=np.float)
         bdata.setfield(np.nan)
@@ -118,6 +125,7 @@ class ViewBPMDataAsBData:
 
         label = f"{self.prefix}:bdata"
         pydev.iointr(label, bdata.ravel())
+
 
 class ViewStringBuffer:
     def __init__(self, label: str):
@@ -131,6 +139,6 @@ class ViewStringBuffer:
 class Views:
     def __init__(self, prefix: str):
         self.ready_data = ViewBPMDataCollection(prefix + ":out:100ms")
-        self.periodic_data = ViewBPMDataCollectionStats(prefix + ":periodic")
+        self.periodic_data = ViewBPMDataCollectionStats(prefix + ":out:2s")
         self.monitor_bpms = ViewBPMMonitoring(prefix + ":mon")
-        self.monitor_update_cmd_errors =  ViewStringBuffer(prefix + ":im:cmd_err")
+        self.monitor_update_cmd_errors = ViewStringBuffer(prefix + ":im:cmd_err")

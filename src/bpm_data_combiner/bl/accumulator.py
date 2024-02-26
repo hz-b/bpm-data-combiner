@@ -25,7 +25,7 @@ class Accumulator:
         self.swap(check_collection_length=False)
 
     def add(self, col: Dict[str, BPMReading]):
-        logger.warning("Accumulator: adding collection!")
+        logger.debug("Accumulator: adding collection!")
         self.collections.append(col)
 
     def swap(self, check_collection_length: bool = True):
