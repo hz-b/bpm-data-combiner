@@ -1,0 +1,13 @@
+# need to find out what I have to replace
+record(waveform, "$(PREFIX):bdata")
+{
+    field(DESC, "bdata values")
+    field(DTYP, "pydev")
+    field(EGU, "??")
+    field(EGU, "nm")
+    field(FTVL, "DOUBLE")
+    field(SCAN, "I/O Intr")
+    field(INP,  "@pydev.iointr('$(PREFIX):bdata')")
+    field(NELM, 128)
+    field(TPRO, 0)
+}
