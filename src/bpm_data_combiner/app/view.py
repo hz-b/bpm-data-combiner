@@ -118,7 +118,7 @@ class ViewBPMDataAsBData:
         """
         # logger.debug("view bdata: publishing data %s", data)
         n_entries = len(data.x.values)
-        bdata = np.empty([8, n_entries], dtype=np.float)
+        bdata = np.empty([8, n_entries], dtype=float)
         bdata.fill(np.nan)
         bdata[0] = data.x.values
         bdata[1] = data.y.values
