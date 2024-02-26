@@ -86,7 +86,9 @@ class ViewBPMDataCollectionStats:
                 label = f"{self.prefix}:{plane}:{suffix}"
                 pydev.iointr(label, var)
 
-        for suffix, var in[("names", string_array_to_bytes(data.names)), ("cnt", data.cnt)]:
+        # which data count? not there yet
+        # ("cnt", data.cnt)
+        for suffix, var in [("names", string_array_to_bytes(data.names)),]:
             label = self.prefix + ":" + suffix
             pydev.iointr(label, var)
 

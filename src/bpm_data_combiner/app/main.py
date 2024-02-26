@@ -73,7 +73,6 @@ dispatcher_collection.subscribe(lambda reading: col.new_reading(preprocessor.pre
 # col.on_above_threshold.add_subscriber(acc_abv_th.add)
 #: accumulate data only using items that a ready
 acc_ready = Accumulator(dev_name_index)
-col.on_ready.add_subscriber(acc_ready.add)
 
 
 # fmt:off
@@ -81,9 +80,17 @@ views = Views(prefix="Pierre:COM")
 def cb(collection):
     # Here we need to use dev_names and not the active ones
     # I guss there should be an exporter
+    for _, item in collection.items():
+        logger.debug("new ready collection %s", item.cnt)
+        break
     data = collection_to_bpm_data_collection(collection, dev_name_index)
+    logger.debug("adding data %s", data)
+    acc_ready.add(data)
     views.ready_data.update(data)
 col.on_ready.add_subscriber(cb)
+# col.on_ready.add_subscriber(acc_ready.add)
+
+
 # fmt:on
 def cb(names):
     logger.debug("Monitoring devics, active ones: %s", names)
@@ -95,7 +102,8 @@ monitor_devices.on_status_change.add_subscriber(cb)
 def cb_periodic_update_accumulated_ready(cnt : Optional[int]):
     """
     """
-    views.periodic_data.update(compute_mean_weights_for_planes(acc_ready.get()))
+    tmp = compute_mean_weights_for_planes(acc_ready.get())
+    views.periodic_data.update(tmp)
 
 
 # could do that directly too ... but appetite comes with eating
