@@ -1,6 +1,7 @@
 import pytest
 import numpy as np
 from bpm_data_combiner.bl.accumulator import Accumulator
+from bpm_data_combiner.bl.collector import collection_to_bpm_data_collection
 from bpm_data_combiner.bl.statistics import compute_mean_weights_for_planes
 from bpm_data_combiner.data_model.bpm_data_reading import BPMReading
 
@@ -30,7 +31,7 @@ def test_accumulator_add():
             name: BPMReading(dev_name=name, x=x, y=y, cnt=i)
             for name, x, y, in zip(dev_names_index, X, Y)
         }
-        acc.add(d)
+        acc.add(collection_to_bpm_data_collection(d, dev_names_index))
 
     rc = acc.get()
     assert (np.array(rc.names) == np.array(list(dev_names_index))).all()
@@ -60,7 +61,7 @@ def test_accumulator_entry_missing():
             name: BPMReading(dev_name=name, x=x, y=y, cnt=cnt)
             for name, x, y, in zip(names, X, Y)
         }
-        acc.add(d)
+        acc.add(collection_to_bpm_data_collection(d, dev_names_index=dev_names_index))
 
     indices = np.arange(1, L + 1)
 
@@ -92,7 +93,7 @@ def test_accumulator_devices_always_missing():
             name: BPMReading(dev_name=name, x=x, y=y, cnt=i)
             for name, x, y, in zip(names, X, Y)
         }
-        acc.add(d)
+        acc.add(collection_to_bpm_data_collection(d, dev_names_index))
 
     r = acc.get()
 
