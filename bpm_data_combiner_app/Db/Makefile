@@ -13,6 +13,7 @@ DB += bpm_with_stats.rec
 DB += bpm.rec
 DB += bpm.db
 DB += bpm_periodic.db
+DB += bpm_bdata.db
 DB += bpm_monitor_overview.db
 # version of the bpm
 DB += bpm_data_combinerVersion.db

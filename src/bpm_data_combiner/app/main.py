@@ -102,9 +102,11 @@ monitor_devices.on_status_change.add_subscriber(cb)
 def cb_periodic_update_accumulated_ready(cnt : Optional[int]):
     """
     """
-    tmp = compute_mean_weights_for_planes(acc_ready.get())
-    views.periodic_data.update(tmp)
-
+    stat_data = compute_mean_weights_for_planes(acc_ready.get())
+    views.periodic_data.update(stat_data)
+    # logger.warning("pushing stat data to bdata_view")
+    views.bdata.update(stat_data)
+    logger.warning("pushing stat data to bdata_view done")
 
 # could do that directly too ... but appetite comes with eating
 # so let's have a common point to see what all shall be processed

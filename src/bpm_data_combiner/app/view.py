@@ -88,7 +88,7 @@ class ViewBPMDataCollectionStats:
                 ("n_readings", [int(v) for v in plane_var.n_readings]),
             ]:
                 label = f"{self.prefix}:{plane}:{suffix}"
-                logger.warning("label %s var %s", label, var)
+                logger.debug("label %s var %s", label, var)
                 pydev.iointr(label, var)
 
         # which data count? not there yet
@@ -114,17 +114,22 @@ class ViewBPMDataAsBData:
         self.prefix = prefix
 
     def update(self, data: BPMDataCollectionStats):
-        """ """
+        """prepare data as expected
+        """
+        # logger.debug("view bdata: publishing data %s", data)
         n_entries = len(data.x.values)
-        bdata = np.empty(8, n_entries, dtype=np.float)
-        bdata.setfield(np.nan)
+        bdata = np.empty([8, n_entries], dtype=np.float)
+        bdata.fill(np.nan)
         bdata[0] = data.x.values
-        bdata[1] = data.x.std
-        bdata[6] = data.y.values
+        bdata[1] = data.y.values
+        bdata[6] = data.x.std
         bdata[7] = data.y.std
 
-        label = f"{self.prefix}:bdata"
-        pydev.iointr(label, bdata.ravel())
+        label = f"{self.prefix}"
+        bdata = [float(v) for v in bdata.ravel()]
+        logger.warning("view bdata: label %s,  %d n_entries", label, n_entries)
+        # logger.warning("view bdata: label %s bdata %s", label, bdata)
+        pydev.iointr(label, bdata)
 
 
 class ViewStringBuffer:
@@ -140,5 +145,6 @@ class Views:
     def __init__(self, prefix: str):
         self.ready_data = ViewBPMDataCollection(prefix + ":out:100ms")
         self.periodic_data = ViewBPMDataCollectionStats(prefix + ":out:2s")
+        self.bdata = ViewBPMDataAsBData(prefix + ":bdata")
         self.monitor_bpms = ViewBPMMonitoring(prefix + ":mon")
         self.monitor_update_cmd_errors = ViewStringBuffer(prefix + ":im:cmd_err")

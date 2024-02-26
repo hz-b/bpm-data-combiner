@@ -132,7 +132,7 @@ def test001_check_stats():
         assert readings.is_ready()
 
     update(dev_name=None, periodic=True)
-    pass
+
 
 class ComputeDelay:
     """To get towards a periodic delay"""
