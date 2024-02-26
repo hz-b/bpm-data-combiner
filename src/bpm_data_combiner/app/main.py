@@ -19,6 +19,7 @@ from ..bl.monitor_devices import MonitorDevices
 from ..bl.preprocessor import PreProcessor
 from ..bl.statistics import compute_mean_weights_for_planes
 from ..data_model.bpm_data_accumulation import BPMDataAccumulation
+from ..data_model.bpm_data_reading import BPMReading
 from ..data_model.monitored_device import MonitoredDevice
 from ..data_model.command import Command
 from .view import Views
@@ -68,7 +69,7 @@ col = Collector(name="data_collector", devices_names=list(dev_name_index), max_c
 dispatcher_collection.subscribe(lambda reading: col.new_reading(preprocessor.preprocess(reading)))
 
 #: accumulate data above threshold
-acc_abv_th = Accumulator(dev_name_index)
+# acc_abv_th = Accumulator(dev_name_index)
 # col.on_above_threshold.add_subscriber(acc_abv_th.add)
 #: accumulate data only using items that a ready
 acc_ready = Accumulator(dev_name_index)
@@ -91,17 +92,17 @@ def cb(names):
 monitor_devices.on_status_change.add_subscriber(cb)
 
 
-def cb_periodic_update_accumulated_above_threshold(cnt : Optional[int]):
+def cb_periodic_update_accumulated_ready(cnt : Optional[int]):
     """
     """
-    views.periodic_data.update(compute_mean_weights_for_planes(acc_abv_th.get()))
+    views.periodic_data.update(compute_mean_weights_for_planes(acc_ready.get()))
 
 
 # could do that directly too ... but appetite comes with eating
 # so let's have a common point to see what all shall be processed
 # at this point
 periodic_event = Event(name="periodic_update_2sec")
-periodic_event.add_subscriber(cb_periodic_update_accumulated_above_threshold)
+periodic_event.add_subscriber(cb_periodic_update_accumulated_ready)
 
 
 def process_cnt(*, dev_name, cnt):
@@ -118,6 +119,12 @@ def process_y_val(*, dev_name, y):
 
 def process_chk_cnt(*, dev_name, ctl):
     return dispatcher_collection.get_dispatcher(dev_name).update_check(ctl)
+
+def process_reading(*, dev_name, reading):
+    cnt, x, y = reading
+    return col.new_reading(
+        preprocessor.preprocess(BPMReading(dev_name=dev_name, x=x, y=y, cnt=cnt))
+    )
 
 
 def process_active(*, dev_name, active):
@@ -148,13 +155,14 @@ cmds = dict(
     # to wait for all data
     periodic=process_periodic_trigger,
     # reset all internal states
-    reset=process_reset
+    reset=process_reset,
+    reading=process_reading
 )
 
 rbuffer = CommandRoundBuffer(maxsize=50)
 
 
-def update(*, dev_name, **kwargs):
+def update(*, dev_name, tpro=False, **kwargs):
     """Inform the dispatcher associated to the device that new data is available"""
     # just to get the cmd: first kwarg
     # for cmd in kwargs: break;

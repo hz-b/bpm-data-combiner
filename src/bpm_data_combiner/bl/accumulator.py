@@ -11,7 +11,7 @@ import numpy as np
 
 
 class Accumulator:
-    def __init__(self, dev_names_index: Dict[str, int]):
+    def __init__(self, dev_names_index: Dict[str, int], max_entries: int = 100):
         # Need to know all dev_names
         # I am using pandas Index for looking up position and handling
         # filling data at correct place

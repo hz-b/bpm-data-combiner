@@ -10,15 +10,16 @@ logger = logging.getLogger("bpm-data-combiner")
 
 
 class UpdateContext:
-    def __init__(self, *, method, rbuffer: CommandRoundBuffer, view: ViewStringBuffer, only_buffer=True):
+    def __init__(self, *, method, rbuffer: CommandRoundBuffer, view: ViewStringBuffer, echo_command=False, only_buffer=True):
         self.method = method
         self.roundbuffer = rbuffer
         self.view = view
         self.only_buffer = only_buffer
+        self.echo_command = echo_command
 
     def __enter__(self):
-        return
-
+        if not self.echo_command:
+            return
         last = self.roundbuffer.last()
 
         cmd = " %8s: cmd %4s, kw%s" %( last.dev_name,  last.cmd, dict_to_string(last.kwargs))
