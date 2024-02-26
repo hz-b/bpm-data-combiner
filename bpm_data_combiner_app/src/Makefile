@@ -13,19 +13,22 @@ USR_CPPFLAGS += -DUSE_TYPED_RSET
 # Build the IOC application
 PROD_IOC = bpm_data_combiner
 
+bpm_data_combinerSupport_LIBS += $(EPICS_BASE_IOC_LIBS)
+
 # bpm_data_combiner.dbd will be created and installed
 DBD += bpm_data_combiner.dbd
 
 bpm_data_combiner_DBD += base.dbd
+bpm_data_combiner_SRCS += array_forward.cpp
+bpm_data_combiner_DBD += array_forward.dbd
 
 # bpm_data_combiner.dbd will include these files:
 bpm_data_combiner_DBD += pydev.dbd
-bpm_data_combiner_DBD += bpm_data_combiner.dbd
+bpm_data_combiner_DBD += pydev315.dbd
 bpm_data_combiner_LIBS += pydev
 
 # bpm_data_combiner_registerRecordDeviceDriver.cpp derives from bpm_data_combiner.dbd
 bpm_data_combiner_SRCS += bpm_data_combiner_registerRecordDeviceDriver.cpp
-bpm_data_combiner_SRCS += array_forward.cpp
 
 # Build the main IOC entry point where needed
 bpm_data_combiner_SRCS_DEFAULT += bpm_data_combinerMain.cpp
