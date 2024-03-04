@@ -1,0 +1,152 @@
+record(longin, "$(PREFIX):count")
+{
+    field(DESC, "Copy counter from neighbour")
+    field(INP, "$(REFERENCE):count CPP")
+    field(VAL, "-1")
+    field(PINI, "YES")
+}
+
+record(ao, "$(PREFIX):freeBytes")
+{
+    field(DESC, "mimic free bytes")
+    # read for MDIZ1T8G:freeBytes
+    field(VAL, "11603544")
+    field(PREC, 0)
+    field(PINI, "YES")
+}
+record(bi, "$(PREFIX):pwr1i")
+{
+    field(DESC, "Mimic pwr of classic bpm ioc")
+    field(ZNAM, "enabled")
+    field(ONAM, "disabled")
+    field(VAL, 0)
+    field(PINI, "YES")
+}
+
+record(bi, "$(PREFIX):agc1i")
+{
+    field(DESC, "Mimic auto. gain ctrl classic bpm ioc")
+    field(ZNAM, "enabled")
+    field(ONAM, "disabled")
+    field(VAL, 0)
+    field(PINI, "YES")
+}
+record(bi, "$(PREFIX):pwr2i")
+{
+    field(DESC, "Mimic pwr of classic bpm ioc")
+    field(ZNAM, "enabled")
+    field(ONAM, "disabled")
+    field(VAL, 0)
+    field(PINI, "YES")
+}
+
+record(bi, "$(PREFIX):agc2i")
+{
+    field(DESC, "Mimic auto. gain ctrl classic bpm ioc")
+    field(ZNAM, "enabled")
+    field(ONAM, "disabled")
+    field(VAL, 0)
+    field(PINI, "YES")
+}
+record(bi, "$(PREFIX):pwr3i")
+{
+    field(DESC, "Mimic pwr of classic bpm ioc")
+    field(ZNAM, "enabled")
+    field(ONAM, "disabled")
+    field(VAL, 0)
+    field(PINI, "YES")
+}
+
+record(bi, "$(PREFIX):agc3i")
+{
+    field(DESC, "Mimic auto. gain ctrl classic bpm ioc")
+    field(ZNAM, "enabled")
+    field(ONAM, "disabled")
+    field(VAL, 0)
+    field(PINI, "YES")
+}
+record(bi, "$(PREFIX):pwr4i")
+{
+    field(DESC, "Mimic pwr of classic bpm ioc")
+    field(ZNAM, "enabled")
+    field(ONAM, "disabled")
+    field(VAL, 0)
+    field(PINI, "YES")
+}
+
+record(bi, "$(PREFIX):agc4i")
+{
+    field(DESC, "Mimic auto. gain ctrl classic bpm ioc")
+    field(ZNAM, "enabled")
+    field(ONAM, "disabled")
+    field(VAL, 0)
+    field(PINI, "YES")
+}
+record(bi, "$(PREFIX):pwr5i")
+{
+    field(DESC, "Mimic pwr of classic bpm ioc")
+    field(ZNAM, "enabled")
+    field(ONAM, "disabled")
+    field(VAL, 0)
+    field(PINI, "YES")
+}
+
+record(bi, "$(PREFIX):agc5i")
+{
+    field(DESC, "Mimic auto. gain ctrl classic bpm ioc")
+    field(ZNAM, "enabled")
+    field(ONAM, "disabled")
+    field(VAL, 0)
+    field(PINI, "YES")
+}
+record(bi, "$(PREFIX):pwr6i")
+{
+    field(DESC, "Mimic pwr of classic bpm ioc")
+    field(ZNAM, "enabled")
+    field(ONAM, "disabled")
+    field(VAL, 0)
+    field(PINI, "YES")
+}
+
+record(bi, "$(PREFIX):agc6i")
+{
+    field(DESC, "Mimic auto. gain ctrl classic bpm ioc")
+    field(ZNAM, "enabled")
+    field(ONAM, "disabled")
+    field(VAL, 0)
+    field(PINI, "YES")
+}
+record(bi, "$(PREFIX):pwr7i")
+{
+    field(DESC, "Mimic pwr of classic bpm ioc")
+    field(ZNAM, "enabled")
+    field(ONAM, "disabled")
+    field(VAL, 0)
+    field(PINI, "YES")
+}
+
+record(bi, "$(PREFIX):agc7i")
+{
+    field(DESC, "Mimic auto. gain ctrl classic bpm ioc")
+    field(ZNAM, "enabled")
+    field(ONAM, "disabled")
+    field(VAL, 0)
+    field(PINI, "YES")
+}
+record(bi, "$(PREFIX):pwr8i")
+{
+    field(DESC, "Mimic pwr of classic bpm ioc")
+    field(ZNAM, "enabled")
+    field(ONAM, "disabled")
+    field(VAL, 0)
+    field(PINI, "YES")
+}
+
+record(bi, "$(PREFIX):agc8i")
+{
+    field(DESC, "Mimic auto. gain ctrl classic bpm ioc")
+    field(ZNAM, "enabled")
+    field(ONAM, "disabled")
+    field(VAL, 0)
+    field(PINI, "YES")
+}
