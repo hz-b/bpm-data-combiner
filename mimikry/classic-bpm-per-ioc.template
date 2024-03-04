@@ -1,0 +1,19 @@
+file iocbdata.template {
+  pattern { SRC,      BIT }
+#         { MDIZ1D1G,   0 }
+#         { MDIZ1D2G,   1 }
+#         { MDIZ1D3G,   2 }
+#         { MDIZ1D4G,   3 }
+#         { MDIZ1D5G,   4 }
+#         { MDIZ1D6G,   5 }
+#         { MDIZ1D7G,   6 }
+          { MDIZ1D8G,   7 }
+#         { MDIZ1T1G,   8 }
+#         { MDIZ1T2G,   9 }
+#         { MDIZ1T3G,   A }
+#         { MDIZ1T4G,   B }
+#         { MDIZ1T5G,   C }
+#         { MDIZ1T6G,   D }
+#         { MDIZ1T7G,   E }
+#         { MDIZ1T8G,   F }
+}

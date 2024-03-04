@@ -1,0 +1,6 @@
+
+record(seq, "$(IOC):$(SRC):trigger")
+{
+	field(DOL1, "1")
+	field(LNK1, "$(IOC):comready.B$(BIT) PP")
+}
