@@ -28,6 +28,17 @@
 #                 }
 #         }
 
+# need to find out what I have to replace
+record(waveform, "$(PREFIX):bdata")
+{
+    field(DESC, "bdata values")
+    field(EGU, "mm")
+    field(FTVL, "DOUBLE")
+    field(INP,  "$(INP) CPP")
+    field(NELM, 64)
+    field(TPRO, 0)
+}
+
 record(bi, "$(PREFIX):status")
 {
     # Todo: find out what the status should be
@@ -45,6 +56,7 @@ record(longin, "$(PREFIX):count")
     field(VAL, "-1")
     field(PINI, "YES")
 }
+
 
 record(ao, "$(PREFIX):freeBytes")
 {
