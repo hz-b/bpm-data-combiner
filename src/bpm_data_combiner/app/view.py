@@ -119,12 +119,33 @@ class ViewBPMDataAsBData:
         # logger.debug("view bdata: publishing data %s", data)
         nm2mm = 1e-6
         n_entries = len(data.x.values)
-        bdata = np.empty([8, n_entries], dtype=float)
+        n_bpms = 8
+        if n_entries > n_bpms:
+            raise ValueError("number of bpms %s too many. max %s", n_entries, n_bpms)
+
+        bdata = np.empty([8, n_bpms], dtype=float)
         bdata.fill(0.0)
-        bdata[0] = data.x.values * nm2mm
-        bdata[1] = data.y.values * nm2mm
-        bdata[6] = data.x.std * nm2mm
-        bdata[7] = data.y.std * nm2mm
+        # flipping coordinate system to get the dispersion on the correct side
+        # todo: check at which state this should be done
+        # fmt:off
+        bdata[0, :n_entries] = - data.x.values * nm2mm
+        bdata[1, :n_entries] =   data.y.values * nm2mm
+        # fmt:on
+        # intensity z 1.3
+        # bdata[2] = 3
+        # intensityz z 1.3
+        # bdata[3] = 3
+        # AGC status needs to be three
+        # todo: fold in from the data that its set AGC
+        #       to 0 if some libera box is not responsive
+        bdata[4] = 3
+        bdata[4, -1] = 2
+        # scale rms so that the slow orbit feedback accepts the data
+        # factor 100 seems to be enough.
+        # I think I should add some check that the noise is large enough
+        scale_rms = 20
+        bdata[6, :n_entries] = data.x.std * nm2mm * scale_rms
+        bdata[7, :n_entries] = data.y.std * nm2mm * scale_rms
 
         label = f"{self.prefix}"
         bdata = [float(v) for v in bdata.ravel()]
