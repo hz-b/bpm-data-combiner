@@ -12,7 +12,7 @@ epicsEnvSet("LOCATION","Helmholtz Zentrum Berlin / BESSY II")
 epicsEnvSet("PREFIX","Pierre:COM")
 epicsEnvSet("REMOTE","Pierre:SIM:")
 epicsEnvSet("PYTHONPATH","$(TOP)/src")
-epicsEnvSet("IOC_NAME","nbdt002")
+# epicsEnvSet("IOC_NAME","${IOC_NAME}")
 
 ## Register all support components
 dbLoadDatabase "dbd/bpm_data_combiner.dbd"

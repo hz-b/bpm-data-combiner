@@ -117,13 +117,14 @@ class ViewBPMDataAsBData:
         """prepare data as expected
         """
         # logger.debug("view bdata: publishing data %s", data)
+        nm2mm = 1e-6
         n_entries = len(data.x.values)
         bdata = np.empty([8, n_entries], dtype=float)
-        bdata.fill(np.nan)
-        bdata[0] = data.x.values
-        bdata[1] = data.y.values
-        bdata[6] = data.x.std
-        bdata[7] = data.y.std
+        bdata.fill(0.0)
+        bdata[0] = data.x.values * nm2mm
+        bdata[1] = data.y.values * nm2mm
+        bdata[6] = data.x.std * nm2mm
+        bdata[7] = data.y.std * nm2mm
 
         label = f"{self.prefix}"
         bdata = [float(v) for v in bdata.ravel()]
