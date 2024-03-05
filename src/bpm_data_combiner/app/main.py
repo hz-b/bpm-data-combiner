@@ -185,3 +185,6 @@ def update(*, dev_name, tpro=False, **kwargs):
     rbuffer.append(dc)
     with UpdateContext(method=method, rbuffer=rbuffer, view=views.monitor_update_cmd_errors):
         method(dev_name=dev_name, **kwargs)
+
+
+__all__ = ["update"]
