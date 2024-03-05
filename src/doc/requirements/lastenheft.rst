@@ -1,7 +1,7 @@
-BPM data combiner: requirement specification
-============================================
+BPM data combiner: requirements specification
+=============================================
 
-Anstelle eines Pflichtenhefts
+Anstelle eines Lastenhefts
 
 Motivation
 ----------

@@ -1,7 +1,7 @@
 Scope statement
 ===============
 
-Anstelle eines Lastenhefts
+Anstelle eines Pflichtenhefts
 
 Background
 ----------
