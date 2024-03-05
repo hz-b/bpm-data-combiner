@@ -43,14 +43,32 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="requirements.html">Requirements</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">API of bpm-data-combiner</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Modules and objects considered internal to bpm-data-combiner</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#business-logic">Business Logic</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#monitor-devices">Monitor devices</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#event">Event</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#dispatcher">Dispatcher</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#collector">Collector</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#accumulator">Accumulator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-bpm_data_combiner.bl">Business Logic</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#module-bpm_data_combiner.bl.monitor_devices">Monitor devices</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#bpm_data_combiner.bl.monitor_devices.MonitorDevices"><code class="docutils literal notranslate"><span class="pre">MonitorDevices</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-bpm_data_combiner.bl.event">Event</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#bpm_data_combiner.bl.event.Event"><code class="docutils literal notranslate"><span class="pre">Event</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-bpm_data_combiner.bl.dispatcher">Dispatcher</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-bpm_data_combiner.bl.collector">Collector</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#bpm_data_combiner.bl.collector.Collector"><code class="docutils literal notranslate"><span class="pre">Collector</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#bpm_data_combiner.bl.collector.ReadingsCollection"><code class="docutils literal notranslate"><span class="pre">ReadingsCollection</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#bpm_data_combiner.bl.collector._combine_collections_by_device_names"><code class="docutils literal notranslate"><span class="pre">_combine_collections_by_device_names()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-bpm_data_combiner.bl.accumulator">Accumulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-bpm_data_combiner.bl.statistics">Statistics</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#bpm_data_combiner.bl.statistics.compute_mean_weight"><code class="docutils literal notranslate"><span class="pre">compute_mean_weight()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#bpm_data_combiner.bl.statistics.compute_mean_weights_for_planes"><code class="docutils literal notranslate"><span class="pre">compute_mean_weights_for_planes()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#bpm_data_combiner.bl.statistics.compute_weights_scaled"><code class="docutils literal notranslate"><span class="pre">compute_weights_scaled()</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -83,22 +101,167 @@
              
   <section id="modules-and-objects-considered-internal-to-bpm-data-combiner">
 <h1>Modules and objects considered internal to bpm-data-combiner<a class="headerlink" href="#modules-and-objects-considered-internal-to-bpm-data-combiner" title="Link to this heading">¶</a></h1>
-<section id="business-logic">
-<h2>Business Logic<a class="headerlink" href="#business-logic" title="Link to this heading">¶</a></h2>
-<section id="monitor-devices">
-<h3>Monitor devices<a class="headerlink" href="#monitor-devices" title="Link to this heading">¶</a></h3>
+<section id="module-bpm_data_combiner.bl">
+<span id="business-logic"></span><h2>Business Logic<a class="headerlink" href="#module-bpm_data_combiner.bl" title="Link to this heading">¶</a></h2>
+<p>Business logic for combining data from different devices</p>
+<p>This currently is implemented only for BPM readings. Could be
+generalised to any readings the carry a unique time stamp
+identifier.</p>
+<ul class="simple">
+<li><p>Dispatcher: combine individual record data to one single object.</p></li>
+<li><p>Collector: collect data records and combine them together
+assuming that the time stamp identifier is the same for all data
+readings issued at the same time</p></li>
+<li><p>Accumulator: accumulate readings together based on the individual
+time count</p></li>
+</ul>
+<p><em>Code reuse</em>: at current stage only the dispatcher depends on
+<code class="xref py py-class docutils literal notranslate"><span class="pre">BPMReading</span></code></p>
+<section id="module-bpm_data_combiner.bl.monitor_devices">
+<span id="monitor-devices"></span><h3>Monitor devices<a class="headerlink" href="#module-bpm_data_combiner.bl.monitor_devices" title="Link to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="bpm_data_combiner.bl.monitor_devices.MonitorDevices">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">bpm_data_combiner.bl.monitor_devices.</span></span><span class="sig-name descname"><span class="pre">MonitorDevices</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">devices_status</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.8/library/typing.html#typing.Sequence" title="(in Python v3.8)"><span class="pre">Sequence</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="api.html#bpm_data_combiner.data_model.monitored_device.MonitoredDevice" title="bpm_data_combiner.data_model.monitored_device.MonitoredDevice"><span class="pre">MonitoredDevice</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bpm_data_combiner/bl/monitor_devices.html#MonitorDevices"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bpm_data_combiner.bl.monitor_devices.MonitorDevices" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Expects to be informed on devices status, passes it on to event subscribes</p>
+<p>Gets informed if a device is
+* active
+* enabled</p>
+<p>If one of them changes the :class:<a href="#id1"><span class="problematic" id="id2">``</span></a>Event any:<cite>on_status_change</cite>
+is triggered. This will pass a sequence of valide device names
+to callers.</p>
+<dl class="simple">
+<dt>These two differ by:</dt><dd><ul class="simple">
+<li><p>Enabled: typically a person will decide that this device
+is used. It is split up for its two planes x and y.</p></li>
+<li><p>active: typically an automatic monitor will check if it the
+device is active or not.</p></li>
+</ul>
+</dd>
+</dl>
+<p>Todo: Rename it to e.g. <cite>MonitoredDevicesStatus</cite></p>
+</dd></dl>
+
 </section>
-<section id="event">
-<h3>Event<a class="headerlink" href="#event" title="Link to this heading">¶</a></h3>
+<section id="module-bpm_data_combiner.bl.event">
+<span id="event"></span><h3>Event<a class="headerlink" href="#module-bpm_data_combiner.bl.event" title="Link to this heading">¶</a></h3>
+<p>A very simple and basic event implementation</p>
+<p>Only allows subscription to the event</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="bpm_data_combiner.bl.event.Event">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">bpm_data_combiner.bl.event.</span></span><span class="sig-name descname"><span class="pre">Event</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">subscribers</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.8/library/typing.html#typing.Sequence" title="(in Python v3.8)"><span class="pre">Sequence</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.8/library/typing.html#typing.Callable" title="(in Python v3.8)"><span class="pre">Callable</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bpm_data_combiner/bl/event.html#Event"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bpm_data_combiner.bl.event.Event" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>A single event managing subscribers</p>
+<p>The subscribers will be called when <a href="#id3"><span class="problematic" id="id4">:method:`trigger`</span></a> is called.
+The object is then passed to the subscribers.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="bpm_data_combiner.bl.event.Event.add_subscriber">
+<span class="sig-name descname"><span class="pre">add_subscriber</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cb</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.8/library/typing.html#typing.Callable" title="(in Python v3.8)"><span class="pre">Callable</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bpm_data_combiner/bl/event.html#Event.add_subscriber"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bpm_data_combiner.bl.event.Event.add_subscriber" title="Link to this definition">¶</a></dt>
+<dd><p>each callable shall expect a single argument</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="bpm_data_combiner.bl.event.Event.trigger">
+<span class="sig-name descname"><span class="pre">trigger</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bpm_data_combiner/bl/event.html#Event.trigger"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bpm_data_combiner.bl.event.Event.trigger" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 </section>
-<section id="dispatcher">
-<h3>Dispatcher<a class="headerlink" href="#dispatcher" title="Link to this heading">¶</a></h3>
+<section id="module-bpm_data_combiner.bl.dispatcher">
+<span id="dispatcher"></span><h3>Dispatcher<a class="headerlink" href="#module-bpm_data_combiner.bl.dispatcher" title="Link to this heading">¶</a></h3>
+<p>Dispatch received data to subscribes as dataclasses</p>
+<p>All subscribers to <code class="xref py py-class docutils literal notranslate"><span class="pre">DispatcherCollection</span></code> subscribe to all
+<code class="xref py py-class docutils literal notranslate"><span class="pre">Dispatcher</span></code>. Currently handled by:</p>
+<p><code class="xref py py-class docutils literal notranslate"><span class="pre">DispatcherCollection</span></code> subscribes its
+on_ready <code class="xref py py-meth docutils literal notranslate"><span class="pre">Event.trigger()</span></code> to each created dispatcher event
+<code class="xref any docutils literal notranslate"><span class="pre">Dispatcher.on_ready</span></code>. Subscribers to
+<code class="xref py py-class docutils literal notranslate"><span class="pre">DispatcherCollection</span></code> are subscribing to its on_ready
+event, and thus any dispatcher triggering on_ready will trigger
+the subscribers to DispatcherCollection</p>
 </section>
-<section id="collector">
-<h3>Collector<a class="headerlink" href="#collector" title="Link to this heading">¶</a></h3>
+<section id="module-bpm_data_combiner.bl.collector">
+<span id="collector"></span><h3>Collector<a class="headerlink" href="#module-bpm_data_combiner.bl.collector" title="Link to this heading">¶</a></h3>
+<p>Combine the data to common sets</p>
+<dl class="simple">
+<dt>Idea:</dt><dd><p>when 50 percent of devices have fired: take this moment for
+reference.
+* when all have responded: get data out
+* if more than half a delta t has passed push data out on the flaky channel</p>
+</dd>
+<dt>Question:</dt><dd><p>what to do with very late arrivals?
+how long of a queue to preserve</p>
+</dd>
+</dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="bpm_data_combiner.bl.collector.Collector">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">bpm_data_combiner.bl.collector.</span></span><span class="sig-name descname"><span class="pre">Collector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">devices_names</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.8/library/typing.html#typing.Sequence" title="(in Python v3.8)"><span class="pre">Sequence</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_collections</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">50</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bpm_data_combiner/bl/collector.html#Collector"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bpm_data_combiner.bl.collector.Collector" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Provide access to active reading collections</p>
+<p>It works assuming that not more than <cite>max_collections</cite> are
+required to be cached. Uses lru_cache for caching the objects.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="bpm_data_combiner.bl.collector.ReadingsCollection">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">bpm_data_combiner.bl.collector.</span></span><span class="sig-name descname"><span class="pre">ReadingsCollection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">device_names</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.8/library/typing.html#typing.Sequence" title="(in Python v3.8)"><span class="pre">Sequence</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bpm_data_combiner/bl/collector.html#ReadingsCollection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bpm_data_combiner.bl.collector.ReadingsCollection" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Collect data for one count</p>
+<p>use <code class="xref py py-meth docutils literal notranslate"><span class="pre">ready()</span></code> to see if sufficient data is here</p>
+<dl class="py property">
+<dt class="sig sig-object py" id="bpm_data_combiner.bl.collector.ReadingsCollection.active">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">active</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><span class="pre">bool</span></a></em><a class="headerlink" href="#bpm_data_combiner.bl.collector.ReadingsCollection.active" title="Link to this definition">¶</a></dt>
+<dd><p>just a convenience function</p>
+<p>return not self.ready</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="bpm_data_combiner.bl.collector.ReadingsCollection.add_reading">
+<span class="sig-name descname"><span class="pre">add_reading</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">val</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="api.html#bpm_data_combiner.data_model.bpm_data_reading.BPMReading" title="bpm_data_combiner.data_model.bpm_data_reading.BPMReading"><span class="pre">BPMReading</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bpm_data_combiner/bl/collector.html#ReadingsCollection.add_reading"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bpm_data_combiner.bl.collector.ReadingsCollection.add_reading" title="Link to this definition">¶</a></dt>
+<dd><p>cmd.dev_name</p>
+<p>Todo: should disabled data be discarded?</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="bpm_data_combiner.bl.collector.ReadingsCollection.is_ready">
+<span class="sig-name descname"><span class="pre">is_ready</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">)</span> <span class="pre">-&gt;</span> <span class="pre">(&lt;class</span> <span class="pre">'bool'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">&lt;class</span> <span class="pre">'bool'&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bpm_data_combiner/bl/collector.html#ReadingsCollection.is_ready"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bpm_data_combiner.bl.collector.ReadingsCollection.is_ready" title="Link to this definition">¶</a></dt>
+<dd><p>Compare to device list and see if all names are in</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="bpm_data_combiner.bl.collector._combine_collections_by_device_names">
+<span class="sig-prename descclassname"><span class="pre">bpm_data_combiner.bl.collector.</span></span><span class="sig-name descname"><span class="pre">_combine_collections_by_device_names</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">collections</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.8/library/typing.html#typing.Sequence" title="(in Python v3.8)"><span class="pre">Sequence</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.8/library/typing.html#typing.Dict" title="(in Python v3.8)"><span class="pre">Dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="api.html#bpm_data_combiner.data_model.bpm_data_reading.BPMReading" title="bpm_data_combiner.data_model.bpm_data_reading.BPMReading"><span class="pre">BPMReading</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dev_names_index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)"><span class="pre">dict</span></a></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default_value</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">MaskedArray</span></span></span><a class="reference internal" href="_modules/bpm_data_combiner/bl/collector.html#_combine_collections_by_device_names"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bpm_data_combiner.bl.collector._combine_collections_by_device_names" title="Link to this definition">¶</a></dt>
+<dd><p>use the name to stuff data into correct location</p>
+</dd></dl>
+
 </section>
-<section id="accumulator">
-<h3>Accumulator<a class="headerlink" href="#accumulator" title="Link to this heading">¶</a></h3>
+<section id="module-bpm_data_combiner.bl.accumulator">
+<span id="accumulator"></span><h3>Accumulator<a class="headerlink" href="#module-bpm_data_combiner.bl.accumulator" title="Link to this heading">¶</a></h3>
+<p>Accumulate collected readings: to provide mean data</p>
+</section>
+<section id="module-bpm_data_combiner.bl.statistics">
+<span id="statistics"></span><h3>Statistics<a class="headerlink" href="#module-bpm_data_combiner.bl.statistics" title="Link to this heading">¶</a></h3>
+<dl class="py function">
+<dt class="sig sig-object py" id="bpm_data_combiner.bl.statistics.compute_mean_weight">
+<span class="sig-prename descclassname"><span class="pre">bpm_data_combiner.bl.statistics.</span></span><span class="sig-name descname"><span class="pre">compute_mean_weight</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">accumulated_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">BPMDataAccumulationForPlane</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">BPMDataCollectionStatsPlane</span></span></span><a class="reference internal" href="_modules/bpm_data_combiner/bl/statistics.html#compute_mean_weight"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bpm_data_combiner.bl.statistics.compute_mean_weight" title="Link to this definition">¶</a></dt>
+<dd><p>compute mean and weighted std of first axis,</p>
+<p>Weights are the standard deviation times the number of readings found</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="bpm_data_combiner.bl.statistics.compute_mean_weights_for_planes">
+<span class="sig-prename descclassname"><span class="pre">bpm_data_combiner.bl.statistics.</span></span><span class="sig-name descname"><span class="pre">compute_mean_weights_for_planes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">BPMDataAccumulation</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="api.html#bpm_data_combiner.data_model.bpm_data_collection.BPMDataCollectionStats" title="bpm_data_combiner.data_model.bpm_data_collection.BPMDataCollectionStats"><span class="pre">BPMDataCollectionStats</span></a></span></span><a class="reference internal" href="_modules/bpm_data_combiner/bl/statistics.html#compute_mean_weights_for_planes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bpm_data_combiner.bl.statistics.compute_mean_weights_for_planes" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="bpm_data_combiner.bl.statistics.compute_weights_scaled">
+<span class="sig-prename descclassname"><span class="pre">bpm_data_combiner.bl.statistics.</span></span><span class="sig-name descname"><span class="pre">compute_weights_scaled</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">values</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_readings</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bpm_data_combiner/bl/statistics.html#compute_weights_scaled"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bpm_data_combiner.bl.statistics.compute_weights_scaled" title="Link to this definition">¶</a></dt>
+<dd><p>Compute weights taking number of readings into account</p>
+<p>Currently unused</p>
+</dd></dl>
+
 </section>
 </section>
 </section>

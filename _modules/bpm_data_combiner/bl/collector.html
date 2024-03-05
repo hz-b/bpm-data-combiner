@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>bpm_data_combiner.bl.collector &mdash; bpm-data-combiner  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            bpm-data-combiner
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../requirements.html">Requirements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API of bpm-data-combiner</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../internals.html">Modules and objects considered internal to bpm-data-combiner</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">bpm-data-combiner</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">bpm_data_combiner.bl.collector</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for bpm_data_combiner.bl.collector</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Combine the data to common sets</span>
+
+<span class="sd">Idea:</span>
+<span class="sd">    when 50 percent of devices have fired: take this moment for</span>
+<span class="sd">    reference.</span>
+<span class="sd">    * when all have responded: get data out</span>
+<span class="sd">    * if more than half a delta t has passed push data out on the flaky channel</span>
+
+<span class="sd">Question:</span>
+<span class="sd">   what to do with very late arrivals?</span>
+<span class="sd">   how long of a queue to preserve</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">functools</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Hashable</span><span class="p">,</span> <span class="n">Dict</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">numpy.ma</span> <span class="k">as</span> <span class="nn">ma</span>
+
+<span class="kn">from</span> <span class="nn">..data_model.collection_item</span> <span class="kn">import</span> <span class="n">CollectionItem</span>
+<span class="kn">from</span> <span class="nn">..data_model.monitored_device</span> <span class="kn">import</span> <span class="n">MonitoredDevice</span>
+<span class="kn">from</span> <span class="nn">..errors</span> <span class="kn">import</span> <span class="n">DoubleSubmissionError</span><span class="p">,</span> <span class="n">UnknownDeviceNameError</span>
+<span class="kn">from</span> <span class="nn">.event</span> <span class="kn">import</span> <span class="n">Event</span>
+<span class="kn">from</span> <span class="nn">..data_model.bpm_data_reading</span> <span class="kn">import</span> <span class="n">BPMReading</span>
+<span class="kn">from</span> <span class="nn">..data_model.bpm_data_collection</span> <span class="kn">import</span> <span class="n">BPMDataCollection</span><span class="p">,</span> <span class="n">BPMDataCollectionPlane</span>
+
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;bpm-data-combiner&quot;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="_combine_collections_by_device_names">
+<a class="viewcode-back" href="../../../internals.html#bpm_data_combiner.bl.collector._combine_collections_by_device_names">[docs]</a>
+<span class="k">def</span> <span class="nf">_combine_collections_by_device_names</span><span class="p">(</span>
+    <span class="n">collections</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">BPMReading</span><span class="p">]],</span> <span class="n">dev_names_index</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">default_value</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ma</span><span class="o">.</span><span class="n">masked_array</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;use the name to stuff data into correct location</span>
+
+<span class="sd">    Todo:</span>
+<span class="sd">        Should it return a masked array? Is there a better</span>
+<span class="sd">        representation?</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">([</span><span class="nb">len</span><span class="p">(</span><span class="n">collections</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">dev_names_index</span><span class="p">),</span> <span class="mi">2</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+    <span class="n">res</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">default_value</span><span class="p">)</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="n">ma</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="c1"># now fill data at appropriate place</span>
+    <span class="c1"># todo: handle that x and y plane can be enabled separately</span>
+    <span class="k">for</span> <span class="n">row</span><span class="p">,</span> <span class="n">data_collection</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">collections</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">bpm_data</span> <span class="ow">in</span> <span class="n">data_collection</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">col</span> <span class="o">=</span> <span class="n">dev_names_index</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+            <span class="n">res</span><span class="o">.</span><span class="n">mask</span><span class="p">[</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">for</span> <span class="n">plane</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">([</span><span class="n">bpm_data</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">bpm_data</span><span class="o">.</span><span class="n">y</span><span class="p">]):</span>
+                <span class="k">if</span> <span class="n">val</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">res</span><span class="p">[</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">,</span> <span class="n">plane</span><span class="p">]</span><span class="o">.</span><span class="n">mask</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">res</span><span class="p">[</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">,</span> <span class="n">plane</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
+
+    <span class="k">return</span> <span class="n">res</span></div>
+
+
+
+<span class="k">def</span> <span class="nf">collection_to_bpm_data_collection</span><span class="p">(</span>
+    <span class="n">collection</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">BPMReading</span><span class="p">],</span> <span class="n">dev_names_index</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">default_value</span><span class="o">=</span><span class="mi">2</span><span class="o">**</span><span class="mi">31</span><span class="o">-</span><span class="mi">1</span>
+<span class="p">):</span>
+    <span class="n">ma</span> <span class="o">=</span> <span class="n">_combine_collections_by_device_names</span><span class="p">([</span><span class="n">collection</span><span class="p">],</span> <span class="n">dev_names_index</span><span class="p">,</span>
+                                              <span class="n">default_value</span><span class="o">=</span><span class="n">default_value</span><span class="p">)</span>
+    <span class="c1"># only one collection -&gt; first dimension one entry</span>
+    <span class="p">(</span><span class="n">ma</span><span class="p">,)</span> <span class="o">=</span> <span class="n">ma</span>
+    <span class="c1"># need one reading to get its count</span>
+    <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">reading</span> <span class="ow">in</span> <span class="n">collection</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">break</span>
+    <span class="k">return</span> <span class="n">BPMDataCollection</span><span class="p">(</span>
+        <span class="n">x</span><span class="o">=</span><span class="n">BPMDataCollectionPlane</span><span class="p">(</span><span class="n">values</span><span class="o">=</span><span class="n">ma</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">valid</span><span class="o">=~</span><span class="n">ma</span><span class="o">.</span><span class="n">mask</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]),</span>
+        <span class="n">y</span><span class="o">=</span><span class="n">BPMDataCollectionPlane</span><span class="p">(</span><span class="n">values</span><span class="o">=</span><span class="n">ma</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">valid</span><span class="o">=~</span><span class="n">ma</span><span class="o">.</span><span class="n">mask</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]),</span>
+        <span class="n">names</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">dev_names_index</span><span class="p">),</span>
+        <span class="c1"># assuming to be the same for both planes</span>
+        <span class="n">cnt</span><span class="o">=</span><span class="n">reading</span><span class="o">.</span><span class="n">cnt</span><span class="p">,</span>
+    <span class="p">)</span>
+
+
+<div class="viewcode-block" id="ReadingsCollection">
+<a class="viewcode-back" href="../../../internals.html#bpm_data_combiner.bl.collector.ReadingsCollection">[docs]</a>
+<span class="k">class</span> <span class="nc">ReadingsCollection</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Collect data for one count</span>
+
+<span class="sd">    use :meth:`ready` to see if sufficient data is here</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">device_names</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">threshold</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">collection</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">device_names</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">device_names</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">threshold</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">threshold</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">device_names</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">threshold</span> <span class="o">=</span> <span class="n">threshold</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ready</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_above_threshold</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_is_active</span> <span class="o">=</span> <span class="kc">True</span>
+
+<div class="viewcode-block" id="ReadingsCollection.add_reading">
+<a class="viewcode-back" href="../../../internals.html#bpm_data_combiner.bl.collector.ReadingsCollection.add_reading">[docs]</a>
+    <span class="k">def</span> <span class="nf">add_reading</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">:</span> <span class="n">BPMReading</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;cmd.dev_name</span>
+
+<span class="sd">        Todo: should disabled data be discarded?</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">dev_name</span> <span class="o">=</span> <span class="n">val</span><span class="o">.</span><span class="n">dev_name</span>
+        <span class="c1"># data from known / expected device</span>
+        <span class="k">if</span> <span class="n">dev_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">device_names</span><span class="p">:</span>
+            <span class="c1"># logger.error(&quot;Collector %s: expecting following device names %s; unknown name %s&quot;,</span>
+            <span class="c1">#              self.name, self.device_names, dev_name)</span>
+            <span class="k">raise</span> <span class="n">UnknownDeviceNameError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown device </span><span class="si">{</span><span class="n">dev_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="c1"># not one device sending twice</span>
+        <span class="k">if</span> <span class="n">dev_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">collection</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">DoubleSubmissionError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">dev_name</span><span class="si">=}</span><span class="s2"> already in collection&quot;</span><span class="p">)</span>
+
+        <span class="c1"># data expected</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">active</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">collection</span><span class="p">[</span><span class="n">dev_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ready</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_above_threshold</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_ready</span><span class="p">()</span></div>
+
+
+    <span class="k">def</span> <span class="nf">data</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">BPMReading</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">collection</span>
+
+<div class="viewcode-block" id="ReadingsCollection.is_ready">
+<a class="viewcode-back" href="../../../internals.html#bpm_data_combiner.bl.collector.ReadingsCollection.is_ready">[docs]</a>
+    <span class="k">def</span> <span class="nf">is_ready</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Compare to device list and see if all names are in&quot;&quot;&quot;</span>
+        <span class="n">L</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device_names</span><span class="o">.</span><span class="n">difference</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">collection</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+        <span class="k">return</span> <span class="n">L</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="n">L</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">threshold</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">ready</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ready</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">above_threshold</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_above_threshold</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">active</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;just a convenience function</span>
+
+<span class="sd">        return not self.ready</span>
+
+<span class="sd">        Todo:</span>
+<span class="sd">            check if it should be removed</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">ready</span></div>
+
+
+
+<div class="viewcode-block" id="Collector">
+<a class="viewcode-back" href="../../../internals.html#bpm_data_combiner.bl.collector.Collector">[docs]</a>
+<span class="k">class</span> <span class="nc">Collector</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Provide access to active reading collections</span>
+
+<span class="sd">    It works assuming that not more than `max_collections` are</span>
+<span class="sd">    required to be cached. Uses lru_cache for caching the objects.</span>
+
+<span class="sd">    Todo:</span>
+<span class="sd">        keep track of finished / timeout :class:`ReadingsCollection`</span>
+<span class="sd">        instances?</span>
+<span class="sd">        to be able to discard :class:`BPMReading` instances that</span>
+<span class="sd">        arrive far too late?</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">devices_names</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">threshold</span> <span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">max_collections</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">50</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_device_names</span> <span class="o">=</span> <span class="n">devices_names</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">on_new_collection</span> <span class="o">=</span> <span class="n">Event</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;on_new_collection&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">on_above_threshold</span> <span class="o">=</span> <span class="n">Event</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;reading_collection_on_threshold&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">on_ready</span> <span class="o">=</span> <span class="n">Event</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;reading_collection_on_ready&quot;</span><span class="p">)</span>
+
+        <span class="nd">@functools</span><span class="o">.</span><span class="n">lru_cache</span><span class="p">(</span><span class="n">maxsize</span><span class="o">=</span><span class="n">max_collections</span><span class="p">)</span>
+        <span class="k">def</span> <span class="nf">_get_collection</span><span class="p">(</span><span class="n">cnt</span><span class="p">:</span> <span class="n">Hashable</span><span class="p">):</span>
+            <span class="n">r</span> <span class="o">=</span> <span class="n">ReadingsCollection</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">device_names</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device_names</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="n">threshold</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">on_new_collection</span><span class="o">.</span><span class="n">trigger</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">r</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_get_collection</span> <span class="o">=</span> <span class="n">_get_collection</span>
+
+    <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_get_collection</span><span class="o">.</span><span class="n">cache_clear</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">get_collection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cnt</span><span class="p">:</span> <span class="n">Hashable</span><span class="p">):</span>
+        <span class="n">col</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_collection</span><span class="p">(</span><span class="n">cnt</span><span class="p">)</span>
+        <span class="c1">#: todo: I think this is always true</span>
+        <span class="k">assert</span> <span class="n">col</span><span class="o">.</span><span class="n">active</span> <span class="ow">or</span> <span class="n">col</span><span class="o">.</span><span class="n">ready</span>
+        <span class="k">return</span> <span class="n">col</span>
+
+    <span class="k">def</span> <span class="nf">new_reading</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">:</span> <span class="n">CollectionItem</span><span class="p">):</span>
+        <span class="n">rc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_collection</span><span class="p">(</span><span class="n">val</span><span class="o">.</span><span class="n">cnt</span><span class="p">)</span>
+        <span class="n">rc</span><span class="o">.</span><span class="n">add_reading</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">rc</span><span class="o">.</span><span class="n">ready</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">on_ready</span><span class="o">.</span><span class="n">trigger</span><span class="p">(</span><span class="n">rc</span><span class="o">.</span><span class="n">data</span><span class="p">())</span>
+        <span class="k">if</span> <span class="n">rc</span><span class="o">.</span><span class="n">above_threshold</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">on_above_threshold</span><span class="o">.</span><span class="n">trigger</span><span class="p">(</span><span class="n">rc</span><span class="o">.</span><span class="n">data</span><span class="p">())</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">device_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_device_names</span>
+
+    <span class="nd">@device_names</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">device_names</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">device_names</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_device_names</span> <span class="o">=</span> <span class="n">device_names</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Helmholtz Zentrum Berlin.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

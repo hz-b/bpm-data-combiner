@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BPM data combiner: requirements specification &mdash; bpm-data-combiner  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Scope statement" href="pflichtenheft.html" />
+    <link rel="prev" title="Requirements" href="../requirements.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            bpm-data-combiner
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../requirements.html">Requirements</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">BPM data combiner: requirements specification</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#motivation">Motivation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#background">Background</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#standard-operation-of-the-units">Standard operation of the units</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#failure-modes-to-consider">Failure modes to consider</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#target">Target:</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#misc-naming">Misc: naming</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="pflichtenheft.html">Scope statement</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API of bpm-data-combiner</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../internals.html">Modules and objects considered internal to bpm-data-combiner</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">bpm-data-combiner</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../requirements.html">Requirements</a></li>
+      <li class="breadcrumb-item active">BPM data combiner: requirements specification</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/requirements/lastenheft.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="bpm-data-combiner-requirements-specification">
+<h1>BPM data combiner: requirements specification<a class="headerlink" href="#bpm-data-combiner-requirements-specification" title="Link to this heading">¶</a></h1>
+<p>Anstelle eines Lastenhefts</p>
+<section id="motivation">
+<h2>Motivation<a class="headerlink" href="#motivation" title="Link to this heading">¶</a></h2>
+<p>The beam position monitors of BESSY~II are read out by
+electronic units. The existing ones are to be replaced
+by new  units.</p>
+<p>Below in the text he new units will be called
+“instrumentation devices”  (or libera spark?) units.</p>
+<p>The data these instrumentation device units provide are
+to be combined in such a fashion to</p>
+<ul>
+<li><p>make it possible to swap out the old units to the new units
+sector per sector</p>
+<p>In the following text the new units are called</p>
+</li>
+<li><p>be able to operate the standard slow orbit feedback of the
+BESSY II machine</p></li>
+<li><p>provide a consistent data set
+of the beam position monitors</p>
+<p>It shall represent the beam positiion monitor data in a consistent
+fashion to the user as soon as all bpm readers are
+“instrumentation devices units”.</p>
+</li>
+</ul>
+</section>
+<section id="background">
+<h2>Background<a class="headerlink" href="#background" title="Link to this heading">¶</a></h2>
+<section id="standard-operation-of-the-units">
+<h3>Standard operation of the units<a class="headerlink" href="#standard-operation-of-the-units" title="Link to this heading">¶</a></h3>
+<p>Each beam position monitor (BPM) is handled by a dedicated unit.
+This unit provides the following data</p>
+<ul class="simple">
+<li><p>x position in nm (or close to that)</p></li>
+<li><p>y position in nm (or close to that)</p></li>
+<li><p>counts since a synchronisation event: this ensures that all
+units provide a consistent count</p></li>
+</ul>
+<p>This data are provided with an update rate of 0.1 Hz.</p>
+</section>
+<section id="failure-modes-to-consider">
+<h3>Failure modes to consider<a class="headerlink" href="#failure-modes-to-consider" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Units can be unresponsive: i.e. they can fail to deliver data</p></li>
+<li><p>Units can deliver erronous data: the machine operator must be
+able to mark them as erronous (done on the unit or here ? ).</p></li>
+</ul>
+</section>
+</section>
+<section id="target">
+<h2>Target:<a class="headerlink" href="#target" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Combine beam position monitor data of all beam position monitors in
+a consistent fashion: i.e. the readings of all beam position monitors
+of the new system are provided in a structure.</p></li>
+<li><p>Provide the beam position in a manner so that the electronic units can be
+swapped out sector per sector.</p></li>
+</ul>
+</section>
+<section id="misc-naming">
+<h2>Misc: naming<a class="headerlink" href="#misc-naming" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>BPM data combiner: it combines the data to a single set</p></li>
+<li><p>BPM data collector: it collects the data of the different units</p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../requirements.html" class="btn btn-neutral float-left" title="Requirements" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="pflichtenheft.html" class="btn btn-neutral float-right" title="Scope statement" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Helmholtz Zentrum Berlin.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

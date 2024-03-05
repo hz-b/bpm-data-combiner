@@ -20,7 +20,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Modules and objects considered internal to bpm-data-combiner" href="internals.html" />
-    <link rel="prev" title="Combine data from beam position monitor sources" href="index.html" /> 
+    <link rel="prev" title="Scope statement" href="requirements/pflichtenheft.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -44,12 +44,24 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="requirements.html">Requirements</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">API of bpm-data-combiner</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#todo-s">TODO’s</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#data-model">Data model</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#status-of-a-bpm">Status of a BPM</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#data-provided-by-a-single-ioc">Data provided by a single IOC</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#representing-the-data-collected-from-a-set-of-bpm-ioc-s">Representing the data collected from a set of BPM IOC’s</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-bpm_data_combiner.data_model.monitored_device">Status of a BPM</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#bpm_data_combiner.data_model.monitored_device.MonitoredDevice"><code class="docutils literal notranslate"><span class="pre">MonitoredDevice</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#bpm_data_combiner.data_model.monitored_device.PlaneNames"><code class="docutils literal notranslate"><span class="pre">PlaneNames</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#data-provided-by-a-single-ioc">Data provided by a single IOC</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#bpm_data_combiner.data_model.bpm_data_reading.BPMReading"><code class="docutils literal notranslate"><span class="pre">BPMReading</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-bpm_data_combiner.data_model.bpm_data_collection">Representing the data collected from a set of BPM IOC’s</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#bpm_data_combiner.data_model.bpm_data_collection.BPMDataCollection"><code class="docutils literal notranslate"><span class="pre">BPMDataCollection</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#bpm_data_combiner.data_model.bpm_data_collection.BPMDataCollectionStats"><code class="docutils literal notranslate"><span class="pre">BPMDataCollectionStats</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -96,14 +108,75 @@ new reading collection is dispatched</p></li>
 </section>
 <section id="data-model">
 <h2>Data model<a class="headerlink" href="#data-model" title="Link to this heading">¶</a></h2>
-<section id="status-of-a-bpm">
-<h3>Status of a BPM<a class="headerlink" href="#status-of-a-bpm" title="Link to this heading">¶</a></h3>
+<section id="module-bpm_data_combiner.data_model.monitored_device">
+<span id="status-of-a-bpm"></span><h3>Status of a BPM<a class="headerlink" href="#module-bpm_data_combiner.data_model.monitored_device" title="Link to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="bpm_data_combiner.data_model.monitored_device.MonitoredDevice">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">bpm_data_combiner.data_model.monitored_device.</span></span><span class="sig-name descname"><span class="pre">MonitoredDevice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">enabled_x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><span class="pre">bool</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">enabled_y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><span class="pre">bool</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">active</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><span class="pre">bool</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bpm_data_combiner/data_model/monitored_device.html#MonitoredDevice"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bpm_data_combiner.data_model.monitored_device.MonitoredDevice" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="bpm_data_combiner.data_model.monitored_device.MonitoredDevice.update_status">
+<span class="sig-name descname"><span class="pre">update_status</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plane</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">status</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><span class="pre">bool</span></a></span></span><a class="reference internal" href="_modules/bpm_data_combiner/data_model/monitored_device.html#MonitoredDevice.update_status"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bpm_data_combiner.data_model.monitored_device.MonitoredDevice.update_status" title="Link to this definition">¶</a></dt>
+<dd><p>update status as required, return if update was needed</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="bpm_data_combiner.data_model.monitored_device.PlaneNames">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">bpm_data_combiner.data_model.monitored_device.</span></span><span class="sig-name descname"><span class="pre">PlaneNames</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">module</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qualname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">boundary</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bpm_data_combiner/data_model/monitored_device.html#PlaneNames"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bpm_data_combiner.data_model.monitored_device.PlaneNames" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.8/library/enum.html#enum.Enum" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></a></p>
+</dd></dl>
+
 </section>
 <section id="data-provided-by-a-single-ioc">
 <h3>Data provided by a single IOC<a class="headerlink" href="#data-provided-by-a-single-ioc" title="Link to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="bpm_data_combiner.data_model.bpm_data_reading.BPMReading">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">bpm_data_combiner.data_model.bpm_data_reading.</span></span><span class="sig-name descname"><span class="pre">BPMReading</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cnt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><span class="pre">int</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><span class="pre">None</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><span class="pre">int</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><span class="pre">None</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">dev_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bpm_data_combiner/data_model/bpm_data_reading.html#BPMReading"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bpm_data_combiner.data_model.bpm_data_reading.BPMReading" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Representation of one bpm reading</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="bpm_data_combiner.data_model.bpm_data_reading.BPMReading.cnt">
+<span class="sig-name descname"><span class="pre">cnt</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><span class="pre">int</span></a></em><a class="headerlink" href="#bpm_data_combiner.data_model.bpm_data_reading.BPMReading.cnt" title="Link to this definition">¶</a></dt>
+<dd><p>in steps of 0.1 second since epoc
+i.e. since it was last triggered to synchronise</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>time count</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="bpm_data_combiner.data_model.bpm_data_reading.BPMReading.x">
+<span class="sig-name descname"><span class="pre">x</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><span class="pre">int</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><span class="pre">None</span></a></em><a class="headerlink" href="#bpm_data_combiner.data_model.bpm_data_reading.BPMReading.x" title="Link to this definition">¶</a></dt>
+<dd><p>x position in nano meter</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="bpm_data_combiner.data_model.bpm_data_reading.BPMReading.y">
+<span class="sig-name descname"><span class="pre">y</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><span class="pre">int</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><span class="pre">None</span></a></em><a class="headerlink" href="#bpm_data_combiner.data_model.bpm_data_reading.BPMReading.y" title="Link to this definition">¶</a></dt>
+<dd><p>y position in nano meter</p>
+</dd></dl>
+
+</dd></dl>
+
 </section>
-<section id="representing-the-data-collected-from-a-set-of-bpm-ioc-s">
-<h3>Representing the data collected from a set of BPM IOC’s<a class="headerlink" href="#representing-the-data-collected-from-a-set-of-bpm-ioc-s" title="Link to this heading">¶</a></h3>
+<section id="module-bpm_data_combiner.data_model.bpm_data_collection">
+<span id="representing-the-data-collected-from-a-set-of-bpm-ioc-s"></span><h3>Representing the data collected from a set of BPM IOC’s<a class="headerlink" href="#module-bpm_data_combiner.data_model.bpm_data_collection" title="Link to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="bpm_data_combiner.data_model.bpm_data_collection.BPMDataCollection">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">bpm_data_combiner.data_model.bpm_data_collection.</span></span><span class="sig-name descname"><span class="pre">BPMDataCollection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bpm_data_combiner.data_model.bpm_data_collection.BPMDataCollectionPlane</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bpm_data_combiner.data_model.bpm_data_collection.BPMDataCollectionPlane</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">names</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cnt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bpm_data_combiner/data_model/bpm_data_collection.html#BPMDataCollection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bpm_data_combiner.data_model.bpm_data_collection.BPMDataCollection" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="bpm_data_combiner.data_model.bpm_data_collection.BPMDataCollectionStats">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">bpm_data_combiner.data_model.bpm_data_collection.</span></span><span class="sig-name descname"><span class="pre">BPMDataCollectionStats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bpm_data_combiner.data_model.bpm_data_collection.BPMDataCollectionStatsPlane</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bpm_data_combiner.data_model.bpm_data_collection.BPMDataCollectionStatsPlane</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">names</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bpm_data_combiner/data_model/bpm_data_collection.html#BPMDataCollectionStats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bpm_data_combiner.data_model.bpm_data_collection.BPMDataCollectionStats" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+</dd></dl>
+
 </section>
 </section>
 </section>
@@ -112,7 +185,7 @@ new reading collection is dispatched</p></li>
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="index.html" class="btn btn-neutral float-left" title="Combine data from beam position monitor sources" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="requirements/pflichtenheft.html" class="btn btn-neutral float-left" title="Scope statement" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="internals.html" class="btn btn-neutral float-right" title="Modules and objects considered internal to bpm-data-combiner" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Scope statement &mdash; bpm-data-combiner  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="API of bpm-data-combiner" href="../api.html" />
+    <link rel="prev" title="BPM data combiner: requirements specification" href="lastenheft.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            bpm-data-combiner
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../requirements.html">Requirements</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="lastenheft.html">BPM data combiner: requirements specification</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Scope statement</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#background">Background</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#data-provided-by-libera-spark">Data provided by Libera Spark</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#data-provided-by-the-existing-units">Data provided by the existing units</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#output-to-be-provided-by-the-combiner">Output to be provided by the combiner</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API of bpm-data-combiner</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../internals.html">Modules and objects considered internal to bpm-data-combiner</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">bpm-data-combiner</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../requirements.html">Requirements</a></li>
+      <li class="breadcrumb-item active">Scope statement</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/requirements/pflichtenheft.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="scope-statement">
+<h1>Scope statement<a class="headerlink" href="#scope-statement" title="Link to this heading">¶</a></h1>
+<p>Anstelle eines Pflichtenhefts</p>
+<section id="background">
+<h2>Background<a class="headerlink" href="#background" title="Link to this heading">¶</a></h2>
+<p>BESSY II will be equipped with new BPMs successively. For a substantial period,
+there will be hybrid operation of existing BPMs and new BPMs (Libera Spark).
+The intention is to provide data structures similar to the old BPMs generated
+from the new data sources to enable operation of applications like slow orbit
+feedback during the transition.</p>
+<p>The control system to be used is <cite>EPICS</cite>.</p>
+<section id="data-provided-by-libera-spark">
+<h3>Data provided by Libera Spark<a class="headerlink" href="#data-provided-by-libera-spark" title="Link to this heading">¶</a></h3>
+<p>Libera Spark units provide, besides many other PVs not relevant for Orbit Feedback:</p>
+<ul class="simple">
+<li><p>x position</p></li>
+<li><p>y position</p></li>
+<li><p>Time since synchronisation (in steps of internal samples)</p></li>
+</ul>
+<p>All these are currently provided in individual PVs. The synchronisation of data production
+across several BPM units will be achieved by a seperate process using the timing system.</p>
+<p>To begin with, the data sources from different BPMs should be regarded as asynchronous.</p>
+</section>
+<section id="data-provided-by-the-existing-units">
+<h3>Data provided by the existing units<a class="headerlink" href="#data-provided-by-the-existing-units" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>x position</p></li>
+<li><p>y position</p></li>
+<li><p>status like Power and Automatic Gain</p></li>
+</ul>
+<p>All readings from BPMs in one cell are transmitted in one PV (one waveform), with the
+elements representing the individual BPMs. The transmission across cells is performed
+by a trigger PV at a pace of 0.5Hz.</p>
+</section>
+<section id="output-to-be-provided-by-the-combiner">
+<h3>Output to be provided by the combiner<a class="headerlink" href="#output-to-be-provided-by-the-combiner" title="Link to this heading">¶</a></h3>
+<p>Provide the beam position in a consistent set in the format of the existing cell IOCs.</p>
+<p>PVs of the new units will need to be collected for all units in a cell (7-8) and averaged
+over time before output triggered by the existing trigger PV.</p>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="lastenheft.html" class="btn btn-neutral float-left" title="BPM data combiner: requirements specification" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../api.html" class="btn btn-neutral float-right" title="API of bpm-data-combiner" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Helmholtz Zentrum Berlin.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

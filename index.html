@@ -19,7 +19,7 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="API of bpm-data-combiner" href="api.html" /> 
+    <link rel="next" title="Requirements" href="requirements.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -43,6 +43,7 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="requirements.html">Requirements</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">API of bpm-data-combiner</a></li>
 <li class="toctree-l1"><a class="reference internal" href="internals.html">Modules and objects considered internal to bpm-data-combiner</a></li>
 </ul>
@@ -76,23 +77,74 @@
 <div class="toctree-wrapper compound">
 <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="requirements.html">Requirements</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="requirements/lastenheft.html">BPM data combiner: requirements specification</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="requirements/lastenheft.html#motivation">Motivation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="requirements/lastenheft.html#background">Background</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="requirements/lastenheft.html#standard-operation-of-the-units">Standard operation of the units</a></li>
+<li class="toctree-l4"><a class="reference internal" href="requirements/lastenheft.html#failure-modes-to-consider">Failure modes to consider</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="requirements/lastenheft.html#target">Target:</a></li>
+<li class="toctree-l3"><a class="reference internal" href="requirements/lastenheft.html#misc-naming">Misc: naming</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="requirements/pflichtenheft.html">Scope statement</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="requirements/pflichtenheft.html#background">Background</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="requirements/pflichtenheft.html#data-provided-by-libera-spark">Data provided by Libera Spark</a></li>
+<li class="toctree-l4"><a class="reference internal" href="requirements/pflichtenheft.html#data-provided-by-the-existing-units">Data provided by the existing units</a></li>
+<li class="toctree-l4"><a class="reference internal" href="requirements/pflichtenheft.html#output-to-be-provided-by-the-combiner">Output to be provided by the combiner</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">API of bpm-data-combiner</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="api.html#todo-s">TODO’s</a></li>
 <li class="toctree-l2"><a class="reference internal" href="api.html#data-model">Data model</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="api.html#status-of-a-bpm">Status of a BPM</a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#data-provided-by-a-single-ioc">Data provided by a single IOC</a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#representing-the-data-collected-from-a-set-of-bpm-ioc-s">Representing the data collected from a set of BPM IOC’s</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api.html#module-bpm_data_combiner.data_model.monitored_device">Status of a BPM</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api.html#bpm_data_combiner.data_model.monitored_device.MonitoredDevice"><code class="docutils literal notranslate"><span class="pre">MonitoredDevice</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#bpm_data_combiner.data_model.monitored_device.PlaneNames"><code class="docutils literal notranslate"><span class="pre">PlaneNames</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api.html#data-provided-by-a-single-ioc">Data provided by a single IOC</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api.html#bpm_data_combiner.data_model.bpm_data_reading.BPMReading"><code class="docutils literal notranslate"><span class="pre">BPMReading</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api.html#module-bpm_data_combiner.data_model.bpm_data_collection">Representing the data collected from a set of BPM IOC’s</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api.html#bpm_data_combiner.data_model.bpm_data_collection.BPMDataCollection"><code class="docutils literal notranslate"><span class="pre">BPMDataCollection</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#bpm_data_combiner.data_model.bpm_data_collection.BPMDataCollectionStats"><code class="docutils literal notranslate"><span class="pre">BPMDataCollectionStats</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="internals.html">Modules and objects considered internal to bpm-data-combiner</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="internals.html#business-logic">Business Logic</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="internals.html#monitor-devices">Monitor devices</a></li>
-<li class="toctree-l3"><a class="reference internal" href="internals.html#event">Event</a></li>
-<li class="toctree-l3"><a class="reference internal" href="internals.html#dispatcher">Dispatcher</a></li>
-<li class="toctree-l3"><a class="reference internal" href="internals.html#collector">Collector</a></li>
-<li class="toctree-l3"><a class="reference internal" href="internals.html#accumulator">Accumulator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="internals.html#module-bpm_data_combiner.bl">Business Logic</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="internals.html#module-bpm_data_combiner.bl.monitor_devices">Monitor devices</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="internals.html#bpm_data_combiner.bl.monitor_devices.MonitorDevices"><code class="docutils literal notranslate"><span class="pre">MonitorDevices</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="internals.html#module-bpm_data_combiner.bl.event">Event</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="internals.html#bpm_data_combiner.bl.event.Event"><code class="docutils literal notranslate"><span class="pre">Event</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="internals.html#module-bpm_data_combiner.bl.dispatcher">Dispatcher</a></li>
+<li class="toctree-l3"><a class="reference internal" href="internals.html#module-bpm_data_combiner.bl.collector">Collector</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="internals.html#bpm_data_combiner.bl.collector.Collector"><code class="docutils literal notranslate"><span class="pre">Collector</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="internals.html#bpm_data_combiner.bl.collector.ReadingsCollection"><code class="docutils literal notranslate"><span class="pre">ReadingsCollection</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="internals.html#bpm_data_combiner.bl.collector._combine_collections_by_device_names"><code class="docutils literal notranslate"><span class="pre">_combine_collections_by_device_names()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="internals.html#module-bpm_data_combiner.bl.accumulator">Accumulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="internals.html#module-bpm_data_combiner.bl.statistics">Statistics</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="internals.html#bpm_data_combiner.bl.statistics.compute_mean_weight"><code class="docutils literal notranslate"><span class="pre">compute_mean_weight()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="internals.html#bpm_data_combiner.bl.statistics.compute_mean_weights_for_planes"><code class="docutils literal notranslate"><span class="pre">compute_mean_weights_for_planes()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="internals.html#bpm_data_combiner.bl.statistics.compute_weights_scaled"><code class="docutils literal notranslate"><span class="pre">compute_weights_scaled()</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -113,7 +165,7 @@
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="api.html" class="btn btn-neutral float-right" title="API of bpm-data-combiner" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="requirements.html" class="btn btn-neutral float-right" title="Requirements" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
