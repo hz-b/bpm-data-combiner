@@ -14,6 +14,6 @@ identifier.
   time count
 
 *Code reuse*: at current stage only the dispatcher depends on
-:class:`BPMReading
+:class:`BPMReading`
 """
 __all__ = ["accumulator", "collector", "dispatcher", "preprocessor", "event", "monitor_devices", "statistics"]
