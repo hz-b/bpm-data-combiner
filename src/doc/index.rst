@@ -5,7 +5,7 @@ Combine data from beam position monitor sources
    :maxdepth: 4
    :caption: Contents:
 
-
+   requirements.rst
    api.rst
    internals.rst
 

@@ -25,8 +25,7 @@ Status of a BPM
 
 .. automodule:: bpm_data_combiner.data_model.monitored_device
    :members:
-   :undoc~members:
-   :show~inheritance:
+   :show-inheritance:
 
 
 Data provided by a single IOC
@@ -34,8 +33,7 @@ Data provided by a single IOC
 
 .. autoclass:: bpm_data_combiner.data_model.bpm_data_reading.BPMReading
    :members:
-   :undoc~members:
-   :show~inheritance:
+   :show-inheritance:
 
 
 
@@ -44,5 +42,4 @@ Representing the data collected from a set of BPM IOC's
 
 .. automodule:: bpm_data_combiner.data_model.bpm_data_collection
    :members:
-   :undoc~members:
-   :show~inheritance:
+   :show-inheritance:
