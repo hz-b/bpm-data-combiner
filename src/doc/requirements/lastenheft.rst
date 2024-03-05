@@ -15,7 +15,7 @@ Below in the text he new units will be called
 
 
 The data these instrumentation device units provide are
-to be comined in such a fashion to
+to be combined in such a fashion to
 
 * make it possible to swap out the old units to the new units
   sector per sector
