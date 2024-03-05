@@ -1,1 +1,1 @@
-__all__ = ["view.py", "main"]
+__all__ = ["main", "command_context_manager", "view" ]

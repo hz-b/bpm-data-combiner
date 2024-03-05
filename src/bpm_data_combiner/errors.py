@@ -4,3 +4,6 @@ class DoubleSubmissionError(AssertionError):
 class UnknownDeviceNameError(AssertionError):
     """Device name unknown
     """
+
+
+__all__ = ["DoubleSubmissionError", "UnknownDeviceNameError"]

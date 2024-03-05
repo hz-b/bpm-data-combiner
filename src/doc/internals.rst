@@ -26,7 +26,6 @@ Event
    :show-inheritance:
 
 
-
 Dispatcher
 ~~~~~~~~~~
 
@@ -48,5 +47,14 @@ Accumulator
 ~~~~~~~~~~~
 
 .. automodule:: bpm_data_combiner.bl.accumulator
+   :members:
+   :show-inheritance:
+
+
+Statistics
+~~~~~~~~~~
+
+
+.. automodule:: bpm_data_combiner.bl.statistics
    :members:
    :show-inheritance:

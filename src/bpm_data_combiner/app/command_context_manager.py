@@ -54,3 +54,6 @@ class UpdateContext:
         traceback.print_tb(exc_tb, file=tb_buf)
         tb_buf.seek(0)
         logger.error("%s\nTraceback:\n%s\n%s\n", marker, tb_buf.read(), marker)
+
+
+__all__ = ["UpdateContext"]

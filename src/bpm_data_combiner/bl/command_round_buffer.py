@@ -3,6 +3,8 @@ from ..data_model.command import Command
 
 
 class CommandRoundBuffer:
+    """Store commands in a round buffer to display in case of errors
+    """
     def __init__(self, maxsize=20):
         self.roundbuffer = deque()
         self.maxsize = maxsize

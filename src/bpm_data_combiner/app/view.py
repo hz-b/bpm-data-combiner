@@ -170,3 +170,13 @@ class Views:
         self.bdata = ViewBPMDataAsBData(prefix + ":bdata")
         self.monitor_bpms = ViewBPMMonitoring(prefix + ":mon")
         self.monitor_update_cmd_errors = ViewStringBuffer(prefix + ":im:cmd_err")
+
+
+__all__ = [
+    "Views",
+    "ViewStringBuffer",
+    "ViewBPMDataAsBData",
+    "ViewBPMDataCollection",
+    "ViewBPMDataCollectionStats",
+    "ViewBPMMonitoring",
+]
