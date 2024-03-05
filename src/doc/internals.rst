@@ -7,8 +7,7 @@ Business Logic
 
 .. automodule:: bpm_data_combiner.bl
    :members:
-   :undoc~members:
-   :show~inheritance:
+   :show-inheritance:
 
 
 Monitor devices
@@ -16,8 +15,7 @@ Monitor devices
 
 .. automodule:: bpm_data_combiner.bl.monitor_devices
    :members:
-   :undoc~members:
-   :show~inheritance:
+   :show-inheritance:
 
 
 Event
@@ -25,8 +23,7 @@ Event
 
 .. automodule:: bpm_data_combiner.bl.event
    :members:
-   :undoc~members:
-   :show~inheritance:
+   :show-inheritance:
 
 
 
@@ -35,8 +32,7 @@ Dispatcher
 
 .. automodule:: bpm_data_combiner.bl.dispatcher
    :members:
-   :undoc~members:
-   :show~inheritance:
+   :show-inheritance:
 
 
 Collector
@@ -44,8 +40,7 @@ Collector
 
 .. automodule:: bpm_data_combiner.bl.collector
    :members:
-   :undoc~members:
-   :show~inheritance:
+   :show-inheritance:
 
 
 
@@ -54,5 +49,4 @@ Accumulator
 
 .. automodule:: bpm_data_combiner.bl.accumulator
    :members:
-   :undoc~members:
-   :show~inheritance:
+   :show-inheritance:
