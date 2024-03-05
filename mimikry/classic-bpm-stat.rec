@@ -1,0 +1,17 @@
+record(bi, "$(PREFIX):pwr$(CHANNEL)i")
+{
+    field(DESC, "Mimic pwr of classic bpm ioc")
+    field(ZNAM, "enabled")
+    field(ONAM, "disabled")
+    field(VAL, 1)
+    field(PINI, "YES")
+}
+
+record(bi, "$(PREFIX):agc$(CHANNEL)i")
+{
+    field(DESC, "Mimic auto. gain ctrl classic bpm ioc")
+    field(ZNAM, "enabled")
+    field(ONAM, "disabled")
+    field(VAL, 1)
+    field(PINI, "YES")
+}
