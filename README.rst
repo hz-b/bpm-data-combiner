@@ -10,8 +10,8 @@ For details see:
 * Product requirements document or `Lastenheft`_
 * Scope statement of `Pflichtenheft`_
 
-.. _`Lastenheft` : bpm_data_combiner_app/doc/lastenheft.rst
-.. _`Pflichtenheft` : bpm_data_combiner_app/doc/pflichtenheft.rst
+.. _`Lastenheft` : src/doc/requirements/lastenheft.rst
+.. _`Pflichtenheft` : src/doc/requirements/pflichtenheft.rst
 
 The functionallity is implemented as  EPICS IOC's. A significant
 fraction is implemented in python using pydevice. All python code
@@ -26,3 +26,4 @@ External dependencies
 
 * EPICS 7
 * PyDevice
+* numpy
