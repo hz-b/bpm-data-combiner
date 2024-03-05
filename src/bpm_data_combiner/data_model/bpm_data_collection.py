@@ -39,3 +39,6 @@ class BPMDataCollectionStats:
     x: BPMDataCollectionStatsPlane
     y: BPMDataCollectionStatsPlane
     names : Sequence[str]
+
+
+__all__ = ["BPMDataCollectionStats", "BPMDataCollection"]
