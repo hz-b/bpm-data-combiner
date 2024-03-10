@@ -256,14 +256,14 @@ record(calcout, "$(PREFIX):im:$(DEV_NAME):mon:cnt_dwn")
 {
 
     field(DESC, "motr stat: counting down")
-    field(INPA, "$(PREFIX):im:(DEV_NAME):mon:trg NPP")
+    field(INPA, "$(PREFIX):im:$(DEV_NAME):mon:trg NPP")
     field(CALC, "(VAL > 0) ? (VAL - 1) : 0")
     field(SCAN, ".5 second")
     field(DOPT, "Use CALC")
-    field(FLNK, "$(PREFIX):im:$(DEV_NAME):mon:is_act")
+    field(FLNK, "$(PREFIX):mon:$(DEV_NAME):is_act")
 }
 
-record(calcout, "$(PREFIX):im:$(DEV_NAME):mon:is_act")
+record(calcout, "$(PREFIX):mon:$(DEV_NAME):is_act")
 {
     field(DESC, "motr stat: active?")
     field(INPA, "$(PREFIX):im:$(DEV_NAME):mon:cnt_dwn")
