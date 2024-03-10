@@ -1,12 +1,11 @@
 file "classic-bpm-stat.rec"
 {
-    pattern { CHANNEL }
-            {       1 }
-            {       2 }
-            {       3 }
-            {       4 }
-            {       5 }
-            {       6 }
-            {       7 }
-            {       8 }
+    pattern { CHANNEL  BPM_BOX  }
+            {       1  BPMZ5D8R }
+            {       2  BPMZ6D8R }
+            {       3  BPMZ7D8R }
+            {       4  BPMZ1T8R }
+            {       5  BPMZ2T8R }
+            {       6  BPMZ3T8R }
+            {       7  BPMZ4T8R }
 }
