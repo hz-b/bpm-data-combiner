@@ -28,12 +28,12 @@ DB += view.db
 # IOCADMIN=$(HOME_DEVEL)/iocStats/iocAdmin/
 
 ## DB_INSTALLS += $(IOCADMIN)/db/iocAdminSoft.db
-## # (if required by next step)
+## ## # (if required by next step)
 ## DB_INSTALLS += $(IOCADMIN)/db/access.db
-## # (optional - ONLY if SCAN monitoring is required)
+## ## # (optional - ONLY if SCAN monitoring is required)
 ## DB_INSTALLS += $(IOCADMIN)/db/iocAdminScanMon.db
-## # If <anyname>.db template is not named <anyname>*.template add
-## # <anyname>_TEMPLATE = <templatename>
+## ## # If <anyname>.db template is not named <anyname>*.template add
+## ## # <anyname>_TEMPLATE = <templatename>
 
 include $(TOP)/configure/RULES
 #----------------------------------------

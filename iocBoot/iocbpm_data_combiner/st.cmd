@@ -19,13 +19,13 @@ dbLoadDatabase "dbd/bpm_data_combiner.dbd"
 bpm_data_combiner_registerRecordDeviceDriver pdbbase
 
 ## stats records
-dbLoadRecords("db/iocAdminSoft.db", "IOC=$(IOC_NAME)")
-dbLoadRecords("db/iocRelease.db", "IOC=$(IOC_NAME)")
+## dbLoadRecords("db/iocAdminSoft.db", "IOC=$(IOC_NAME)")
+## dbLoadRecords("db/iocRelease.db", "IOC=$(IOC_NAME)")
 
 ## Load record instances
-dbLoadTemplate("db/bpm_dev_input.db", "PREFIX=$(PREFIX)")
+dbLoadTemplate("db/bpm_dev_input.substitutions", "PREFIX=$(PREFIX)")
 # dbLoadRecords("db/bpm_dev_input_offbeat.db", "PREFIX=$(PREFIX)")
-dbLoadTemplate("db/bpm.db", "PREFIX=$(PREFIX)")
+dbLoadTemplate("db/bpm.substitutions", "PREFIX=$(PREFIX)")
 dbLoadRecords("db/bpm_monitor_overview.db", "PREFIX=$(PREFIX),VIEW=mon")
 dbLoadRecords("db/view.db", "PREFIX=$(PREFIX)")
 dbLoadRecords("db/bpm_periodic.db", "PREFIX=$(PREFIX)")
