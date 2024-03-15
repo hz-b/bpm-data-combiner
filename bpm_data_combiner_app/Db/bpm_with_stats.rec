@@ -10,11 +10,11 @@ record(waveform, "$(PREFIX):$(VIEW):values")
     # todo: how to make sure that it is a group of
     #       x or y
     #       do I need an extra variable ?
-    info(Q:group, {
-         "$(PREFIX)$(VIEW)": {
-            "values": {+channel:"VAL"}
-        }
-    })
+    # info(Q:group, {
+    #      "$(PREFIX)$(VIEW)": {
+    #         "values": {+channel:"VAL"}
+    #     }
+    # })
 }
 
 record(waveform, "$(PREFIX):$(VIEW):std")
@@ -26,11 +26,11 @@ record(waveform, "$(PREFIX):$(VIEW):std")
     field(SCAN, "I/O Intr")
     field(INP,  "@pydev.iointr('$(PREFIX):$(VIEW):std')")
     field(NELM, 128)
-    info(Q:group, {
-         "$(PREFIX)$(VIEW)": {
-            "std": {+channel:"VAL"}
-        }
-    })
+    # info(Q:group, {
+    #      "$(PREFIX)$(VIEW)": {
+    #         "std": {+channel:"VAL"}
+    #     }
+    # })
 }
 
 record(waveform, "$(PREFIX):$(VIEW):n_readings")
@@ -42,9 +42,9 @@ record(waveform, "$(PREFIX):$(VIEW):n_readings")
     field(SCAN, "I/O Intr")
     field(INP,  "@pydev.iointr('$(PREFIX):$(VIEW):n_readings')")
     field(NELM, 128)
-    info(Q:group, {
-         "$(PREFIX)$(VIEW)": {
-            "n_readings": {+channel:"VAL"}
-        }
-    })
+    # info(Q:group, {
+    #      "$(PREFIX)$(VIEW)": {
+    #         "n_readings": {+channel:"VAL"}
+    #     }
+    # })
 }
