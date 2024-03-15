@@ -1,4 +1,4 @@
-file "db/bpm_dev_input.rec"
+file "db/bpm_dev_input_rec.db"
 {
 	pattern { DEV_NAME  }
 	        { BPMZ5D8R  }
