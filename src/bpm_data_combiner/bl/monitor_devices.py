@@ -1,6 +1,6 @@
 from typing import Sequence
 
-from ..data_model.monitored_device import MonitoredDevice
+from ..data_model.monitored_device import MonitoredDevice, SynchronisationStatus
 from .event import Event
 
 
@@ -30,7 +30,7 @@ class MonitorDevices:
 
     def get_devicenames(self) -> Sequence[str]:
         devs = [
-            ds.name for _, ds in self.devices_status.items() if ds.active and ds.enabled
+            ds.name for _, ds in self.devices_status.items() if ds.active and ds.synchronised
         ]
         return devs
 
@@ -48,3 +48,6 @@ class MonitorDevices:
 
         self.devices_status[dev_name].active = status
         self._status_changed()
+
+    def set_synchronisation_status(self, dev_name: str, sync_stat: SynchronisationStatus):
+        self.devices_status[dev_name].sync_stat =  SynchronisationStatus(sync_stat)

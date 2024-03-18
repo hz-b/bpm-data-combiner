@@ -68,7 +68,7 @@ ifdef EPICS_QSRV_MAJOR_VERSION
     bpm_data_combiner_DBD += qsrv.dbd
 endif
 
-WITH_IOCSTATS=1
+WITH_IOCSTATS=0
 ifeq ($(WITH_IOCSTATS),1)
   bpm_data_combiner_LIBS += devIocStats
   bpm_data_combiner_DBD += devIocStats.dbd iocAdmin.dbd

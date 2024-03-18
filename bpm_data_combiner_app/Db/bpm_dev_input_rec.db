@@ -61,6 +61,20 @@ record(aai, "$(PREFIX):inp:$(DEV_NAME):posv")
      field(FLNK, "$(PREFIX):im:$(DEV_NAME):toposv")
 }
 
+record(mbbi, "$(PREFIX):inp:$(DEV_NAME):sync_stat")
+{
+     field(DESC, "Device synchronised? ")
+     field(INP, "$(DEV_NAME):clocks:sync_st_m CPP")
+     field(ZRST, "NoSync")
+     field(ONST, "Tracking")
+     field(TWST, "Synchronised")
+     field(ZRVL, 0)
+     field(ONVL, 1)
+     field(TWVL, 2)
+     field(FLNK, "$(PREFIX):im:$(DEV_NAME):sync_stat")
+}
+
+
 # push dat from input to pydev:aao
 # aao seems not to have an DOL entry
 record(aSub, "$(PREFIX):im:$(DEV_NAME):toposv")
@@ -86,6 +100,22 @@ record(aao, "$(PREFIX):im:$(DEV_NAME):posv")
      field(OUT,  "@update(dev_name='$(DEV_NAME)', reading=%VAL%, tpro=%TPRO%)")
      field(FLNK, "$(PREFIX):im:$(DEV_NAME):mon:trg")
      field(TPRO, 0)
+}
+
+record(mbbo, "$(PREFIX):im:$(DEV_NAME):sync_stat")
+{
+      field(DESC, "Sync stat -> py")
+      field(DTYP, "pydev")
+      field(DOL, "$(PREFIX):inp:$(DEV_NAME):sync_stat")
+      field(OMSL, "closed_loop")
+      field(OUT,  "@update(dev_name='$(DEV_NAME)', sync_stat=%VAL%, tpro=%TPRO%)")
+      field(ZRST, "NoSync")
+      field(ONST, "Tracking")
+      field(TWST, "Synchronised")
+      field(ZRVL, 0)
+      field(ONVL, 1)
+      field(TWVL, 2)
+      field(TPRO, 1)
 }
 
 record(fanout, "$(PREFIX):inp:$(DEV_NAME):trg")
@@ -237,6 +267,7 @@ record(stringout, "$(PREFIX):im:$(DEV_NAME):name")
     field(PINI, "YES")
     # field(TPRO, 1)
 }
+
 
 # Monitor: use a fixed value for count down
 # Reason: cont down is easy to see when it expirces: credit Fritz Lang
