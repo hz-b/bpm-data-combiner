@@ -1,11 +1,17 @@
 from dataclasses import dataclass
-from enum import Enum
+from enum import Enum, IntEnum
 from typing import Optional
 
 
 class PlaneNames(Enum):
     x = "x"
     y = "y"
+
+
+class SynchronisationStatus(IntEnum):
+    no_sync = 0
+    tracking = 1
+    synchronised = 2
 
 
 @dataclass
@@ -17,10 +23,16 @@ class MonitoredDevice:
     enabled_y: Optional[bool] = True
     # is it active: i.e. data are received
     active: Optional[bool] = True
+    # is the device in synch state: thus the counters are valid ones
+    sync_stat : Optional[SynchronisationStatus] = SynchronisationStatus.no_sync
 
     @property
     def enabled(self):
         return self.enabled_x or self.enabled_y
+
+    @property
+    def synchronised(self) -> bool:
+        return self.sync_stat == SynchronisationStatus.synchronised
 
     def update_status(self, plane, status) -> bool:
         """update status as required, return if update was needed"""

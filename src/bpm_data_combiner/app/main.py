@@ -72,7 +72,7 @@ acc_ready = Accumulator(dev_name_index)
 
 
 # fmt:off
-views = Views(prefix="Pierre:COM")
+views = Views(prefix="OrbCol")
 def cb(collection):
     # Here we need to use dev_names and not the active ones
     # I guss there should be an exporter
@@ -140,6 +140,8 @@ def process_reading(*, dev_name, reading):
 def process_active(*, dev_name, active):
     return monitor_devices.set_active(dev_name, active)
 
+def process_sync_stat(*, dev_name, sync_stat):
+    return monitor_devices.set_synchronisation_status(dev_name, sync_stat)
 
 def process_enabled(*, dev_name, enabled, plane):
     return monitor_devices.set_enabled(dev_name, enabled, plane)
@@ -162,6 +164,7 @@ cmds = dict(
     # handling device status monitoring
     enabled=process_enabled,
     active=process_active,
+    sync_stat=process_sync_stat,
     # metronom: used to derive appropriate delay
     # to wait for all data
     periodic=process_periodic_trigger,

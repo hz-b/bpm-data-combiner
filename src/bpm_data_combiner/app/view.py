@@ -116,7 +116,7 @@ class ViewBPMDataAsBData:
     def update(self, data: BPMDataCollectionStats):
         """prepare data as expected
         """
-        # logger.debug("view bdata: publishing data %s", data)
+        logger.debug("view bdata: publishing data %s", data)
         nm2mm = 1e-6
         n_entries = len(data.x.values)
         n_bpms = 8
@@ -135,23 +135,22 @@ class ViewBPMDataAsBData:
         # bdata[2] = 3
         # intensityz z 1.3
         # bdata[3] = 3
-        # AGC status needs to be three
-        # todo: fold in from the data that its set AGC
-        #       to 0 if some libera box is not responsive
-        bdata[4] = 3
+        # AGC status needs to be three for valid data
+        # todo: find out what to set if only one plane is valid?
+        bdata[4,:n_entries] = np.where((data.x.n_readings > 0) | (data.y.n_readings > 0), 3, 0)
         bdata[4, -1] = 2
         # scale rms so that the slow orbit feedback accepts the data
         # factor 100 seems to be enough.
         # I think I should add some check that the noise is large enough
         scale_rms = 20
-        bdata[6, :n_entries] = data.x.std * nm2mm * scale_rms
-        bdata[7, :n_entries] = data.y.std * nm2mm * scale_rms
+        bdata[6, :n_entries] = np.where(data.x.n_readings > 0, data.x.std * nm2mm * scale_rms, 0)
+        bdata[7, :n_entries] = np.where(data.y.n_readings > 0, data.y.std * nm2mm * scale_rms, 0)
 
         label = f"{self.prefix}"
         bdata = [float(v) for v in bdata.ravel()]
+        pydev.iointr(label, bdata)
         logger.debug("view bdata: label %s,  %d n_entries", label, n_entries)
         # logger.warning("view bdata: label %s bdata %s", label, bdata)
-        pydev.iointr(label, bdata)
 
 
 class ViewStringBuffer:
@@ -159,8 +158,8 @@ class ViewStringBuffer:
         self.label = label
 
     def update(self, buf: Sequence[str]):
-        # logger.warning(f'View string {self.label}:"{t_str}"')
         pydev.iointr(self.label, string_array_to_bytes(buf))
+        # logger.warning(f'View string {self.label}:"{t_str}"')
 
 
 class Views:
