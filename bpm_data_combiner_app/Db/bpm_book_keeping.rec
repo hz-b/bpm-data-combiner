@@ -39,11 +39,11 @@ record(waveform, "$(PREFIX):$(VIEW):names")
     field(SCAN, "I/O Intr")
     field(INP,  "@pydev.iointr('$(PREFIX):$(VIEW):names')")
     field(NELM, 128)
-    info(Q:group, {
-         "$(PREFIX)$(VIEW)": {
-            "names": {+channel:"VAL"}
-        }
-    })
+#    info(Q:group, {
+#         "$(PREFIX)$(VIEW)": {
+#            "names": {+channel:"VAL"}
+#        }
+#    })
     field(TPRO, 0)
 }
 

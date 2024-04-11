@@ -15,7 +15,9 @@ USR_CPPFLAGS += -DUSE_TYPED_RSET
 
 
 # Build the IOC application
+ifeq ($(EPICS_VERSION), 7)
 PROD_IOC = bpm_dev_sim
+endif
 
 # bpm_dev_sim.dbd will be created and installed
 DBD += bpm_dev_sim.dbd
@@ -31,7 +33,7 @@ bpm_dev_sim_SRCS_DEFAULT += bpm_dev_simMain.cpp
 bpm_dev_sim_SRCS_vxWorks += -nil-
 
 # Link in the code from our support library
-bpm_dev_sim_LIBS += bpm_dev_simSupport
+bpm_dev_sim_LIBS += $(EPICS_BASE_IOC_LIBS)
 
 bpm_dev_sim_DBD += concatRecord.dbd
 bpm_dev_sim_LIBS += concatRecord

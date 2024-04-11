@@ -8,12 +8,12 @@ record(longin, "$(PREFIX):inp:7:$(DEV_NAME):x")
 {
     field(DESC, "mirror: $(DEV_NAME) x value")
     field(EGU, "nm")
-    field(INP, {pva:{
-        pv:"$(DEV_NAME):pos",
-        field:"X",
-        proc:true,
-        }}
-    )
+#    field(INP, {pva:{
+#        pv:"$(DEV_NAME):pos",
+#        field:"X",
+#        proc:true,
+#        }}
+#    )
     # Forwarding data handled by separate fanout to ensure that
     # data are pushed in desired order to python
     # field(FLNK, "$(PREFIX)$(DEV_NAME):im:x")
@@ -24,12 +24,12 @@ record(longin, "$(PREFIX):inp:7:$(DEV_NAME):y")
 {
     field(DESC, "mirror: y value")
     field(EGU, "nm")
-    field(INP, {pva:{
-        pv:"$(DEV_NAME):pos",
-        field:"Y",
-        proc:true,
-        }}
-    )
+#    field(INP, {pva:{
+#        pv:"$(DEV_NAME):pos",
+#        field:"Y",
+#        proc:true,
+#        }}
+#    )
     # field(FLNK, "$(PREFIX)$(DEV_NAME):im:y")
     field(VAL, -100000000)
 }
@@ -39,12 +39,12 @@ record(longin, "$(PREFIX):inp:7:$(DEV_NAME):y")
 record(longin, "$(PREFIX):inp:7:$(DEV_NAME):cnt")
 {
     field(DESC, "mirror: (time) cnt")
-    field(INP, {pva:{
-        pv:"$(DEV_NAME):pos",
-        field:"lmt_l",
-        proc:true
-        }}
-    )
+#    field(INP, {pva:{
+#        pv:"$(DEV_NAME):pos",
+#        field:"lmt_l",
+#        proc:true
+#        }}
+#    )
     # done by epics 3 record currenty
     # field(FLNK, "$(PREFIX):im:$(DEV_NAME):psh")
     field(VAL, -1)
@@ -147,12 +147,12 @@ record(subArray, "$(PREFIX):inp:$(DEV_NAME):cnt")
 record(stringin, "$(PREFIX):inp:$(DEV_NAME):name")
 {
     field(DESC, "mirror: name")
-    field(INP, {pva:{
-        pv:"$(DEV_NAME):pos",
-        field:"cfg.name",
-        proc:true,
-        }}
-    )
+#    field(INP, {pva:{
+#        pv:"$(DEV_NAME):pos",
+#        field:"cfg.name",
+#        proc:true,
+#        }}
+#    )
     field(VAL, "unknown")
     field(PINI, "YES")
     field(FLNK, "$(PREFIX):im:$(DEV_NAME):name")

@@ -36,3 +36,11 @@ DB_INSTALLS += $(IOCADMIN)/db/iocAdminScanMon.db
 include $(TOP)/configure/RULES
 #----------------------------------------
 #  ADD EXTRA GNUMAKE RULES BELOW HERE
+MSI=msi
+MSI_FLAGS=-V
+
+$(COMMON_DIR)/%.db : ../%.template
+	$(MSI) $(MSI_FLAGS) -I$(CURDIR) -o $@ $<
+
+# $(COMMON_DIR)/bpm_dev_input.db : ../bpm_dev_input.rec ../bpm_dev_input.template
+#	$(MSI) $(MSI_FLAGS) -I$(CURDIR) -o $@ ../bpm_dev_input.template

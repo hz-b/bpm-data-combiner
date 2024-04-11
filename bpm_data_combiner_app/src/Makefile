@@ -11,9 +11,11 @@ USR_CPPFLAGS += -DUSE_TYPED_RSET
 # Auto-generate a header file containing a version string.
 # Version comes from the VCS if available, else date+time.
 # Build the IOC application
+ifeq ($(EPICS_HOST_ARCH),$(T_A))
 PROD_IOC = bpm_data_combiner
+endif # EPICS_HOST_ARCH
 
-bpm_data_combinerSupport_LIBS += $(EPICS_BASE_IOC_LIBS)
+# bpm_data_combinerSupport_LIBS += $(EPICS_BASE_IOC_LIBS)
 
 # bpm_data_combiner.dbd will be created and installed
 DBD += bpm_data_combiner.dbd
@@ -34,10 +36,10 @@ bpm_data_combiner_SRCS += bpm_data_combiner_registerRecordDeviceDriver.cpp
 bpm_data_combiner_SRCS_DEFAULT += bpm_data_combinerMain.cpp
 bpm_data_combiner_SRCS_vxWorks += -nil-
 
-bpm_data_combinerSupport_LIBS += $(EPICS_BASE_IOC_LIBS)
+# bpm_data_combinerSupport_LIBS += $(EPICS_BASE_IOC_LIBS)
 
 # Link in the code from our support library
-bpm_data_combiner_LIBS += bpm_data_combinerSupport
+bpm_data_combiner_LIBS += $(EPICS_BASE_IOC_LIBS)
 
 # To build SNL programs, SNCSEQ must be defined
 # in the <top>/configure/RELEASE file
@@ -72,6 +74,8 @@ ifeq ($(WITH_IOCSTATS),1)
   bpm_data_combiner_LIBS += devIocStats
   bpm_data_combiner_DBD += devIocStats.dbd iocAdmin.dbd
 endif
+
+
 
 # Finally link IOC to the EPICS Base libraries
 bpm_data_combiner_LIBS += $(EPICS_BASE_IOC_LIBS)

@@ -2,7 +2,10 @@
 #include <menuFtype.h>
 #include <registryFunction.h>
 #include <epicsExport.h>
+#include <algorithm>
 #include <cstring>
+#include <cstdio>
+
 /*
  * forward as single array from one location to the next
  */
@@ -19,8 +22,10 @@ static int element_length_from(const int ftype, const int verbose, const char* r
     case menuFtypeUSHORT: return sizeof( epicsUInt16 ); break;
     case menuFtypeLONG  : return sizeof( epicsInt32  ); break;
     case menuFtypeULONG : return sizeof( epicsUInt32 ); break;
+#if EPICS_VERSION > 3
     case menuFtypeINT64 : return sizeof( epicsInt64  ); break;
     case menuFtypeUINT64: return sizeof( epicsUInt64 ); break;
+#endif
 	// case menuFtypeFLOAT : return sizeof( epicsFloat  ); break;
 	// case menuFtypeDOUBLE: return sizeof( epicsDouble ); break;
 
