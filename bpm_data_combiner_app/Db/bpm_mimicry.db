@@ -1,0 +1,113 @@
+record(ao, "$(PREFIX):par:mls:conversion")
+{
+    field(DESC, "double to bit conversion factor")
+    # classic BPM system
+    # 16 bit for -10..10 V   
+    # 1 V per mm
+    #
+    # libera boxes
+    # use nm
+    field(VAL, "3276.8e-6")
+    field(PINI, "YES")
+}
+
+# scale libera nm to classic bits
+record(pycalc, "$(PREFIX):im:x:values")
+{
+    field(INPA, "$(PREFIX):out:2s:x:values CPP")
+    field(INPB, "$(PREFIX):par:mls:conversion")
+    field(FTA, "LONG")
+    field(FTB, "DOUBLE")
+    field(CALC, "A * B")
+    field(FTVL, "DOUBLE")
+    field(MEVL, 128)
+}
+
+
+# scale libera nm to classic bits
+record(pycalc, "$(PREFIX):im:y:values")
+{
+    field(INPA, "$(PREFIX):out:2s:y:values CPP")
+    field(INPB, "$(PREFIX):par:mls:conversion")
+    field(FTA, "LONG")
+    field(FTB, "DOUBLE")
+    field(CALC, "A * B")
+    field(FTVL, "DOUBLE")
+    field(MEVL, 128)
+}
+
+
+# scale libera nm to classic bits
+record(pycalc, "$(PREFIX):im:x:std")
+{
+    field(INPA, "$(PREFIX):out:2s:x:std CPP")
+    field(INPB, "$(PREFIX):par:mls:conversion")
+    field(FTA, "LONG")
+    field(FTB, "DOUBLE")
+    field(CALC, "A * B")
+    field(FTVL, "DOUBLE")
+    field(MEVL, 128)
+}
+
+
+# scale libera nm to classic bits
+record(pycalc, "$(PREFIX):im:y:std")
+{
+    field(INPA, "$(PREFIX):out:2s:y:std CPP")
+    field(INPB, "$(PREFIX):par:mls:conversion")
+    field(FTA, "LONG")
+    field(FTB, "DOUBLE")
+    field(CALC, "A * B")
+    field(FTVL, "DOUBLE")
+    field(MEVL, 128)
+}
+
+
+# currently only a single index.
+# let's make it a waveform as soon as more BPM's are to be used
+record(longin, "$(PREFIX):par:index")
+{
+    field(DESC, "insert libera readings at this place")
+    field(VAL, "10")
+    field(PINI, "YES") 
+}
+
+
+# need to scale data so that BPM readings accepts data?
+record(ao, "$(PREFIX):par:scale_std")
+{
+    field(DESC, "scale factor for std")
+    field(VAL, "1")
+    field(PINI, "YES") 
+}
+
+# add data at correct position into array
+record(pycalc, "$(PREFIX):im:rdBpmBuf")
+{
+    # the combiner is triggered by this data
+    # so being triggered on the other data should do the job
+    field(DESC, "insert libera data at proper place")
+    field(INPA, "BPMZ1X003GP:rdBufBpm")
+    field(MEA, 256)
+    field(FTA, "SHORT")
+    field(INPB, "$(PREFIX):im:x:values")
+    field(FTB, "LONG")
+    field(INPC, "$(PREFIX):im:x:std")
+    field(FTC, "LONG")
+    field(INPD, "$(PREFIX):im:y:values")
+    field(FTD, "LONG")
+    # assuming that this data is the last one produced by the 
+    # the combiner
+    field(INPE, "$(PREFIX):im:y:std CPP")
+    field(FTE, "LONG")
+    field(INPF, "$(PREFIX):par:index")
+    field(FTF, "LONG")
+    field(INPG, "$(PREFIX):par:scale_std")
+    field(FTG, "DOUBLE")
+
+    field(CALC, "insert(data=A, x=(B,C), y=(D,E), index=F, active=True, scale=G, verbose=%TPRO%)")
+    field(FTVL, "LONG")
+    field(MEVL, 256)
+
+    field(TPRO, 1)
+}
