@@ -27,17 +27,6 @@ from datetime import datetime
 logger = logging.getLogger("bpm-data-combiner")
 
 #: Todo where to get the device names from
-_dev_names = [
-    "BPMZ5D8R",
-    "BPMZ6D8R",
-    "BPMZ7D8R",
-
-    "BPMZ1T8R",
-    "BPMZ2T8R",
-    "BPMZ3T8R",
-    "BPMZ4T8R",
-
-]
 
 _dev_names = [
     "BPMZ1K1RP",
