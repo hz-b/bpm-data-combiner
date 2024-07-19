@@ -1,1 +1,1 @@
-__all__ = ["data_model", "bl", "errors", "app"]
+__all__ = ["data_model", "bl", "errors", "app", "insert"]

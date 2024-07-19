@@ -30,8 +30,10 @@ dbLoadRecords("db/bpm_monitor_overview.db", "PREFIX=$(PREFIX),VIEW=mon")
 dbLoadRecords("db/view.db", "PREFIX=$(PREFIX)")
 dbLoadRecords("db/bpm_periodic.db", "PREFIX=$(PREFIX)")
 dbLoadRecords("db/bpm_bdata.db", "PREFIX=$(PREFIX)")
+dbLoadRecords("db/bpm_mimicry.db", "PREFIX=$(PREFIX)")
 
 pydev("from bpm_data_combiner.app.main import update")
+pydev("from bpm_data_combiner.insert import insert")
 
 #- Set this to see messages from mySub
 #-var mySubDebug 1

@@ -16,7 +16,7 @@
 record(waveform, "$(PREFIX):inp:periodic:psh")
 {
       field(DESC, "Listen to neighbour")
-      field(INP,  "MDIZ1T7G:bdata CPP")
+      field(INP,  "BPMZ1X003GP:rdBufBpm CPP")
       field(FLNK, "$(PREFIX):im:periodic:psh")
 }
 

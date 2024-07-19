@@ -39,6 +39,9 @@ _dev_names = [
 
 ]
 
+_dev_names = [
+    "BPMZ1K1RP",
+]
 dev_name_index = {name: idx for idx, name in enumerate(_dev_names)}
 print(f"Known devices {list(dev_name_index)}")
 # Now connect all the different objects together

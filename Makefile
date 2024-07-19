@@ -5,6 +5,7 @@ include $(TOP)/configure/CONFIG
 # Directories to build, any order
 DIRS += configure
 DIRS += $(wildcard *Sup)
+# DIRS += bpm_data_combiner_app
 DIRS += $(wildcard *_app)
 DIRS += $(wildcard *Top)
 DIRS += $(wildcard iocBoot)

@@ -19,6 +19,10 @@ DB += bpm_monitor_overview.db
 DB += bpm_data_combinerVersion.db
 DB += view.db
 
+# MLS mimicry
+DB += bpm_mimicry.db
+
+
 # follow description https://www.slac.stanford.edu/grp/ssrl/spear/epics/site/devIocStats/README_iocAdmin
 # IOCstats / admin
 # (soft    IOCs)

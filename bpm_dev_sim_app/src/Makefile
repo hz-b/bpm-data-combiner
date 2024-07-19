@@ -9,9 +9,13 @@ USR_CPPFLAGS += -DUSE_TYPED_RSET
 
 
 # Build an IOC support library
-# LIBRARY_IOC += bpm_dev_simSupport
+LIBRARY_IOC += bpm_dev_simSupport
 
-# bpm_dev_simSupport_LIBS += $(EPICS_BASE_IOC_LIBS)
+# bpm_dev_sim_registerRecordDeviceDriver.cpp derives from bpm_dev_sim.dbd
+bpm_dev_simSupport_SRCS += bpm_dev_sim_registerRecordDeviceDriver.cpp
+
+bpm_dev_simSupport_LIBS += $(EPICS_BASE_IOC_LIBS)
+
 
 
 # Build the IOC application
@@ -23,8 +27,6 @@ DBD += bpm_dev_sim.dbd
 # bpm_dev_sim.dbd will include these files:
 bpm_dev_sim_DBD += base.dbd
 
-# bpm_dev_sim_registerRecordDeviceDriver.cpp derives from bpm_dev_sim.dbd
-bpm_dev_sim_SRCS += bpm_dev_sim_registerRecordDeviceDriver.cpp
 
 # Build the main IOC entry point where needed
 bpm_dev_sim_SRCS_DEFAULT += bpm_dev_simMain.cpp

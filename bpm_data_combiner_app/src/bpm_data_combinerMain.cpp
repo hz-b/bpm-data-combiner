@@ -17,6 +17,7 @@ int main(int argc,char *argv[])
         iocsh(argv[1]);
         epicsThreadSleep(.2);
     }
+    fprintf(stderr, "start\n");
     iocsh(NULL);
     epicsExit(0);
     return(0);
