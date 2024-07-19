@@ -2,7 +2,7 @@ record(ao, "$(PREFIX):par:mls:conversion")
 {
     field(DESC, "double to bit conversion factor")
     # classic BPM system
-    # 16 bit for -10..10 V   
+    # 16 bit for -10..10 V
     # 1 V per mm
     #
     # libera boxes
@@ -60,7 +60,7 @@ record(pycalc, "$(PREFIX):im:y:std")
     field(CALC, "A * B")
     field(FTVL, "DOUBLE")
     field(MEVL, 128)
-    # assuming that this data is the last one produced by the 
+    # assuming that this data is the last one produced by the
     # the combiner
     field(FLNK, "$(PREFIX):im:rdBpmBuf")
 }
@@ -71,8 +71,8 @@ record(pycalc, "$(PREFIX):im:y:std")
 record(longin, "$(PREFIX):par:index")
 {
     field(DESC, "insert libera readings at this place")
-    field(VAL, "10")
-    field(PINI, "YES") 
+    field(VAL, "27")
+    field(PINI, "YES")
 }
 
 
@@ -81,7 +81,7 @@ record(ao, "$(PREFIX):par:scale_std")
 {
     field(DESC, "scale factor for std")
     field(VAL, "1")
-    field(PINI, "YES") 
+    field(PINI, "YES")
 }
 
 # add data at correct position into array
@@ -99,7 +99,7 @@ record(pycalc, "$(PREFIX):im:rdBpmBuf")
     field(FTC, "LONG")
     field(INPD, "$(PREFIX):im:y:values")
     field(FTD, "LONG")
-    # assuming that this data is the last one produced by the 
+    # assuming that this data is the last one produced by the
     # the combiner
     field(INPE, "$(PREFIX):im:y:std")
     field(FTE, "LONG")
