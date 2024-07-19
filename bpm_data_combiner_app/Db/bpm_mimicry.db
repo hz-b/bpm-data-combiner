@@ -60,6 +60,9 @@ record(pycalc, "$(PREFIX):im:y:std")
     field(CALC, "A * B")
     field(FTVL, "DOUBLE")
     field(MEVL, 128)
+    # assuming that this data is the last one produced by the 
+    # the combiner
+    field(FLNK, "$(PREFIX):im:rdBpmBuf")
 }
 
 
@@ -98,7 +101,7 @@ record(pycalc, "$(PREFIX):im:rdBpmBuf")
     field(FTD, "LONG")
     # assuming that this data is the last one produced by the 
     # the combiner
-    field(INPE, "$(PREFIX):im:y:std CPP")
+    field(INPE, "$(PREFIX):im:y:std")
     field(FTE, "LONG")
     field(INPF, "$(PREFIX):par:index")
     field(FTF, "LONG")
@@ -106,8 +109,22 @@ record(pycalc, "$(PREFIX):im:rdBpmBuf")
     field(FTG, "DOUBLE")
 
     field(CALC, "insert(data=A, x=(B,C), y=(D,E), index=F, active=True, scale=G, verbose=%TPRO%)")
-    field(FTVL, "LONG")
-    field(MEVL, 256)
+    field(FTVL, "SHORT")
+    field(MEVL, "256")
 
-    field(TPRO, 1)
+    field(TPRO, 0)
+    # field(FLNK, "BPMZ1X013GP:rdBufBpm")
+}
+
+
+# why can I not read the data directly from pydev
+record(waveform, "BPMZ1X013GP:rdBufBpm")
+{
+    field(DESC, "Proxy output")
+    field(DTYP, "pydev")
+    field(INP, "$(PREFIX):im:rdBpmBuf")
+    field(SCAN, "I/O Intr")
+    field(INP,  "@pydev.iointr('scaled-bpm-data')")
+    field(NELM, "256")
+    field(FTVL, "SHORT")
 }
