@@ -33,7 +33,7 @@ dbLoadRecords("db/bpm_bdata.db", "PREFIX=$(PREFIX)")
 dbLoadRecords("db/bpm_mimicry.db", "PREFIX=$(PREFIX)")
 
 pydev("from bpm_data_combiner.app.main import update")
-pydev("from bpm_data_combiner.insert import insert")
+pydev("from bpm_data_combiner.insert import insert, recalculate_value")
 
 #- Set this to see messages from mySub
 #-var mySubDebug 1

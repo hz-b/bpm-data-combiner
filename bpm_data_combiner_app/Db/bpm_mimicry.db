@@ -1,13 +1,45 @@
-record(ao, "$(PREFIX):par:mls:conversion")
+record(ao, "$(PREFIX):par:mls:conv:x")
 {
     field(DESC, "double to bit conversion factor")
     # classic BPM system
     # 16 bit for -10..10 V
+    # for BESSY II
     # 1 V per mm
+    # cross checks for MLS indicate
+    # 2/3 V per mm
     #
     # libera boxes
     # use nm
+    # value for BESSY II
     field(VAL, "3276.8e-6")
+    # value for MLS multiply with 1/1.5
+    field(VAL, "2184.533e-6")
+    field(PINI, "YES")
+}
+
+record(ao, "$(PREFIX):par:mls:conv:y")
+{
+    field(DESC, "double to bit conversion factor")
+    # classic BPM system
+    # 16 bit for -10..10 V
+    # for BESSY II
+    # 1 V per mm
+    # cross checks for MLS indicate
+    # 2/3 V per mm
+    #
+    # libera boxes
+    # use nm
+    # value for BESSY II
+    # value for MLS seems to be x
+    field(VAL, "3276.8e-6")
+    field(PINI, "YES")
+}
+
+# need to scale data so that BPM readings accepts data?
+record(ao, "$(PREFIX):par:scale_std")
+{
+    field(DESC, "scale factor for std")
+    field(VAL, "1")
     field(PINI, "YES")
 }
 
@@ -15,11 +47,11 @@ record(ao, "$(PREFIX):par:mls:conversion")
 record(pycalc, "$(PREFIX):im:x:values")
 {
     field(INPA, "$(PREFIX):out:2s:x:values CPP")
-    field(INPB, "$(PREFIX):par:mls:conversion")
+    field(INPB, "$(PREFIX):par:mls:conv:x")
     field(FTA, "LONG")
     field(FTB, "DOUBLE")
-    field(CALC, "A * B")
-    field(FTVL, "DOUBLE")
+    field(CALC, "recalculate_value(value=A, nm2bits=B)")
+    field(FTVL, "SHORT")
     field(MEVL, 128)
 }
 
@@ -28,11 +60,11 @@ record(pycalc, "$(PREFIX):im:x:values")
 record(pycalc, "$(PREFIX):im:y:values")
 {
     field(INPA, "$(PREFIX):out:2s:y:values CPP")
-    field(INPB, "$(PREFIX):par:mls:conversion")
+    field(INPB, "$(PREFIX):par:mls:conv:y")
     field(FTA, "LONG")
     field(FTB, "DOUBLE")
-    field(CALC, "A * B")
-    field(FTVL, "DOUBLE")
+    field(CALC, "recalculate_value(value=A, nm2bits=B)")
+    field(FTVL, "SHORT")
     field(MEVL, 128)
 }
 
@@ -41,28 +73,29 @@ record(pycalc, "$(PREFIX):im:y:values")
 record(pycalc, "$(PREFIX):im:x:std")
 {
     field(INPA, "$(PREFIX):out:2s:x:std CPP")
-    field(INPB, "$(PREFIX):par:mls:conversion")
+    field(INPB, "$(PREFIX):par:mls:conv:x")
     field(FTA, "LONG")
     field(FTB, "DOUBLE")
-    field(CALC, "A * B")
-    field(FTVL, "DOUBLE")
+    field(INPC, "$(PREFIX):par:scale_std")
+    field(CALC, "recalculate_value(value=A, nm2bits=B, scale=C)")
+    field(FTVL, "SHORT")
     field(MEVL, 128)
 }
-
 
 # scale libera nm to classic bits
 record(pycalc, "$(PREFIX):im:y:std")
 {
     field(INPA, "$(PREFIX):out:2s:y:std CPP")
-    field(INPB, "$(PREFIX):par:mls:conversion")
+    field(INPB, "$(PREFIX):par:mls:conv:y")
+    field(INPC, "$(PREFIX):par:scale_std")
     field(FTA, "LONG")
     field(FTB, "DOUBLE")
-    field(CALC, "A * B")
-    field(FTVL, "DOUBLE")
+    field(CALC, "recalculate_value(value=A, nm2bits=B, scale=C)")
+    field(FTVL, "SHORT")
     field(MEVL, 128)
     # assuming that this data is the last one produced by the
     # the combiner
-    field(FLNK, "$(PREFIX):im:rdBpmBuf")
+    field(FLNK, "$(PREFIX):im:rdBufBpm")
 }
 
 
@@ -76,16 +109,9 @@ record(longin, "$(PREFIX):par:index")
 }
 
 
-# need to scale data so that BPM readings accepts data?
-record(ao, "$(PREFIX):par:scale_std")
-{
-    field(DESC, "scale factor for std")
-    field(VAL, "1")
-    field(PINI, "YES")
-}
 
 # add data at correct position into array
-record(pycalc, "$(PREFIX):im:rdBpmBuf")
+record(pycalc, "$(PREFIX):im:rdBufBpm")
 {
     # the combiner is triggered by this data
     # so being triggered on the other data should do the job
@@ -94,21 +120,18 @@ record(pycalc, "$(PREFIX):im:rdBpmBuf")
     field(MEA, 256)
     field(FTA, "SHORT")
     field(INPB, "$(PREFIX):im:x:values")
-    field(FTB, "LONG")
+    field(FTB, "SHORT")
     field(INPC, "$(PREFIX):im:x:std")
-    field(FTC, "LONG")
+    field(FTC, "SHORT")
     field(INPD, "$(PREFIX):im:y:values")
-    field(FTD, "LONG")
+    field(FTD, "SHORT")
     # assuming that this data is the last one produced by the
     # the combiner
     field(INPE, "$(PREFIX):im:y:std")
-    field(FTE, "LONG")
+    field(FTE, "SHORT")
     field(INPF, "$(PREFIX):par:index")
     field(FTF, "LONG")
-    field(INPG, "$(PREFIX):par:scale_std")
-    field(FTG, "DOUBLE")
-
-    field(CALC, "insert(data=A, x=(B,C), y=(D,E), index=F, active=True, scale=G, verbose=%TPRO%)")
+    field(CALC, "insert(data=A, x=(B,C), y=(D,E), index=F, active=True, verbose=%TPRO%)")
     field(FTVL, "SHORT")
     field(MEVL, "256")
 
@@ -122,7 +145,7 @@ record(waveform, "BPMZ1X013GP:rdBufBpm")
 {
     field(DESC, "Proxy output")
     field(DTYP, "pydev")
-    field(INP, "$(PREFIX):im:rdBpmBuf")
+    # field(INP, "$(PREFIX):im:rdBufBpm")
     field(SCAN, "I/O Intr")
     field(INP,  "@pydev.iointr('scaled-bpm-data')")
     field(NELM, "256")

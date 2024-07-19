@@ -11,6 +11,17 @@ import numpy as np
 import pydev
 
 
+def recalculate_value(*, value, nm2bits, scale=1, verbose=False):
+    """scale value to bits
+    """
+    nval = np.round(np.asarray(value) * nm2bits * scale).astype(np.int16)
+    # set it artificially to 1 ... otherwise SOFB rejects the data
+    nval[np.absolute(nval)<1] = 1
+    if verbose:
+        printf(f"val {val} -> nval {nval}")
+    return nval.tolist()
+
+
 def write_rearranged_data(stream, data, name):
     stream.write(f"start {name:10s} ----------------------------\n")
     for col in data:
@@ -19,7 +30,7 @@ def write_rearranged_data(stream, data, name):
     stream.flush()
 
 
-def insert(*, data: Sequence, x: Tuple[int, int], y: Tuple[int, int], scale: float, active: bool, index=int, verbose=False) -> Sequence:
+def insert(*, data: Sequence, x: Tuple[int, int], y: Tuple[int, int], active: bool, index=int, verbose=False) -> Sequence:
     """
     """
     if len(data) == 0:
@@ -42,10 +53,10 @@ def insert(*, data: Sequence, x: Tuple[int, int], y: Tuple[int, int], scale: flo
 
     rearranged[0, index] = x_val
     rearranged[1, index] = y_val
-    rearranged[6, index] = x_std * scale
-    rearranged[7, index] = y_std * scale
+    rearranged[6, index] = x_std
+    rearranged[7, index] = y_std
 
-    rearranged[4, index] = active * 2
+    rearranged[4, index] = active * 3
 
     if verbose:
         write_rearranged_data(sys.stdout, rearranged, "output")
