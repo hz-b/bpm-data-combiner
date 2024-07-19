@@ -11,14 +11,15 @@ import numpy as np
 import pydev
 
 
-def recalculate_value(*, value, nm2bits, scale=1, verbose=False):
+def recalculate_value(*, val, nm2bits, scale=1, verbose=False):
     """scale value to bits
     """
-    nval = np.round(np.asarray(value) * nm2bits * scale).astype(np.int16)
+    nval = np.round(np.asarray(val) * nm2bits * scale).astype(np.int16)
     # set it artificially to 1 ... otherwise SOFB rejects the data
-    nval[np.absolute(nval)<1] = 1
+    nval = np.where(np.absolute(nval)<1, 1, nval)
+    nval = nval.astype(np.int16)
     if verbose:
-        printf(f"val {val} -> nval {nval}")
+        print(f"val {val} -> nval {nval}")
     return nval.tolist()
 
 
