@@ -9,10 +9,10 @@ USR_CPPFLAGS += -DUSE_TYPED_RSET
 
 
 # Build an IOC support library
-# LIBRARY_IOC += bpm_dev_simSupport
+LIBRARY_IOC += bpm_dev_simSupport
 
-# bpm_dev_simSupport_LIBS += $(EPICS_BASE_IOC_LIBS)
-
+bpm_dev_simSupport_LIBS += $(EPICS_BASE_IOC_LIBS)
+bpm_dev_simSupport_SRCS += empty.c
 
 # Build the IOC application
 PROD_IOC = bpm_dev_sim
@@ -29,6 +29,8 @@ bpm_dev_sim_SRCS += bpm_dev_sim_registerRecordDeviceDriver.cpp
 # Build the main IOC entry point where needed
 bpm_dev_sim_SRCS_DEFAULT += bpm_dev_simMain.cpp
 bpm_dev_sim_SRCS_vxWorks += -nil-
+
+# bpm_dev_simSupport_LIBS += $(EPICS_BASE_IOC_LIBS)
 
 # Link in the code from our support library
 bpm_dev_sim_LIBS += bpm_dev_simSupport
@@ -49,6 +51,7 @@ ifdef EPICS_QSRV_MAJOR_VERSION
 endif
 
 # Finally link IOC to the EPICS Base libraries
+bpm_dev_sim_LIBS += bpm_dev_simSupport
 bpm_dev_sim_LIBS += $(EPICS_BASE_IOC_LIBS)
 
 include $(TOP)/configure/RULES
