@@ -1,35 +1,35 @@
 # BPM data collected
 
-## record(waveform, "$(PREFIX):$(VIEW):active")
-## {
-##     field(DESC, "BPM active")
-##     field(DTYP, "pydev")
-##     field(FTVL, "CHAR")
-##     field(SCAN, "I/O Intr")
-##     field(INP,  "@pydev.iointr('$(PREFIX)$(VIEW):active')")
-##     field(NELM, 128)
-##     info(Q:group, {
-##          "$(PREFIX)$(VIEW)": {
-##             "active": {+channel:"VAL"}
-##         }
-##     })
-## }
+record(waveform, "$(PREFIX):$(VIEW):active")
+{
+    field(DESC, "BPM active")
+    field(DTYP, "pydev")
+    field(FTVL, "CHAR")
+    field(SCAN, "I/O Intr")
+    field(INP,  "@pydev.iointr('$(PREFIX)$(VIEW):active')")
+    field(NELM, 128)
+    info(Q:group, {
+         "$(PREFIX)$(VIEW)": {
+            "active": {+channel:"VAL"}
+        }
+    })
+}
 
-## record(waveform, "$(PREFIX):$(VIEW):names")
-## {
-##     field(DESC, "names of bpms")
-##     field(DTYP, "pydev")
-##     field(FTVL, "STRING")
-##     field(SCAN, "I/O Intr")
-##     field(INP,  "@pydev.iointr('$(PREFIX)$(VIEW):names')")
-##     field(NELM, 128)
-##     field(TPRO, 1)
-##     #info(Q:group, {
-##     #     "$(PREFIX)$(VIEW)": {
-##     #        "names": {+channel:"VAL"}
-##     #    }
-##     #})
-## }
+record(waveform, "$(PREFIX):$(VIEW):names")
+{
+    field(DESC, "names of bpms")
+    field(DTYP, "pydev")
+    field(FTVL, "STRING")
+    field(SCAN, "I/O Intr")
+    field(INP,  "@pydev.iointr('$(PREFIX)$(VIEW):names')")
+    field(NELM, 128)
+    field(TPRO, 1)
+    info(Q:group, {
+         "$(PREFIX)$(VIEW)": {
+            "names": {+channel:"VAL"}
+        }
+    })
+}
 
 record(waveform, "$(PREFIX):$(VIEW):names")
 {
@@ -39,11 +39,11 @@ record(waveform, "$(PREFIX):$(VIEW):names")
     field(SCAN, "I/O Intr")
     field(INP,  "@pydev.iointr('$(PREFIX):$(VIEW):names')")
     field(NELM, 128)
-    # info(Q:group, {
-    #      "$(PREFIX)$(VIEW)": {
-    #         "names": {+channel:"VAL"}
-    #     }
-    # })
+     info(Q:group, {
+          "$(PREFIX)$(VIEW)": {
+             "names": {+channel:"VAL"}
+         }
+     })
     field(TPRO, 0)
 }
 
@@ -53,11 +53,11 @@ record(longin, "$(PREFIX):$(VIEW):cnt")
     field(DTYP, "pydev")
     field(SCAN, "I/O Intr")
     field(INP,  "@pydev.iointr('$(PREFIX):$(VIEW):cnt')")
-    #    info(Q:group, {
-    #      "$(PREFIX)$(VIEW)": {
-    #         "cnt": {+channel:"VAL"}
-    #     }
-    # })
+        info(Q:group, {
+          "$(PREFIX)$(VIEW)": {
+             "cnt": {+channel:"VAL"}
+         }
+     })
     field(VAL, -1)
     field(TPRO, 0)
 }

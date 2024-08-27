@@ -39,7 +39,7 @@ include $(TOP)/configure/RULES
 #----------------------------------------
 #  ADD EXTRA GNUMAKE RULES BELOW HERE
 
-MSI=msi 
+MSI=msi
 MSI_FLAGS=-V
 
 bpm_dev_input.db : bpm_dev_input.rec bpm_dev_input.template

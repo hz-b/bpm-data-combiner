@@ -16,6 +16,38 @@ record(waveform, "$(PREFIX):$(VIEW):active")
     field(TPRO, 0)
 }
 
+record(waveform, "$(PREFIX):$(VIEW):synchronised")
+{
+    field(DESC, "BPM monitored as synchronised")
+    field(DTYP, "pydev")
+    field(FTVL, "CHAR")
+    field(SCAN, "I/O Intr")
+    field(INP,  "@pydev.iointr('$(PREFIX):$(VIEW):synchronised')")
+    field(NELM, 128)
+    # info(Q:group, {
+    #       "$(PREFIX)$(VIEW)": {
+    #          "active": {+channel:"VAL"}
+    #      }
+    # })
+    field(TPRO, 0)
+}
+
+record(waveform, "$(PREFIX):$(VIEW):usable")
+{
+    field(DESC, "BPM monitored as useable: act & sync")
+    field(DTYP, "pydev")
+    field(FTVL, "CHAR")
+    field(SCAN, "I/O Intr")
+    field(INP,  "@pydev.iointr('$(PREFIX):$(VIEW):usable')")
+    field(NELM, 128)
+    # info(Q:group, {
+    #       "$(PREFIX)$(VIEW)": {
+    #          "active": {+channel:"VAL"}
+    #      }
+    # })
+    field(TPRO, 0)
+}
+
 record(waveform, "$(PREFIX):$(VIEW):names")
 {
     field(DESC, "BPM monitored names. ")
@@ -31,7 +63,6 @@ record(waveform, "$(PREFIX):$(VIEW):names")
     # })
     field(TPRO, 0)
 }
-
 
 record(longin, "$(PREFIX):$(VIEW):cnt")
 {

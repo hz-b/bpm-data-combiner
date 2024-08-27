@@ -21,12 +21,11 @@ bpm_data_combinerSupport_LIBS += $(EPICS_BASE_IOC_LIBS)
 DBD += bpm_data_combiner.dbd
 
 bpm_data_combiner_DBD += base.dbd
-bpm_data_combiner_SRCS += array_forward.cpp
-bpm_data_combiner_DBD += array_forward.dbd
 
 # bpm_data_combiner.dbd will include these files:
 bpm_data_combiner_DBD += pydev.dbd
 bpm_data_combiner_DBD += pydev315.dbd
+bpm_data_combiner_DBD += pycalcRecord.dbd
 bpm_data_combiner_LIBS += pydev
 
 # bpm_data_combiner_registerRecordDeviceDriver.cpp derives from bpm_data_combiner.dbd
