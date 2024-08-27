@@ -1,12 +1,9 @@
 import numpy as np
-
-from ..data_model.bpm_data_collection import BPMDataCollection, BPMDataCollectionStats
-import logging
 from typing import Sequence
+from ..bl.logger import logger
+from ..data_model.bpm_data_collection import BPMDataCollection, BPMDataCollectionStats
 
 import pydev
-
-logger = logging.getLogger("bpm-data-combiner")
 
 
 def string_array_to_bytes(names: Sequence[str], *, encoding="utf8"):
@@ -17,8 +14,14 @@ class ViewBPMMonitoring:
     def __init__(self, prefix: str):
         self.prefix = prefix
 
-    def update(self, names: Sequence[str], active: Sequence[bool]):
-        names = string_array_to_bytes(names)
+    def update(self, *,
+               names: Sequence[str],
+               active: Sequence[bool],
+               synchronised: Sequence[bool],
+               usable: Sequence[bool],
+               ):
+        # names = string_array_to_bytes(names)
+        names = list(names)
         label = self.prefix + ":" + "names"
         logger.debug("Update active view label %s, values %s", label, names)
         pydev.iointr(label, names)
@@ -28,7 +31,20 @@ class ViewBPMMonitoring:
         active = np.array(active, dtype=np.int32)
         label = self.prefix + ":" + "active"
         logger.debug("Update active view label %s, values %s", label, active)
-        pydev.iointr(label, active)
+        pydev.iointr(label, active.tolist())
+
+        synchronised = [bool(v) for v in synchronised]
+        synchronised = np.array(synchronised, dtype=np.int32)
+        label = self.prefix + ":" + "synchronised"
+        logger.debug("Update active view label %s, values %s", label, synchronised)
+        pydev.iointr(label, synchronised.tolist())
+
+        usable = [bool(v) for v in usable]
+        usable = np.array(usable, dtype=np.int32)
+        label = self.prefix + ":" + "usable"
+        logger.debug("Update active view label %s, values %s", label, usable)
+        pydev.iointr(label, usable.tolist())
+
 
 
 class ViewBPMDataCollection:
@@ -94,7 +110,7 @@ class ViewBPMDataCollectionStats:
         # which data count? not there yet
         # ("cnt", data.cnt)
         for suffix, var in [
-            ("names", string_array_to_bytes(data.names)),
+            ("names", data.names),
         ]:
             label = self.prefix + ":" + suffix
             pydev.iointr(label, var)
@@ -158,7 +174,7 @@ class ViewStringBuffer:
         self.label = label
 
     def update(self, buf: Sequence[str]):
-        pydev.iointr(self.label, string_array_to_bytes(buf))
+        pydev.iointr(self.label, list(buf))
         # logger.warning(f'View string {self.label}:"{t_str}"')
 
 

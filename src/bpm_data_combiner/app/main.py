@@ -3,8 +3,10 @@
 Todo:
    add a reset command
 """
-import logging
+
+
 from typing import Optional, Sequence, Mapping
+import sys
 
 from .command_context_manager import UpdateContext
 from ..bl.accumulator import Accumulator
@@ -12,6 +14,7 @@ from ..bl.collector import Collector, collection_to_bpm_data_collection
 from ..bl.command_round_buffer import CommandRoundBuffer
 from ..bl.dispatcher import DispatcherCollection
 from ..bl.event import Event
+from ..bl.logger import logger
 from ..bl.monitor_devices import MonitorDevices
 from ..bl.preprocessor import PreProcessor
 from ..bl.statistics import compute_mean_weights_for_planes
@@ -24,19 +27,16 @@ import numpy as np
 from datetime import datetime
 
 
-logger = logging.getLogger("bpm-data-combiner")
-
 #: Todo where to get the device names from
+#: use a pycalc record to push it in
 _dev_names = [
     "BPMZ5D8R",
     "BPMZ6D8R",
     "BPMZ7D8R",
-
     "BPMZ1T8R",
     "BPMZ2T8R",
     "BPMZ3T8R",
     "BPMZ4T8R",
-
 ]
 
 dev_name_index = {name: idx for idx, name in enumerate(_dev_names)}
@@ -60,9 +60,13 @@ monitor_devices.on_status_change.add_subscriber(update_device_names)
 
 # ToDo: Collector should get / retrieve an updated set of valid
 #       device names every time a new reading collections is created
-col = Collector(name="data_collector", devices_names=list(dev_name_index), max_collections=10)
+col = Collector(
+    name="data_collector", devices_names=list(dev_name_index), max_collections=10
+)
 # preprocessor: set x or y to None if disabled
-dispatcher_collection.subscribe(lambda reading: col.new_reading(preprocessor.preprocess(reading)))
+dispatcher_collection.subscribe(
+    lambda reading: col.new_reading(preprocessor.preprocess(reading))
+)
 
 #: accumulate data above threshold
 # acc_abv_th = Accumulator(dev_name_index)
@@ -90,8 +94,13 @@ col.on_ready.add_subscriber(cb)
 
 # fmt:off
 def cb(names):
-    logger.debug("Monitoring devics, active ones: %s", names)
-    views.monitor_bpms.update(names, np.ones(len(names), bool))
+    logger.debug("Monitoring devices, active ones: %s", names)
+    views.monitor_bpms.update(
+        names=[ds.name for _, ds in monitor_devices.devices_status.items()],
+        active=[ds.active for _, ds in monitor_devices.devices_status.items()],
+        synchronised=[ds.synchronised for _, ds in monitor_devices.devices_status.items()],
+        usable=[ds.usable for _, ds in monitor_devices.devices_status.items()],
+    )
 monitor_devices.on_status_change.add_subscriber(cb)
 # fmt:on
 
@@ -138,10 +147,12 @@ def process_reading(*, dev_name, reading):
 
 
 def process_active(*, dev_name, active):
-    return monitor_devices.set_active(dev_name, active)
+    r = monitor_devices.set_active(dev_name, active)
+
 
 def process_sync_stat(*, dev_name, sync_stat):
     return monitor_devices.set_synchronisation_status(dev_name, sync_stat)
+
 
 def process_enabled(*, dev_name, enabled, plane):
     return monitor_devices.set_enabled(dev_name, enabled, plane)
@@ -149,6 +160,7 @@ def process_enabled(*, dev_name, enabled, plane):
 
 def process_periodic_trigger(*, dev_name, periodic: Mapping):
     periodic_event.trigger(periodic)
+
 
 def process_reset(*, dev_name, reset):
     dispatcher_collection.reset()
@@ -170,7 +182,7 @@ cmds = dict(
     periodic=process_periodic_trigger,
     # reset all internal states
     reset=process_reset,
-    reading=process_reading
+    reading=process_reading,
 )
 
 rbuffer = CommandRoundBuffer(maxsize=50)
@@ -182,12 +194,33 @@ def update(*, dev_name, tpro=False, **kwargs):
     # for cmd in kwargs: break;
     # that code says it
 
+    # if tpro:
+    #    sys.stdout.write(f" update(dev_name {dev_name}, kwargs {kwargs})\n")
+    #    sys.stdout.flush()
+
     cmd = next(iter(kwargs))
     method = cmds[cmd]
-    dc = Command(cmd=cmd, dev_name=dev_name, kwargs=kwargs, timestamp=datetime.now())
-    rbuffer.append(dc)
-    with UpdateContext(method=method, rbuffer=rbuffer, view=views.monitor_update_cmd_errors):
+    try:
+        dc = Command(
+            cmd=cmd, dev_name=dev_name, kwargs=kwargs, timestamp=datetime.now()
+        )
+        rbuffer.append(dc)
+    except:
+        logger.error("Failed to prepare wrapper info")
+        raise
+    with UpdateContext(
+        method=method,
+        rbuffer=rbuffer,
+        view=views.monitor_update_cmd_errors,
+        only_buffer=False,
+    ):
         method(dev_name=dev_name, **kwargs)
+
+    # todo: does pydevice expects a return on the function ?
+    logger.info(f" update(dev_name {dev_name}, kwargs {kwargs}) succeded\n")
+    sys.stdout.write(f" update(dev_name {dev_name}, kwargs {kwargs}) succeded\n")
+    sys.stdout.flush()
+    return True
 
 
 __all__ = ["update"]

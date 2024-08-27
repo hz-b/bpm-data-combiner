@@ -34,6 +34,10 @@ class MonitoredDevice:
     def synchronised(self) -> bool:
         return self.sync_stat == SynchronisationStatus.synchronised
 
+    @property
+    def usable(self) ->  bool:
+        return self.synchronised and self.active
+
     def update_status(self, plane, status) -> bool:
         """update status as required, return if update was needed"""
 
