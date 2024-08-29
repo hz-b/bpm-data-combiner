@@ -79,10 +79,12 @@ class ReadingsCollection:
     use :meth:`ready` to see if sufficient data is here
     """
 
-    def __init__(self, *, name: str, device_names: Sequence[str], threshold: int = None):
+    def __init__(self, *, name: str, device_names: Sequence[str], threshold: int = None, cnt : int):
         self.name = name
         self.collection = dict()
         self.device_names = set(device_names)
+        # for debug purposes
+        self.cnt = cnt
 
         if threshold is None:
             threshold = max(1, len(device_names) // 2)
@@ -162,7 +164,7 @@ class Collector:
 
         @functools.lru_cache(maxsize=max_collections)
         def _get_collection(cnt: Hashable):
-            r = ReadingsCollection(name=self.name, device_names=self.device_names, threshold=threshold)
+            r = ReadingsCollection(name=self.name, device_names=self.device_names, threshold=threshold, cnt=cnt)
             self.on_new_collection.trigger(r)
             return r
 

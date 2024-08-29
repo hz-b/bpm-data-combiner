@@ -10,34 +10,29 @@ import sys
 
 from .command_context_manager import UpdateContext
 from ..bl.accumulator import Accumulator
-from ..bl.collector import Collector, collection_to_bpm_data_collection
+from ..bl.collector import Collector, ReadingsCollection, collection_to_bpm_data_collection
 from ..bl.command_round_buffer import CommandRoundBuffer
 from ..bl.dispatcher import DispatcherCollection
 from ..bl.event import Event
 from ..bl.logger import logger
 from ..bl.monitor_devices import MonitorDevices
+from ..bl.monitor_synchronisation import MonitorDeviceSynchronisation, offset_from_median
 from ..bl.preprocessor import PreProcessor
 from ..bl.statistics import compute_mean_weights_for_planes
 from ..data_model.bpm_data_reading import BPMReading
 from ..data_model.monitored_device import MonitoredDevice
 from ..data_model.command import Command
+from .config import Config
 from .view import Views
-
+from .known_devices import dev_names as _dev_names
 import numpy as np
 from datetime import datetime
 
 
-#: Todo where to get the device names from
-#: use a pycalc record to push it in
-_dev_names = [
-    "BPMZ5D8R",
-    "BPMZ6D8R",
-    "BPMZ7D8R",
-    "BPMZ1T8R",
-    "BPMZ2T8R",
-    "BPMZ3T8R",
-    "BPMZ4T8R",
-]
+config = Config()
+def cb(flag):
+    views.configuration.update(flag)
+config.on_median_computation_request.add_subscriber(cb)
 
 dev_name_index = {name: idx for idx, name in enumerate(_dev_names)}
 print(f"Known devices {list(dev_name_index)}")
@@ -47,6 +42,12 @@ print(f"Known devices {list(dev_name_index)}")
 #       interaction of collection further down
 dispatcher_collection = DispatcherCollection()
 monitor_devices = MonitorDevices([MonitoredDevice(name) for name in dev_name_index])
+monitor_device_synchronisation = MonitorDeviceSynchronisation(monitored_devices=monitor_devices)
+def process_mon_sync(data):
+    if config.do_median_computation:
+        # needs roughly half of the CPU ... only switch it on by request
+        views.monitor_device_sync.update(*offset_from_median(data))
+monitor_device_synchronisation.on_new_index.add_subscriber(process_mon_sync)
 # fmt:off
 preprocessor = PreProcessor(devices_status=monitor_devices.devices_status)
 def update_device_names(device_names: Sequence[str]):
@@ -63,6 +64,14 @@ monitor_devices.on_status_change.add_subscriber(update_device_names)
 col = Collector(
     name="data_collector", devices_names=list(dev_name_index), max_collections=10
 )
+# fmt:off
+def update_collection_number(r: ReadingsCollection):
+    logger.info("collector new readings collection with number %d", r.cnt)
+    # sys.stdout.write(f"collector new readings collection with number  {r.cnt}")
+    # sys.stdout.flush()
+    views.collector.update(r.cnt)
+col.on_new_collection.add_subscriber(update_collection_number)
+# fmt:on
 # preprocessor: set x or y to None if disabled
 dispatcher_collection.subscribe(
     lambda reading: col.new_reading(preprocessor.preprocess(reading))
@@ -141,6 +150,8 @@ def process_chk_cnt(*, dev_name, ctl):
 
 def process_reading(*, dev_name, reading):
     cnt, x, y = reading
+    logger.debug(f"new reading for dev %s cnt %s", dev_name, cnt)
+    monitor_device_synchronisation.add_new_count(dev_name, cnt)
     return col.new_reading(
         preprocessor.preprocess(BPMReading(dev_name=dev_name, x=x, y=y, cnt=cnt))
     )
@@ -166,6 +177,8 @@ def process_reset(*, dev_name, reset):
     dispatcher_collection.reset()
     col.reset()
 
+def process_compute_median(*, dev_name, cfg_comp_median):
+    config.request_median_computation(cfg_comp_median)
 
 cmds = dict(
     # handling a single reading
@@ -183,6 +196,7 @@ cmds = dict(
     # reset all internal states
     reset=process_reset,
     reading=process_reading,
+    cfg_comp_median=process_compute_median,
 )
 
 rbuffer = CommandRoundBuffer(maxsize=50)
@@ -217,9 +231,7 @@ def update(*, dev_name, tpro=False, **kwargs):
         method(dev_name=dev_name, **kwargs)
 
     # todo: does pydevice expects a return on the function ?
-    logger.info(f" update(dev_name {dev_name}, kwargs {kwargs}) succeded\n")
-    sys.stdout.write(f" update(dev_name {dev_name}, kwargs {kwargs}) succeded\n")
-    sys.stdout.flush()
+    # logger.info(f" update(dev_name {dev_name}, kwargs {kwargs}) succeded\n")
     return True
 
 

@@ -22,7 +22,7 @@ class MonitoredDevice:
     enabled_x: Optional[bool] = True
     enabled_y: Optional[bool] = True
     # is it active: i.e. data are received
-    active: Optional[bool] = True
+    active: Optional[bool] = False
     # is the device in synch state: thus the counters are valid ones
     sync_stat : Optional[SynchronisationStatus] = SynchronisationStatus.no_sync
 

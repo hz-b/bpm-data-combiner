@@ -29,10 +29,13 @@ dbLoadTemplate("db/bpm.substitutions", "PREFIX=$(PREFIX)")
 dbLoadRecords("db/bpm_monitor_overview.db", "PREFIX=$(PREFIX),VIEW=mon")
 dbLoadRecords("db/view.db", "PREFIX=$(PREFIX)")
 dbLoadRecords("db/bpm_periodic.db", "PREFIX=$(PREFIX)")
+dbLoadRecords("db/bpm_cfg.db", "PREFIX=$(PREFIX)")
 dbLoadRecords("db/bpm_bdata.db", "PREFIX=$(PREFIX)")
 
-pydev("from bpm_data_combiner.app.main import update")
-
+pydev("from bpm_data_combiner.app import main ")
+pydev("update = main.update")
+pydev("print(main, update)")
+pydev("import sys; stream = sys.stdout")
 #- Set this to see messages from mySub
 #-var mySubDebug 1
 

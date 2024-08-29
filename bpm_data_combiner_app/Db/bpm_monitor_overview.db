@@ -77,3 +77,43 @@ record(longin, "$(PREFIX):$(VIEW):cnt")
     #})
     field(TPRO, 1)
 }
+
+record(longin, "$(PREFIX):$(VIEW):col:cnt")
+{
+      field(DESC, "collector: last new count")
+      field(DTYP, "pydev")
+      field(SCAN, "I/O Intr")
+      field(INP,  "@pydev.iointr('$(PREFIX):$(VIEW):col:cnt')")
+}
+
+
+record(longin, "$(PREFIX):$(VIEW):sync:median")
+{
+      field(DESC, "data: median of last cnt from all dev's")
+      field(DTYP, "pydev")
+      field(SCAN, "I/O Intr")
+      field(INP,  "@pydev.iointr('$(PREFIX):$(VIEW):sync:median')")
+      field(TPRO, 0)
+}
+
+record(waveform, "$(PREFIX):$(VIEW):sync:offset")
+{
+      field(DESC, "data: median of last cnt from all dev's")
+      field(DTYP, "pydev")
+      field(SCAN, "I/O Intr")
+      field(INP,  "@pydev.iointr('$(PREFIX):$(VIEW):sync:offset')")
+      field(FTVL, "LONG")
+      field(NELM, 128)
+      field(TPRO, 0)
+}
+
+record(bi, "$(PREFIX):$(VIEW):cfg:comp:median")
+{
+      field(DESC, "compute ")
+      field(DTYP, "pydev")
+      field(SCAN, "I/O Intr")
+      field(INP,  "@pydev.iointr('$(PREFIX):$(VIEW):cfg:comp:median')")
+      field(ZNAM, "don't compute")
+      field(ONAM, "compute")
+      field(TPRO, 0)
+}

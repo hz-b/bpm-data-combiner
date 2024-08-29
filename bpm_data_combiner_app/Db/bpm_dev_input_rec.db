@@ -58,7 +58,6 @@ record(pycalc, "$(PREFIX):inp:$(DEV_NAME):posv")
       field(FTA, LONG)
       field(MEA, 3)
       field(CALC, "update(dev_name='$(DEV_NAME)', reading=%A%, tpro=%TPRO%)")
-      field(CALC, "True")
       field(FLNK, "$(PREFIX):inp:$(DEV_NAME):trg")
       # field(TPRO, 1)
 }
@@ -77,6 +76,7 @@ record(mbbi, "$(PREFIX):inp:$(DEV_NAME):sync_stat")
      field(FLNK, "$(PREFIX):im:$(DEV_NAME):sync_stat")
 }
 
+
 record(mbbo, "$(PREFIX):im:$(DEV_NAME):sync_stat")
 {
       field(DESC, "Sync stat -> py")
@@ -90,8 +90,9 @@ record(mbbo, "$(PREFIX):im:$(DEV_NAME):sync_stat")
       field(ZRVL, 0)
       field(ONVL, 1)
       field(TWVL, 2)
-      field(TPRO, 1)
+      # field(TPRO, 1)
 }
+
 
 record(fanout, "$(PREFIX):inp:$(DEV_NAME):trg")
 {
@@ -297,7 +298,7 @@ record(bo, "$(PREFIX):im:$(DEV_NAME):mon:active")
     field(DOL, "$(PREFIX):im:$(DEV_NAME):mon:is_act")
     field(OMSL, "closed_loop")
     field(OUT, "@update(dev_name='$(DEV_NAME)', active=%VAL%, tpro=%TPRO%)")
-    field(TPRO, 1)
+    # field(TPRO, 1)
 }
 
 
@@ -309,7 +310,7 @@ record(bo, "$(PREFIX):$(DEV_NAME):enabled:x")
     field(ONAM, "active")
     field(VAL, 1)
     field(PINI, "YES")
-    field(TPRO, 1)
+    # field(TPRO, 1)
     field(OUT, "$(PREFIX):im:$(DEV_NAME):enabled:x PP")
 }
 
@@ -319,7 +320,7 @@ record(bo, "$(PREFIX):$(DEV_NAME):enabled:y")
     field(ONAM, "active")
     field(VAL, 1)
     field(PINI, "YES")
-    field(TPRO, 1)
+    # field(TPRO, 1)
     field(OUT, "$(PREFIX):im:$(DEV_NAME):enabled:y PP")
 }
 
@@ -328,7 +329,7 @@ record(bo, "$(PREFIX):im:$(DEV_NAME):enabled:x")
     field(DTYP, "pydev")
     field(ZNAM, "inactive")
     field(ONAM, "active")
-    field(TPRO, 1)
+    # field(TPRO, 1)
     field(OUT, "@update(dev_name='$(DEV_NAME)', enabled=%VAL%, plane='x', tpro=%TPRO%)")
 }
 
@@ -337,6 +338,6 @@ record(bo, "$(PREFIX):im:$(DEV_NAME):enabled:y")
     field(DTYP, "pydev")
     field(ZNAM, "inactive")
     field(ONAM, "active")
-    field(TPRO, 1)
+    # field(TPRO, 1)
     field(OUT, "@update(dev_name='$(DEV_NAME)', enabled=%VAL%, plane='y', tpro=%TPRO%)")
 }

@@ -5,6 +5,8 @@ from ..data_model.bpm_data_collection import BPMDataCollection, BPMDataCollectio
 
 import pydev
 
+import sys
+stream = sys.stdout
 
 def string_array_to_bytes(names: Sequence[str], *, encoding="utf8"):
     return [bytes(name, encoding) for name in names]
@@ -135,6 +137,7 @@ class ViewBPMDataAsBData:
         logger.debug("view bdata: publishing data %s", data)
         nm2mm = 1e-6
         n_entries = len(data.x.values)
+        return
         n_bpms = 8
         if n_entries > n_bpms:
             raise ValueError("number of bpms %s too many. max %s", n_entries, n_bpms)
@@ -178,6 +181,37 @@ class ViewStringBuffer:
         # logger.warning(f'View string {self.label}:"{t_str}"')
 
 
+class ViewCollectorStatus:
+    def __init__(self, label: str):
+        self.label = label
+
+    def update(self, cnt: int):
+        # stream.write(f"updating {self.label} with cnt {cnt}\n")
+        # stream.flush()
+        pydev.iointr(self.label, cnt)
+
+
+class ViewDeviceSynchronisation:
+    def __init__(self, prefix: str):
+        self.prefix = prefix
+
+    def update(self, median: int, offset_from_median: Sequence[np.int32]):
+        # stream.write(f"updating {self.prefix} with median {median}\n")
+        # stream.flush()
+        pydev.iointr(self.prefix + ':median', median)
+        pydev.iointr(self.prefix + ':offset', list(offset_from_median))
+
+
+class ViewConfiguration:
+    def __init__(self, prefix: str):
+        self.prefix = prefix
+
+    def update(self, median_computation: bool):
+        stream.write(f"updating {self.prefix} with median {median_computation}\n")
+        stream.flush()
+        pydev.iointr(self.prefix + ':comp:median', bool(median_computation))
+
+
 class Views:
     def __init__(self, prefix: str):
         self.ready_data = ViewBPMDataCollection(prefix + ":out:100ms")
@@ -185,6 +219,9 @@ class Views:
         self.bdata = ViewBPMDataAsBData(prefix + ":bdata")
         self.monitor_bpms = ViewBPMMonitoring(prefix + ":mon")
         self.monitor_update_cmd_errors = ViewStringBuffer(prefix + ":im:cmd_err")
+        self.collector = ViewCollectorStatus(prefix + ":mon:col:cnt")
+        self.monitor_device_sync = ViewDeviceSynchronisation(prefix + ":mon:sync")
+        self.configuration = ViewConfiguration(prefix + ":mon:cfg")
 
 
 __all__ = [

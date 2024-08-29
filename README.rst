@@ -19,7 +19,12 @@ is implemented in the python module `bpm-data-combiner`. Have a
 look to  https://hz-b.github.io/bpm-data-combiner/ for its
 documentation.
 
+Debugging IOC
+-------------
 
+see description in debugging functionality in `debugging`_
+
+.. _`debugging` : src/doc/debugging.rst
 
 External dependencies
 ---------------------
