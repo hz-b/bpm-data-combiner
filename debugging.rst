@@ -37,10 +37,55 @@ Checking basic functionalities : triggering
    to this IOC and sends then an update command to
    python, which in turn will produce new data update
 
-   This count here allows seeing if new data have arrived
-   on the EPICS side.
+   This count here allows seeing if the trigger for
+   new (accumulated) data is arriving
+
+   This number should be continously increasing
+   with the same rate as the (other) classic bpms are
+   updated
+
+Checking basic functionalities : data arriving
+----------------------------------------------
+
+* 'OrbCol:mon:col:cnt': shows the last count in
+   any bpm package arrived from anywhere.
+
+   This count should change very frequently
 
 
+Check that senders are synchronised
+-----------------------------------
+
+**Please note**: these data are only an indication and
+not necessarily sufficient.
+
+1. First activate this computation by setting
+   `OrbCol:cfg:comp:median` to 1
+   This will double the computational requirement of this
+   IOC and should be deactivated afterwards
+
+2. Check that the IOC has reacted to this request by checking
+   'OrbCol:mon:cfg:comp:median' has been set to 1
+
+3. Now have a look to `OrbCol:mon:sync:median`
+   this value should change frequently. If it does
+   not changes at all most probably the bpms are
+   not synchronised
+
+   How is this value computed: internally the last cnt
+   that has arrived for each channel is tracked. Then the
+   median value of this cnt is calculated
+
+   At last look to  `OrbCol:mon:sync:offset`. These
+   offsets should chance similiarily. Good reference
+   values have to be derived from measurments with the
+   real BPMs.
+
+   Still these values should not be very large.
+
+   If the offset of the median changes peroidically within the
+   same values one can assume that the BPM electronics are
+   synchronised
 
 
 Organisation of variables
