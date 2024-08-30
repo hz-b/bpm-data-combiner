@@ -10,26 +10,29 @@ Which BPM's are the ones that the collector knowns?
 
 Check the following variable
 
-* `OrbCol:mon:names`: list all the bpms the
-   collector knows of
+* ``OrbCol:mon:names``
+   list all the bpms the collector knows of
 
-* `OrbCol:mon:active`: which of the BPM's
-   are marked as active (i.e. have sent data
+* ``OrbCol:mon:active``
+   which of the BPM's are marked as active (i.e. have sent data
    recently)
 
-* `OrbCol:mon:synchronised`: which of the BPM's
+* ``OrbCol:mon:synchronised``
+   which of the BPM's
    are marked as synchronised on their IOC. Please
    be aware that the BPM's could not be synchronised
    even if the flag it.
 
-* `OrbCol:mon:useable`: which of the BPM's
+* ``OrbCol:mon:useable``
+   which of the BPM's
    does the collector consider as useable
 
 
 Checking basic functionalities : triggering
 -------------------------------------------
 
-* `OrbCol:mon:periodic:cnt': how often has the external
+* ``OrbCol:mon:periodic:cnt'`
+   how often has the external
    trigger for producing data been received
 
    Currently all 2 seconds a new data update is requested
@@ -47,7 +50,8 @@ Checking basic functionalities : triggering
 Checking basic functionalities : data arriving
 ----------------------------------------------
 
-* 'OrbCol:mon:col:cnt': shows the last count in
+* ``OrbCol:mon:col:cnt``
+   shows the last count in
    any bpm package arrived from anywhere.
 
    This count should change very frequently
