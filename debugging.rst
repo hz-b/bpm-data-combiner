@@ -31,7 +31,7 @@ Check the following variable
 Checking basic functionalities : triggering
 -------------------------------------------
 
-* ``OrbCol:mon:periodic:cnt'`
+* ``OrbCol:mon:periodic:cnt``
    how often has the external
    trigger for producing data been received
 
