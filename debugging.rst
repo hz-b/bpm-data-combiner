@@ -69,7 +69,7 @@ not necessarily sufficient.
    IOC and should be deactivated afterwards
 
 2. Check that the IOC has reacted to this request by checking
-   'OrbCol:mon:cfg:comp:median' has been set to 1
+   ``OrbCol:mon:cfg:comp:median`` has been set to 1
 
 3. Now have a look to
    ``OrbCol:mon:sync:median``
