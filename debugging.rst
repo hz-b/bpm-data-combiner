@@ -23,7 +23,7 @@ Check the following variable
    be aware that the BPM's could not be synchronised
    even if the flag it.
 
-* ``OrbCol:mon:useable``
+* ``OrbCol:mon:usable``
    which of the BPM's
    does the collector consider as useable
 
