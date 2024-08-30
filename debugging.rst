@@ -106,10 +106,10 @@ Organisation of variables
    this IOC.
 
 * ``OrbCol:mon``
-  monitor variables. These shall tell you
-  something of the state of the IOC
+   monitor variables. These shall tell you
+   something of the state of the IOC
 
 * ``OrbCol:im``
     intermediate or internal variables.
-   Please be careful if setting or using them. Please be prepared
-   that these names could changes
+    Please be careful if setting or using them. Please be prepared
+    that these names could changes
