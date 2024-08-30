@@ -64,14 +64,15 @@ Check that senders are synchronised
 not necessarily sufficient.
 
 1. First activate this computation by setting
-   `OrbCol:cfg:comp:median` to 1
+   ``OrbCol:cfg:comp:median`` to 1
    This will double the computational requirement of this
    IOC and should be deactivated afterwards
 
 2. Check that the IOC has reacted to this request by checking
    'OrbCol:mon:cfg:comp:median' has been set to 1
 
-3. Now have a look to `OrbCol:mon:sync:median`
+3. Now have a look to
+   ``OrbCol:mon:sync:median``
    this value should change frequently. If it does
    not changes at all most probably the bpms are
    not synchronised
@@ -80,7 +81,8 @@ not necessarily sufficient.
    that has arrived for each channel is tracked. Then the
    median value of this cnt is calculated
 
-   At last look to  `OrbCol:mon:sync:offset`. These
+   At last look to
+   ``OrbCol:mon:sync:offset``. These
    offsets should chance similiarily. Good reference
    values have to be derived from measurments with the
    real BPMs.
@@ -95,12 +97,19 @@ not necessarily sufficient.
 Organisation of variables
 -------------------------
 
-* `OrbCol:inp` input variables, thus data expected to be
+* ``OrbCol:inp``
+   input variables, thus data expected to be
    read by channel access from some other place
 
-* `OrbCol:mon` monitor variables. These shall tell you
+* ``OrbCol:out``
+   output variables, thus data provided by
+   this IOC.
+
+* ``OrbCol:mon``
+  monitor variables. These shall tell you
   something of the state of the IOC
 
-* `OrbCol:im` intermediate or internal variables.
-   Please be careful if setting them. Please be prepared
+* ``OrbCol:im``
+    intermediate or internal variables.
+   Please be careful if setting or using them. Please be prepared
    that these names could changes
