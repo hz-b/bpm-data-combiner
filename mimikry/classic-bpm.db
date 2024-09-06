@@ -34,7 +34,7 @@ record(waveform, "$(PREFIX):bdata")
     field(DESC, "bdata values")
     field(EGU, "mm")
     field(FTVL, "DOUBLE")
-    field(INP,  "$(INP) CPP")
+    field(INP,  "$(INP):bdata CPP")
     field(NELM, 64)
     field(TPRO, 0)
 }
@@ -66,137 +66,155 @@ record(ao, "$(PREFIX):freeBytes")
     field(PREC, 0)
     field(PINI, "YES")
 }
-record(bi, "$(PREFIX):pwr1i")
+record(bi, "$(PREFIX,undefined):pwr1i")
 {
     field(DESC, "Mimic pwr of classic bpm ioc")
+    field(INP, "$(INP,undefined):mon:BPMZ5D8R:is_act CPP")
     field(ZNAM, "enabled")
     field(ONAM, "disabled")
     field(VAL, 1)
     field(PINI, "YES")
+    field(FLNK, "$(PREFIX,undefined):agc1i")
 }
 
-record(bi, "$(PREFIX):agc1i")
+
+# need to learn if the new boxes give me such an output too
+record(bi, "$(PREFIX,undefined):agc1i")
 {
     field(DESC, "Mimic auto. gain ctrl classic bpm ioc")
+    field(INP, "$(PREFIX,undefined):pwr1i")
     field(ZNAM, "enabled")
     field(ONAM, "disabled")
     field(VAL, 1)
     field(PINI, "YES")
 }
-record(bi, "$(PREFIX):pwr2i")
+record(bi, "$(PREFIX,undefined):pwr2i")
 {
     field(DESC, "Mimic pwr of classic bpm ioc")
+    field(INP, "$(INP,undefined):mon:BPMZ6D8R:is_act CPP")
     field(ZNAM, "enabled")
     field(ONAM, "disabled")
     field(VAL, 1)
     field(PINI, "YES")
+    field(FLNK, "$(PREFIX,undefined):agc2i")
 }
 
-record(bi, "$(PREFIX):agc2i")
+
+# need to learn if the new boxes give me such an output too
+record(bi, "$(PREFIX,undefined):agc2i")
 {
     field(DESC, "Mimic auto. gain ctrl classic bpm ioc")
+    field(INP, "$(PREFIX,undefined):pwr2i")
     field(ZNAM, "enabled")
     field(ONAM, "disabled")
     field(VAL, 1)
     field(PINI, "YES")
 }
-record(bi, "$(PREFIX):pwr3i")
+record(bi, "$(PREFIX,undefined):pwr3i")
 {
     field(DESC, "Mimic pwr of classic bpm ioc")
+    field(INP, "$(INP,undefined):mon:BPMZ7D8R:is_act CPP")
     field(ZNAM, "enabled")
     field(ONAM, "disabled")
     field(VAL, 1)
     field(PINI, "YES")
+    field(FLNK, "$(PREFIX,undefined):agc3i")
 }
 
-record(bi, "$(PREFIX):agc3i")
+
+# need to learn if the new boxes give me such an output too
+record(bi, "$(PREFIX,undefined):agc3i")
 {
     field(DESC, "Mimic auto. gain ctrl classic bpm ioc")
+    field(INP, "$(PREFIX,undefined):pwr3i")
     field(ZNAM, "enabled")
     field(ONAM, "disabled")
     field(VAL, 1)
     field(PINI, "YES")
 }
-record(bi, "$(PREFIX):pwr4i")
+record(bi, "$(PREFIX,undefined):pwr4i")
 {
     field(DESC, "Mimic pwr of classic bpm ioc")
+    field(INP, "$(INP,undefined):mon:BPMZ1T8R:is_act CPP")
     field(ZNAM, "enabled")
     field(ONAM, "disabled")
     field(VAL, 1)
     field(PINI, "YES")
+    field(FLNK, "$(PREFIX,undefined):agc4i")
 }
 
-record(bi, "$(PREFIX):agc4i")
+
+# need to learn if the new boxes give me such an output too
+record(bi, "$(PREFIX,undefined):agc4i")
 {
     field(DESC, "Mimic auto. gain ctrl classic bpm ioc")
+    field(INP, "$(PREFIX,undefined):pwr4i")
     field(ZNAM, "enabled")
     field(ONAM, "disabled")
     field(VAL, 1)
     field(PINI, "YES")
 }
-record(bi, "$(PREFIX):pwr5i")
+record(bi, "$(PREFIX,undefined):pwr5i")
 {
     field(DESC, "Mimic pwr of classic bpm ioc")
+    field(INP, "$(INP,undefined):mon:BPMZ2T8R:is_act CPP")
     field(ZNAM, "enabled")
     field(ONAM, "disabled")
     field(VAL, 1)
     field(PINI, "YES")
+    field(FLNK, "$(PREFIX,undefined):agc5i")
 }
 
-record(bi, "$(PREFIX):agc5i")
+
+# need to learn if the new boxes give me such an output too
+record(bi, "$(PREFIX,undefined):agc5i")
 {
     field(DESC, "Mimic auto. gain ctrl classic bpm ioc")
+    field(INP, "$(PREFIX,undefined):pwr5i")
     field(ZNAM, "enabled")
     field(ONAM, "disabled")
     field(VAL, 1)
     field(PINI, "YES")
 }
-record(bi, "$(PREFIX):pwr6i")
+record(bi, "$(PREFIX,undefined):pwr6i")
 {
     field(DESC, "Mimic pwr of classic bpm ioc")
+    field(INP, "$(INP,undefined):mon:BPMZ3T8R:is_act CPP")
     field(ZNAM, "enabled")
     field(ONAM, "disabled")
     field(VAL, 1)
     field(PINI, "YES")
+    field(FLNK, "$(PREFIX,undefined):agc6i")
 }
 
-record(bi, "$(PREFIX):agc6i")
+
+# need to learn if the new boxes give me such an output too
+record(bi, "$(PREFIX,undefined):agc6i")
 {
     field(DESC, "Mimic auto. gain ctrl classic bpm ioc")
+    field(INP, "$(PREFIX,undefined):pwr6i")
     field(ZNAM, "enabled")
     field(ONAM, "disabled")
     field(VAL, 1)
     field(PINI, "YES")
 }
-record(bi, "$(PREFIX):pwr7i")
+record(bi, "$(PREFIX,undefined):pwr7i")
 {
     field(DESC, "Mimic pwr of classic bpm ioc")
+    field(INP, "$(INP,undefined):mon:BPMZ4T8R:is_act CPP")
     field(ZNAM, "enabled")
     field(ONAM, "disabled")
     field(VAL, 1)
     field(PINI, "YES")
+    field(FLNK, "$(PREFIX,undefined):agc7i")
 }
 
-record(bi, "$(PREFIX):agc7i")
-{
-    field(DESC, "Mimic auto. gain ctrl classic bpm ioc")
-    field(ZNAM, "enabled")
-    field(ONAM, "disabled")
-    field(VAL, 1)
-    field(PINI, "YES")
-}
-record(bi, "$(PREFIX):pwr8i")
-{
-    field(DESC, "Mimic pwr of classic bpm ioc")
-    field(ZNAM, "enabled")
-    field(ONAM, "disabled")
-    field(VAL, 1)
-    field(PINI, "YES")
-}
 
-record(bi, "$(PREFIX):agc8i")
+# need to learn if the new boxes give me such an output too
+record(bi, "$(PREFIX,undefined):agc7i")
 {
     field(DESC, "Mimic auto. gain ctrl classic bpm ioc")
+    field(INP, "$(PREFIX,undefined):pwr7i")
     field(ZNAM, "enabled")
     field(ONAM, "disabled")
     field(VAL, 1)

@@ -6,7 +6,9 @@ record(bi, "$(PREFIX):pwr$(CHANNEL)i")
     field(ONAM, "disabled")
     field(VAL, 1)
     field(PINI, "YES")
+    field(FLNK, "$(PREFIX):agc$(CHANNEL)i")
 }
+
 
 # need to learn if the new boxes give me such an output too
 record(bi, "$(PREFIX):agc$(CHANNEL)i")

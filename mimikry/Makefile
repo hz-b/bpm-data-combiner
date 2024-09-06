@@ -1,6 +1,6 @@
 EPICS_BASE?=/home/mfp/Devel/github/epics-base/
 T_A?=linux-x86_64
-MSI=$(EPICS_BASE)/bin/$(T_A)/msi
+MSI=msi# $(EPICS_BASE)/bin/$(T_A)/msi
 
 RM=rm
 RMFLAGS=-f
