@@ -70,7 +70,7 @@ endif
 WITH_IOCSTATS=0
 ifeq ($(WITH_IOCSTATS),1)
   bpm_data_combiner_LIBS += devIocStats
-  bpm_data_combiner_DBD += devIocStats.dbd iocAdmin.dbd
+  bpm_data_combiner_DBD += devIocStats.dbd # iocAdmin.dbd
 endif
 
 endif # EPICS HOST ARCH

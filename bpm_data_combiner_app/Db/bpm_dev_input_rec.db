@@ -77,6 +77,9 @@ record(mbbi, "$(PREFIX):inp:$(DEV_NAME):sync_stat")
 }
 
 
+#
+# Todo: Bug? shows 1 instead of 2 even if the value is 2
+#
 record(mbbo, "$(PREFIX):im:$(DEV_NAME):sync_stat")
 {
       field(DESC, "Sync stat -> py")
@@ -90,7 +93,6 @@ record(mbbo, "$(PREFIX):im:$(DEV_NAME):sync_stat")
       field(ZRVL, 0)
       field(ONVL, 1)
       field(TWVL, 2)
-      # field(TPRO, 1)
 }
 
 

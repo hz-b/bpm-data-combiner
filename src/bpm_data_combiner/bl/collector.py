@@ -25,6 +25,7 @@ from ..data_model.bpm_data_collection import BPMDataCollection, BPMDataCollectio
 
 from .logger import logger
 
+from sys import stderr as stream
 
 def _combine_collections_by_device_names(
     collections: Sequence[Dict[str, BPMReading]], dev_names_index: dict, *, default_value
@@ -104,7 +105,7 @@ class ReadingsCollection:
         if dev_name not in self.device_names:
             logger.info("Collector %s: expecting following device names %s; unknown name %s",
                           self.name, self.device_names, dev_name)
-            raise UnknownDeviceNameError(f"Unknown device {dev_name}")
+            raise UnknownDeviceNameError(f"Unknown or unusable device {dev_name}")
         # not one device sending twice
         if dev_name in self.collection:
             raise DoubleSubmissionError(f"{dev_name=} already in collection")

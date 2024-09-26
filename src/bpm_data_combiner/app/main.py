@@ -232,7 +232,7 @@ def update(*, dev_name, tpro=False, **kwargs):
 
     # todo: does pydevice expects a return on the function ?
     # logger.info(f" update(dev_name {dev_name}, kwargs {kwargs}) succeded\n")
-    return True
+    return  kwargs.get("val", True)
 
 
 __all__ = ["update"]
