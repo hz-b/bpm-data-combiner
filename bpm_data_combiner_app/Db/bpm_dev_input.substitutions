@@ -1,7 +1,6 @@
-file "db/bpm_dev_sim.rec"
+file "db/bpm_dev_input_rec.db"
 {
 	pattern { DEV_NAME  }
-# the ones already available
                 { BPMZ5D8R  }
                 { BPMZ6D8R  }
                 { BPMZ7D8R  }
@@ -18,7 +17,7 @@ file "db/bpm_dev_sim.rec"
 ##                 { BPMZ2T1R }
 ##                 { BPMZ3T1R }
 ##                 { BPMZ4T1R }
-##
+## #
 ##                 { BPMZ5T1R }
 ##                 { BPMZ6T1R }
 ##                 { BPMZ7T1R }
@@ -26,7 +25,7 @@ file "db/bpm_dev_sim.rec"
 ##                 { BPMZ2D2R }
 ##                 { BPMZ3D2R }
 ##                 { BPMZ4D2R }
-##
+## #
 ##                 { BPMZ5D2R }
 ##                 { BPMZ6D2R }
 ##                 { BPMZ7D2R }
@@ -34,7 +33,7 @@ file "db/bpm_dev_sim.rec"
 ##                 { BPMZ2T2R }
 ##                 { BPMZ3T2R }
 ##                 { BPMZ4T2R }
-##
+## #
 ##                 { BPMZ5T2R }
 ##                 { BPMZ6T2R }
 ##                 { BPMZ7T2R }
@@ -42,7 +41,7 @@ file "db/bpm_dev_sim.rec"
 ##                 { BPMZ2D3R }
 ##                 { BPMZ3D3R }
 ##                 { BPMZ4D3R }
-##
+## #
 ##                 { BPMZ5D3R }
 ##                 { BPMZ6D3R }
 ##                 { BPMZ7D3R }
@@ -50,7 +49,7 @@ file "db/bpm_dev_sim.rec"
 ##                 { BPMZ2T3R }
 ##                 { BPMZ3T3R }
 ##                 { BPMZ4T3R }
-##
+## #
 ##                 { BPMZ5T3R }
 ##                 { BPMZ6T3R }
 ##                 { BPMZ7T3R }
@@ -58,7 +57,7 @@ file "db/bpm_dev_sim.rec"
 ##                 { BPMZ2D4R }
 ##                 { BPMZ3D4R }
 ##                 { BPMZ4D4R }
-##
+## #
 ##                 { BPMZ5D4R }
 ##                 { BPMZ6D4R }
 ##                 { BPMZ7D4R }
@@ -66,7 +65,7 @@ file "db/bpm_dev_sim.rec"
 ##                 { BPMZ2T4R }
 ##                 { BPMZ3T4R }
 ##                 { BPMZ4T4R }
-##
+## #
 ##                 { BPMZ5T4R }
 ##                 { BPMZ6T4R }
 ##                 { BPMZ7T4R }
@@ -74,7 +73,7 @@ file "db/bpm_dev_sim.rec"
 ##                 { BPMZ2D5R }
 ##                 { BPMZ3D5R }
 ##                 { BPMZ4D5R }
-##
+## #
 ##                 { BPMZ5D5R }
 ##                 { BPMZ6D5R }
 ##                 { BPMZ7D5R }
@@ -82,7 +81,7 @@ file "db/bpm_dev_sim.rec"
 ##                 { BPMZ2T5R }
 ##                 { BPMZ3T5R }
 ##                 { BPMZ4T5R }
-##
+## #
 ##                 { BPMZ5T5R }
 ##                 { BPMZ6T5R }
 ##                 { BPMZ7T5R }
@@ -90,7 +89,7 @@ file "db/bpm_dev_sim.rec"
 ##                 { BPMZ2D6R }
 ##                 { BPMZ3D6R }
 ##                 { BPMZ4D6R }
-##
+## #
 ##                 { BPMZ5D6R }
 ##                 { BPMZ6D6R }
 ##                 { BPMZ7D6R }
@@ -98,7 +97,7 @@ file "db/bpm_dev_sim.rec"
 ##                 { BPMZ2T6R }
 ##                 { BPMZ3T6R }
 ##                 { BPMZ4T6R }
-##
+## #
 ##                 { BPMZ5T6R }
 ##                 { BPMZ6T6R }
 ##                 { BPMZ7T6R }
@@ -106,7 +105,7 @@ file "db/bpm_dev_sim.rec"
 ##                 { BPMZ2D7R }
 ##                 { BPMZ3D7R }
 ##                 { BPMZ4D7R }
-##
+## #
 ##                 { BPMZ5D7R }
 ##                 { BPMZ6D7R }
 ##                 { BPMZ7D7R }
@@ -114,7 +113,7 @@ file "db/bpm_dev_sim.rec"
 ##                 { BPMZ2T7R }
 ##                 { BPMZ3T7R }
 ##                 { BPMZ4T7R }
-##
+## #
 ##                 { BPMZ5T7R }
 ##                 { BPMZ6T7R }
 ##                 { BPMZ7T7R }
@@ -122,7 +121,7 @@ file "db/bpm_dev_sim.rec"
 ##                 { BPMZ2D8R }
 ##                 { BPMZ3D8R }
 ##                 { BPMZ4D8R }
-##
+## #
 ## # repetition whats already available
 ## # adding a d for twin
 ##                 { BPMZ5D8RD }
@@ -132,7 +131,7 @@ file "db/bpm_dev_sim.rec"
 ##                 { BPMZ2T8RD }
 ##                 { BPMZ3T8RD }
 ##                 { BPMZ4T8RD }
-##
+## #
 ##                 { BPMZ5T8RD }
 ##                 { BPMZ6T8RD }
 ##                 { BPMZ7T8RD }
@@ -149,7 +148,7 @@ file "db/bpm_dev_sim.rec"
 ##                 { BPMZ2T1RD }
 ##                 { BPMZ3T1RD }
 ##                 { BPMZ4T1RD }
-##
+## #
 ##                 { BPMZ5T1RD }
 ##                 { BPMZ6T1RD }
 ##                 { BPMZ7T1RD }
@@ -157,7 +156,7 @@ file "db/bpm_dev_sim.rec"
 ##                 { BPMZ2D2RD }
 ##                 { BPMZ3D2RD }
 ##                 { BPMZ4D2RD }
-##
+## #
 ##                 { BPMZ5D2RD }
 ##                 { BPMZ6D2RD }
 ##                 { BPMZ7D2RD }
@@ -165,7 +164,7 @@ file "db/bpm_dev_sim.rec"
 ##                 { BPMZ2T2RD }
 ##                 { BPMZ3T2RD }
 ##                 { BPMZ4T2RD }
-##
+## #
 ##                 { BPMZ5T2RD }
 ##                 { BPMZ6T2RD }
 ##                 { BPMZ7T2RD }
@@ -173,7 +172,7 @@ file "db/bpm_dev_sim.rec"
 ##                 { BPMZ2D3RD }
 ##                 { BPMZ3D3RD }
 ##                 { BPMZ4D3RD }
-##
+## #
 ##                 { BPMZ5D3RD }
 ##                 { BPMZ6D3RD }
 ##                 { BPMZ7D3RD }
@@ -181,7 +180,7 @@ file "db/bpm_dev_sim.rec"
 ##                 { BPMZ2T3RD }
 ##                 { BPMZ3T3RD }
 ##                 { BPMZ4T3RD }
-##
+## #
 ##                 { BPMZ5T3RD }
 ##                 { BPMZ6T3RD }
 ##                 { BPMZ7T3RD }
@@ -189,7 +188,7 @@ file "db/bpm_dev_sim.rec"
 ##                 { BPMZ2D4RD }
 ##                 { BPMZ3D4RD }
 ##                 { BPMZ4D4RD }
-##
+## #
 ##                 { BPMZ5D4RD }
 ##                 { BPMZ6D4RD }
 ##                 { BPMZ7D4RD }
@@ -197,7 +196,7 @@ file "db/bpm_dev_sim.rec"
 ##                 { BPMZ2T4RD }
 ##                 { BPMZ3T4RD }
 ##                 { BPMZ4T4RD }
-##
+## #
 ##                 { BPMZ5T4RD }
 ##                 { BPMZ6T4RD }
 ##                 { BPMZ7T4RD }
@@ -205,7 +204,7 @@ file "db/bpm_dev_sim.rec"
 ##                 { BPMZ2D5RD }
 ##                 { BPMZ3D5RD }
 ##                 { BPMZ4D5RD }
-##
+## #
 ##                 { BPMZ5D5RD }
 ##                 { BPMZ6D5RD }
 ##                 { BPMZ7D5RD }
@@ -213,7 +212,7 @@ file "db/bpm_dev_sim.rec"
 ##                 { BPMZ2T5RD }
 ##                 { BPMZ3T5RD }
 ##                 { BPMZ4T5RD }
-##
+## #
 ##                 { BPMZ5T5RD }
 ##                 { BPMZ6T5RD }
 ##                 { BPMZ7T5RD }
@@ -221,7 +220,7 @@ file "db/bpm_dev_sim.rec"
 ##                 { BPMZ2D6RD }
 ##                 { BPMZ3D6RD }
 ##                 { BPMZ4D6RD }
-##
+## #
 ##                 { BPMZ5D6RD }
 ##                 { BPMZ6D6RD }
 ##                 { BPMZ7D6RD }
@@ -229,7 +228,7 @@ file "db/bpm_dev_sim.rec"
 ##                 { BPMZ2T6RD }
 ##                 { BPMZ3T6RD }
 ##                 { BPMZ4T6RD }
-##
+## #
 ##                 { BPMZ5T6RD }
 ##                 { BPMZ6T6RD }
 ##                 { BPMZ7T6RD }
@@ -237,7 +236,7 @@ file "db/bpm_dev_sim.rec"
 ##                 { BPMZ2D7RD }
 ##                 { BPMZ3D7RD }
 ##                 { BPMZ4D7RD }
-##
+## #
 ##                 { BPMZ5D7RD }
 ##                 { BPMZ6D7RD }
 ##                 { BPMZ7D7RD }
@@ -245,7 +244,7 @@ file "db/bpm_dev_sim.rec"
 ##                 { BPMZ2T7RD }
 ##                 { BPMZ3T7RD }
 ##                 { BPMZ4T7RD }
-##
+## #
 ##                 { BPMZ5T7RD }
 ##                 { BPMZ6T7RD }
 ##                 { BPMZ7T7RD }
@@ -253,7 +252,7 @@ file "db/bpm_dev_sim.rec"
 ##                 { BPMZ2D8RD }
 ##                 { BPMZ3D8RD }
 ##                 { BPMZ4D8RD }
-##
+## #
 ##                 { BPMZ5D8RD }
 ##                 { BPMZ6D8RD }
 ##                 { BPMZ7D8RD }
@@ -261,7 +260,7 @@ file "db/bpm_dev_sim.rec"
 ##                 { BPMZ2T8RD }
 ##                 { BPMZ3T8RD }
 ##                 { BPMZ4T8RD }
-##
+## #
 ##                 { BPMZ5T8RD }
 ##                 { BPMZ6T8RD }
 ##                 { BPMZ7T8RD }

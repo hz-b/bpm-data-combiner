@@ -30,8 +30,6 @@ record(longin, "$(PREFIX)$(DEV_NAME):im:cnt")
 {
     field(DESC, "BPM dev simulator, time counter")
     field(EGU, "ds")
-    field(VAL, 0)
-    field(PINI, "YES")
     field(INP, "$(PREFIX)$(DEV_NAME):im:cnt:trg")
     info(Q:group, {
         "$(DEV_NAME)":{"cnt": {+channel:"VAL", +trigger:"*"}}
@@ -72,9 +70,9 @@ record(calc, "$(PREFIX)$(DEV_NAME):im:cnt:x")
    field(INPA, "$(PREFIX)$(DEV_NAME):par:inc:x PP")
    field(INPB, "$(PREFIX)$(DEV_NAME):im:cnt:x")
    field(CALC, "A+B")
+   # field(VAL, 2147483648)
    # Start one below
    # this field is triggered when par is upated
-   field(VAL, 0)
    field(FLNK, "$(PREFIX)$(DEV_NAME):im:x")
 }
 
@@ -87,18 +85,18 @@ record(calc, "$(PREFIX)$(DEV_NAME):im:cnt:y")
    # Start one below
    # this field is triggered when par is upated
    # note: y is counting downwards
-   field(VAL, 0)
+   # field(VAL, 0)
    field(FLNK, "$(PREFIX)$(DEV_NAME):im:y")
 }
 
 # provide count and trigger x and y over fanout
 record(calc, "$(PREFIX)$(DEV_NAME):im:cnt:trg")
 {
-   field(INPA, "$(PREFIX)$(DEV_NAME):im:cnt:trg")
-   field(VAL, 0)
    field(PINI, "YES")
-   field(CALC, "A+1")
+   field(CALC, "VAL+1")
+   field(VAL,  -2000000)
    field(SCAN, ".1 second")
+   # field(TPRO, 1)
    field(FLNK, "$(PREFIX)$(DEV_NAME):im:fanout")
 }
 
@@ -122,4 +120,18 @@ record(concat, "$(DEV_NAME):posv")
    field(IN01, "$(PREFIX)$(DEV_NAME):im:x")
    field(IN02, "$(PREFIX)$(DEV_NAME):im:y")
    field(EGU, "nm")
+}
+
+
+record(mbbo, "$(DEV_NAME):clocks:sync_st_m")
+{
+   field(DESC, "stat synchronside")
+   field(ZRST, "NoSync")
+   field(ONST, "Tracking")
+   field(TWST, "Synchronised")
+   field(ZRVL, 0)
+   field(ONVL, 1)
+   field(TWVL, 2)
+   field(VAL, 2)
+   field(PINI, "YES")
 }

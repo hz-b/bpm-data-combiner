@@ -1,12 +1,8 @@
-from ..bl.command_round_buffer import CommandRoundBuffer, round_buffer_to_string, dict_to_string
-from .view import ViewStringBuffer
-
-
-import logging
 import io
 import traceback
-
-logger = logging.getLogger("bpm-data-combiner")
+from ..bl.command_round_buffer import CommandRoundBuffer, round_buffer_to_string, dict_to_string
+from ..bl.logger import logger
+from .view import ViewStringBuffer
 
 
 class UpdateContext:
@@ -20,12 +16,10 @@ class UpdateContext:
     def __enter__(self):
         if not self.echo_command:
             return
-        last = self.roundbuffer.last()
 
+        last = self.roundbuffer.last()
         cmd = " %8s: cmd %4s, kw%s" %( last.dev_name,  last.cmd, dict_to_string(last.kwargs))
-        logger.warning(
-            "Processing dev_name %8s, command %4s, kwargs = %s", last.dev_name,  last.cmd, last.kwargs
-        )
+        logger.warning("Processing %s", cmd)
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         if exc_type is None:

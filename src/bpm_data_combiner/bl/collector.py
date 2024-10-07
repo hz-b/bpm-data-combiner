@@ -12,7 +12,6 @@ Question:
    how long of a queue to preserve
 """
 import functools
-import logging
 from typing import Sequence, Hashable, Dict
 import numpy as np
 import numpy.ma as ma
@@ -24,9 +23,9 @@ from .event import Event
 from ..data_model.bpm_data_reading import BPMReading
 from ..data_model.bpm_data_collection import BPMDataCollection, BPMDataCollectionPlane
 
+from .logger import logger
 
-logger = logging.getLogger("bpm-data-combiner")
-
+from sys import stderr as stream
 
 def _combine_collections_by_device_names(
     collections: Sequence[Dict[str, BPMReading]], dev_names_index: dict, *, default_value
@@ -81,10 +80,12 @@ class ReadingsCollection:
     use :meth:`ready` to see if sufficient data is here
     """
 
-    def __init__(self, *, name: str, device_names: Sequence[str], threshold: int = None):
+    def __init__(self, *, name: str, device_names: Sequence[str], threshold: int = None, cnt : int):
         self.name = name
         self.collection = dict()
         self.device_names = set(device_names)
+        # for debug purposes
+        self.cnt = cnt
 
         if threshold is None:
             threshold = max(1, len(device_names) // 2)
@@ -102,9 +103,9 @@ class ReadingsCollection:
         dev_name = val.dev_name
         # data from known / expected device
         if dev_name not in self.device_names:
-            # logger.error("Collector %s: expecting following device names %s; unknown name %s",
-            #              self.name, self.device_names, dev_name)
-            raise UnknownDeviceNameError(f"Unknown device {dev_name}")
+            logger.info("Collector %s: expecting following device names %s; unknown name %s",
+                          self.name, self.device_names, dev_name)
+            raise UnknownDeviceNameError(f"Unknown or unusable device {dev_name}")
         # not one device sending twice
         if dev_name in self.collection:
             raise DoubleSubmissionError(f"{dev_name=} already in collection")
@@ -164,7 +165,7 @@ class Collector:
 
         @functools.lru_cache(maxsize=max_collections)
         def _get_collection(cnt: Hashable):
-            r = ReadingsCollection(name=self.name, device_names=self.device_names, threshold=threshold)
+            r = ReadingsCollection(name=self.name, device_names=self.device_names, threshold=threshold, cnt=cnt)
             self.on_new_collection.trigger(r)
             return r
 

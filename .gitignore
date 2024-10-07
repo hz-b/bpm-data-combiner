@@ -4,6 +4,8 @@
 
 # epics build directories
 O.linux-x86_64/
+O.RTEMS-mvme2100/
+O.RTEMS-mvme5500/
 O.Common/
 
 # epics install dirs

@@ -1,13 +1,12 @@
 import numpy as np
-
-from ..data_model.bpm_data_collection import BPMDataCollection, BPMDataCollectionStats
-import logging
 from typing import Sequence
+from ..bl.logger import logger
+from ..data_model.bpm_data_collection import BPMDataCollection, BPMDataCollectionStats
 
 import pydev
 
-logger = logging.getLogger("bpm-data-combiner")
-
+import sys
+stream = sys.stdout
 
 def string_array_to_bytes(names: Sequence[str], *, encoding="utf8"):
     return [bytes(name, encoding) for name in names]
@@ -17,8 +16,14 @@ class ViewBPMMonitoring:
     def __init__(self, prefix: str):
         self.prefix = prefix
 
-    def update(self, names: Sequence[str], active: Sequence[bool]):
-        names = string_array_to_bytes(names)
+    def update(self, *,
+               names: Sequence[str],
+               active: Sequence[bool],
+               synchronised: Sequence[bool],
+               usable: Sequence[bool],
+               ):
+        # names = string_array_to_bytes(names)
+        names = list(names)
         label = self.prefix + ":" + "names"
         logger.debug("Update active view label %s, values %s", label, names)
         pydev.iointr(label, names)
@@ -28,7 +33,20 @@ class ViewBPMMonitoring:
         active = np.array(active, dtype=np.int32)
         label = self.prefix + ":" + "active"
         logger.debug("Update active view label %s, values %s", label, active)
-        pydev.iointr(label, active)
+        pydev.iointr(label, active.tolist())
+
+        synchronised = [bool(v) for v in synchronised]
+        synchronised = np.array(synchronised, dtype=np.int32)
+        label = self.prefix + ":" + "synchronised"
+        logger.debug("Update active view label %s, values %s", label, synchronised)
+        pydev.iointr(label, synchronised.tolist())
+
+        usable = [bool(v) for v in usable]
+        usable = np.array(usable, dtype=np.int32)
+        label = self.prefix + ":" + "usable"
+        logger.debug("Update active view label %s, values %s", label, usable)
+        pydev.iointr(label, usable.tolist())
+
 
 
 class ViewBPMDataCollection:
@@ -94,7 +112,7 @@ class ViewBPMDataCollectionStats:
         # which data count? not there yet
         # ("cnt", data.cnt)
         for suffix, var in [
-            ("names", string_array_to_bytes(data.names)),
+            ("names", data.names),
         ]:
             label = self.prefix + ":" + suffix
             pydev.iointr(label, var)
@@ -116,9 +134,10 @@ class ViewBPMDataAsBData:
     def update(self, data: BPMDataCollectionStats):
         """prepare data as expected
         """
-        # logger.debug("view bdata: publishing data %s", data)
+        logger.debug("view bdata: publishing data %s", data)
         nm2mm = 1e-6
         n_entries = len(data.x.values)
+        return
         n_bpms = 8
         if n_entries > n_bpms:
             raise ValueError("number of bpms %s too many. max %s", n_entries, n_bpms)
@@ -135,23 +154,22 @@ class ViewBPMDataAsBData:
         # bdata[2] = 3
         # intensityz z 1.3
         # bdata[3] = 3
-        # AGC status needs to be three
-        # todo: fold in from the data that its set AGC
-        #       to 0 if some libera box is not responsive
-        bdata[4] = 3
+        # AGC status needs to be three for valid data
+        # todo: find out what to set if only one plane is valid?
+        bdata[4,:n_entries] = np.where((data.x.n_readings > 0) | (data.y.n_readings > 0), 3, 0)
         bdata[4, -1] = 2
         # scale rms so that the slow orbit feedback accepts the data
         # factor 100 seems to be enough.
         # I think I should add some check that the noise is large enough
         scale_rms = 20
-        bdata[6, :n_entries] = data.x.std * nm2mm * scale_rms
-        bdata[7, :n_entries] = data.y.std * nm2mm * scale_rms
+        bdata[6, :n_entries] = np.where(data.x.n_readings > 0, data.x.std * nm2mm * scale_rms, 0)
+        bdata[7, :n_entries] = np.where(data.y.n_readings > 0, data.y.std * nm2mm * scale_rms, 0)
 
         label = f"{self.prefix}"
         bdata = [float(v) for v in bdata.ravel()]
+        pydev.iointr(label, bdata)
         logger.debug("view bdata: label %s,  %d n_entries", label, n_entries)
         # logger.warning("view bdata: label %s bdata %s", label, bdata)
-        pydev.iointr(label, bdata)
 
 
 class ViewStringBuffer:
@@ -159,8 +177,39 @@ class ViewStringBuffer:
         self.label = label
 
     def update(self, buf: Sequence[str]):
+        pydev.iointr(self.label, list(buf))
         # logger.warning(f'View string {self.label}:"{t_str}"')
-        pydev.iointr(self.label, string_array_to_bytes(buf))
+
+
+class ViewCollectorStatus:
+    def __init__(self, label: str):
+        self.label = label
+
+    def update(self, cnt: int):
+        # stream.write(f"updating {self.label} with cnt {cnt}\n")
+        # stream.flush()
+        pydev.iointr(self.label, cnt)
+
+
+class ViewDeviceSynchronisation:
+    def __init__(self, prefix: str):
+        self.prefix = prefix
+
+    def update(self, median: int, offset_from_median: Sequence[np.int32]):
+        # stream.write(f"updating {self.prefix} with median {median}\n")
+        # stream.flush()
+        pydev.iointr(self.prefix + ':median', median)
+        pydev.iointr(self.prefix + ':offset', list(offset_from_median))
+
+
+class ViewConfiguration:
+    def __init__(self, prefix: str):
+        self.prefix = prefix
+
+    def update(self, median_computation: bool):
+        stream.write(f"updating {self.prefix} with median {median_computation}\n")
+        stream.flush()
+        pydev.iointr(self.prefix + ':comp:median', bool(median_computation))
 
 
 class Views:
@@ -170,6 +219,9 @@ class Views:
         self.bdata = ViewBPMDataAsBData(prefix + ":bdata")
         self.monitor_bpms = ViewBPMMonitoring(prefix + ":mon")
         self.monitor_update_cmd_errors = ViewStringBuffer(prefix + ":im:cmd_err")
+        self.collector = ViewCollectorStatus(prefix + ":mon:col:cnt")
+        self.monitor_device_sync = ViewDeviceSynchronisation(prefix + ":mon:sync")
+        self.configuration = ViewConfiguration(prefix + ":mon:cfg")
 
 
 __all__ = [

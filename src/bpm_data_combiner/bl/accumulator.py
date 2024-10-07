@@ -10,7 +10,7 @@ from ..data_model.bpm_data_reading import BPMReading
 from .collector import _combine_collections_by_device_names
 from typing import Dict
 import numpy as np
-
+from .logger import logger
 logger = logging.getLogger("bpm-data-combiner")
 
 

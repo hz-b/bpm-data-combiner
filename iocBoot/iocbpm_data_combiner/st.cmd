@@ -9,8 +9,8 @@ cd "${TOP}"
 epicsEnvSet("ENGINEER", "Pierre Schnizer")
 epicsEnvSet("LOCATION","Helmholtz Zentrum Berlin / BESSY II")
 
-epicsEnvSet("PREFIX","Pierre:COM")
-epicsEnvSet("REMOTE","Pierre:SIM:")
+epicsEnvSet("PREFIX","OrbCol")
+epicsEnvSet("REMOTE","")
 epicsEnvSet("PYTHONPATH","$(TOP)/src")
 # epicsEnvSet("IOC_NAME","${IOC_NAME}")
 
@@ -19,20 +19,23 @@ dbLoadDatabase "dbd/bpm_data_combiner.dbd"
 bpm_data_combiner_registerRecordDeviceDriver pdbbase
 
 ## stats records
-dbLoadRecords("db/iocAdminSoft.db", "IOC=$(IOC_NAME)")
-dbLoadRecords("db/iocRelease.db", "IOC=$(IOC_NAME)")
+## dbLoadRecords("db/iocAdminSoft.db", "IOC=$(IOC_NAME)")
+## dbLoadRecords("db/iocRelease.db", "IOC=$(IOC_NAME)")
 
 ## Load record instances
-dbLoadTemplate("db/bpm_dev_input.db", "PREFIX=$(PREFIX)")
+dbLoadTemplate("db/bpm_dev_input.substitutions", "PREFIX=$(PREFIX)")
 # dbLoadRecords("db/bpm_dev_input_offbeat.db", "PREFIX=$(PREFIX)")
-dbLoadTemplate("db/bpm.db", "PREFIX=$(PREFIX)")
+dbLoadTemplate("db/bpm.substitutions", "PREFIX=$(PREFIX)")
 dbLoadRecords("db/bpm_monitor_overview.db", "PREFIX=$(PREFIX),VIEW=mon")
 dbLoadRecords("db/view.db", "PREFIX=$(PREFIX)")
 dbLoadRecords("db/bpm_periodic.db", "PREFIX=$(PREFIX)")
+dbLoadRecords("db/bpm_cfg.db", "PREFIX=$(PREFIX)")
 dbLoadRecords("db/bpm_bdata.db", "PREFIX=$(PREFIX)")
 
-pydev("from bpm_data_combiner.app.main import update")
-
+pydev("from bpm_data_combiner.app import main ")
+pydev("update = main.update")
+pydev("print(main, update)")
+pydev("import sys; stream = sys.stdout")
 #- Set this to see messages from mySub
 #-var mySubDebug 1
 

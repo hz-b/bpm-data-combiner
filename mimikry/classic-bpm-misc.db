@@ -34,7 +34,7 @@ record(waveform, "$(PREFIX):bdata")
     field(DESC, "bdata values")
     field(EGU, "mm")
     field(FTVL, "DOUBLE")
-    field(INP,  "$(INP) CPP")
+    field(INP,  "$(INP):bdata CPP")
     field(NELM, 64)
     field(TPRO, 0)
 }

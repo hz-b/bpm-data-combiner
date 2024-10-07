@@ -9,11 +9,11 @@ record(waveform, "$(PREFIX):$(VIEW):x:values")
     field(INP,  "@pydev.iointr('$(PREFIX):$(VIEW):x:values')")
     field(NELM, 128)
     field(TPRO, 0)
-    info(Q:group, {
-         "$(PREFIX)$(VIEW)": {
-            "x.values": {+channel:"VAL"}
-        }
-    })
+    # info(Q:group, {
+    #      "$(PREFIX)$(VIEW)": {
+    #         "x.values": {+channel:"VAL"}
+    #     }
+    # })
 }
 
 record(waveform, "$(PREFIX):$(VIEW):x:valid")
@@ -25,11 +25,11 @@ record(waveform, "$(PREFIX):$(VIEW):x:valid")
     field(INP,  "@pydev.iointr('$(PREFIX):$(VIEW):x:valid')")
     field(NELM, 128)
     field(TPRO, 0)
-    info(Q:group, {
-         "$(PREFIX)$(VIEW)": {
-            "x.active": {+channel:"VAL"}
-        }
-    })
+    # info(Q:group, {
+    #      "$(PREFIX)$(VIEW)": {
+    #         "x.active": {+channel:"VAL"}
+    #     }
+    # })
 }
 
 
@@ -44,11 +44,11 @@ record(waveform, "$(PREFIX):$(VIEW):y:values")
     field(INP,  "@pydev.iointr('$(PREFIX):$(VIEW):y:values')")
     field(NELM, 128)
     field(TPRO, 0)
-    info(Q:group, {
-         "$(PREFIX)$(VIEW)": {
-            "y.values": {+channel:"VAL"}
-        }
-    })
+    # info(Q:group, {
+    #      "$(PREFIX)$(VIEW)": {
+    #         "y.values": {+channel:"VAL"}
+    #     }
+    # })
 }
 
 record(waveform, "$(PREFIX):$(VIEW):y:valid")
@@ -61,9 +61,9 @@ record(waveform, "$(PREFIX):$(VIEW):y:valid")
     field(INP,  "@pydev.iointr('$(PREFIX):$(VIEW):y:valid')")
     field(NELM, 128)
     field(TPRO, 0)
-    info(Q:group, {
-         "$(PREFIX)$(VIEW)": {
-            "y.active": {+channel:"VAL"}
-        }
-    })
+    # info(Q:group, {
+    #      "$(PREFIX)$(VIEW)": {
+    #         "y.active": {+channel:"VAL"}
+    #     }
+    # })
 }

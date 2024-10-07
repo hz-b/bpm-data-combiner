@@ -1,0 +1,12 @@
+record(bo, "$(PREFIX):cfg:comp:median")
+{
+    field(DESC, "compute median of cnt")
+    field(DTYP, "pydev")
+    field(ZNAM, "don't compute")
+    field(ONAM, "compute")
+    # assume not sending by default
+    field(VAL, 0)
+    field(PINI, "YES")
+    field(OUT, "@update(dev_name=None, cfg_comp_median=%VAL%, tpro=%TPRO%)")
+    field(TPRO, 1)
+}

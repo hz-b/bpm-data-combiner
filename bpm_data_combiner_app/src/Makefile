@@ -8,6 +8,8 @@ include $(PYDEVICE)/configure/CONFIG.PyDevice
 # Use typed rset structure (see 3.16.1 release notes)
 USR_CPPFLAGS += -DUSE_TYPED_RSET
 
+ifeq ($(EPICS_HOST_ARCH),$(T_A))
+
 # Auto-generate a header file containing a version string.
 # Version comes from the VCS if available, else date+time.
 # Build the IOC application
@@ -19,12 +21,11 @@ bpm_data_combinerSupport_LIBS += $(EPICS_BASE_IOC_LIBS)
 DBD += bpm_data_combiner.dbd
 
 bpm_data_combiner_DBD += base.dbd
-bpm_data_combiner_SRCS += array_forward.cpp
-bpm_data_combiner_DBD += array_forward.dbd
 
 # bpm_data_combiner.dbd will include these files:
 bpm_data_combiner_DBD += pydev.dbd
 bpm_data_combiner_DBD += pydev315.dbd
+bpm_data_combiner_DBD += pycalcRecord.dbd
 bpm_data_combiner_LIBS += pydev
 
 # bpm_data_combiner_registerRecordDeviceDriver.cpp derives from bpm_data_combiner.dbd
@@ -33,11 +34,10 @@ bpm_data_combiner_SRCS += bpm_data_combiner_registerRecordDeviceDriver.cpp
 # Build the main IOC entry point where needed
 bpm_data_combiner_SRCS_DEFAULT += bpm_data_combinerMain.cpp
 bpm_data_combiner_SRCS_vxWorks += -nil-
-
-bpm_data_combinerSupport_LIBS += $(EPICS_BASE_IOC_LIBS)
+# bpm_data_combinerSupport_LIBS += $(EPICS_BASE_IOC_LIBS)
 
 # Link in the code from our support library
-bpm_data_combiner_LIBS += bpm_data_combinerSupport
+bpm_data_combiner_LIBS +=  $(EPICS_BASE_IOC_LIBS)
 
 # To build SNL programs, SNCSEQ must be defined
 # in the <top>/configure/RELEASE file
@@ -67,12 +67,13 @@ ifdef EPICS_QSRV_MAJOR_VERSION
     bpm_data_combiner_DBD += qsrv.dbd
 endif
 
-WITH_IOCSTATS=1
+WITH_IOCSTATS=0
 ifeq ($(WITH_IOCSTATS),1)
   bpm_data_combiner_LIBS += devIocStats
-  bpm_data_combiner_DBD += devIocStats.dbd iocAdmin.dbd
+  bpm_data_combiner_DBD += devIocStats.dbd # iocAdmin.dbd
 endif
 
+endif # EPICS HOST ARCH
 # Finally link IOC to the EPICS Base libraries
 bpm_data_combiner_LIBS += $(EPICS_BASE_IOC_LIBS)
 

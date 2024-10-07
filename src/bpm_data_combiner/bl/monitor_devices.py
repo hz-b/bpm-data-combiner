@@ -1,7 +1,9 @@
 from typing import Sequence
 
-from ..data_model.monitored_device import MonitoredDevice
+from ..data_model.monitored_device import MonitoredDevice, SynchronisationStatus
 from .event import Event
+
+from .logger import (logger)
 
 
 class MonitorDevices:
@@ -29,8 +31,13 @@ class MonitorDevices:
         self.on_status_change = Event(name="monitor_devices_on_status_change")
 
     def get_devicenames(self) -> Sequence[str]:
+        """
+
+        Todo:
+            rename to "names of useable or participating devices"
+        """
         devs = [
-            ds.name for _, ds in self.devices_status.items() if ds.active and ds.enabled
+            ds.name for _, ds in self.devices_status.items() if ds.usable
         ]
         return devs
 
@@ -43,8 +50,13 @@ class MonitorDevices:
             self._status_changed()
 
     def set_active(self, dev_name: str, status: bool):
+        logger.debug("dev_name %s set active? status = %s", dev_name, status)
         if status == self.devices_status[dev_name].active:
             return
 
         self.devices_status[dev_name].active = status
         self._status_changed()
+
+    def set_synchronisation_status(self, dev_name: str, sync_stat: SynchronisationStatus):
+        self.devices_status[dev_name].sync_stat =  SynchronisationStatus(sync_stat)
+        logger.info(f'set {dev_name} to sync stat {self.devices_status[dev_name].sync_stat}')

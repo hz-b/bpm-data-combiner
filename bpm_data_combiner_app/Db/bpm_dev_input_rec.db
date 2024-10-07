@@ -8,12 +8,12 @@ record(longin, "$(PREFIX):inp:7:$(DEV_NAME):x")
 {
     field(DESC, "mirror: $(DEV_NAME) x value")
     field(EGU, "nm")
-    field(INP, {pva:{
-        pv:"$(DEV_NAME):pos",
-        field:"X",
-        proc:true,
-        }}
-    )
+    # field(INP, {pva:{
+    #     pv:"$(DEV_NAME):pos",
+    #     field:"X",
+    #     proc:true,
+    #     }}
+    # )
     # Forwarding data handled by separate fanout to ensure that
     # data are pushed in desired order to python
     # field(FLNK, "$(PREFIX)$(DEV_NAME):im:x")
@@ -24,12 +24,12 @@ record(longin, "$(PREFIX):inp:7:$(DEV_NAME):y")
 {
     field(DESC, "mirror: y value")
     field(EGU, "nm")
-    field(INP, {pva:{
-        pv:"$(DEV_NAME):pos",
-        field:"Y",
-        proc:true,
-        }}
-    )
+    # field(INP, {pva:{
+    #     pv:"$(DEV_NAME):pos",
+    #     field:"Y",
+    #     proc:true,
+    #     }}
+    # )
     # field(FLNK, "$(PREFIX)$(DEV_NAME):im:y")
     field(VAL, -100000000)
 }
@@ -39,54 +39,62 @@ record(longin, "$(PREFIX):inp:7:$(DEV_NAME):y")
 record(longin, "$(PREFIX):inp:7:$(DEV_NAME):cnt")
 {
     field(DESC, "mirror: (time) cnt")
-    field(INP, {pva:{
-        pv:"$(DEV_NAME):pos",
-        field:"lmt_l",
-        proc:true
-        }}
-    )
+    # field(INP, {pva:{
+    #     pv:"$(DEV_NAME):pos",
+    #     field:"lmt_l",
+    #     proc:true
+    #     }}
+    # )
     # done by epics 3 record currenty
     # field(FLNK, "$(PREFIX):im:$(DEV_NAME):psh")
     field(VAL, -1)
 }
 
-# Input data collected from the different bpm devices
-# First get the data into here ...
-# Pydevice needs to support aao
-record(aai, "$(PREFIX):inp:$(DEV_NAME):posv")
+# # Input data collected from the different bpm devices
+record(pycalc, "$(PREFIX):inp:$(DEV_NAME):posv")
 {
-     field(DESC, "mirror: $(DEV_NAME) posv")
-     field(INP,  "$(DEV_NAME):posv CPP")
-     field(NELM, 3)
-     field(FLNK, "$(PREFIX):im:$(DEV_NAME):toposv")
+      field(DESC, "mirror: $(DEV_NAME) posv")
+      field(INPA,  "$(DEV_NAME):posv CPP")
+      field(FTA, LONG)
+      field(MEA, 3)
+      field(CALC, "update(dev_name='$(DEV_NAME)', reading=%A%, tpro=%TPRO%)")
+      field(FLNK, "$(PREFIX):inp:$(DEV_NAME):trg")
+      # field(TPRO, 1)
 }
 
-# push dat from input to pydev:aao
-# aao seems not to have an DOL entry
-record(aSub, "$(PREFIX):im:$(DEV_NAME):toposv")
+
+record(mbbi, "$(PREFIX):inp:$(DEV_NAME):sync_stat")
 {
-     field(DESC, "mirror: $(DEV_NAME) posv to aao")
-     # perhaps to read directly from network ?
-     field(INPA, "$(PREFIX):inp:$(DEV_NAME):posv")
-     field(OUTA, "$(PREFIX):im:$(DEV_NAME):posv PP")
-     field(NOA,  3)
-     field(NOVA, 3)
-     field(FTA,  "LONG")
-     field(FTVA,  "LONG")
-     field(SNAM, "array_forward")
-     field(TPRO, 0)
+     field(DESC, "Device synchronised? ")
+     field(INP, "$(DEV_NAME):clocks:sync_st_m CPP")
+     field(ZRST, "NoSync")
+     field(ONST, "Tracking")
+     field(TWST, "Synchronised")
+     field(ZRVL, 0)
+     field(ONVL, 1)
+     field(TWVL, 2)
+     field(FLNK, "$(PREFIX):im:$(DEV_NAME):sync_stat")
 }
 
-record(aao, "$(PREFIX):im:$(DEV_NAME):posv")
+
+#
+# Todo: Bug? shows 1 instead of 2 even if the value is 2
+#
+record(mbbo, "$(PREFIX):im:$(DEV_NAME):sync_stat")
 {
-     field(DESC, "mirror: $(DEV_NAME) posv to py")
-     field(DTYP, "pydev")
-     field(NELM, 3)
-     field(FTVL,  "LONG")
-     field(OUT,  "@update(dev_name='$(DEV_NAME)', reading=%VAL%, tpro=%TPRO%)")
-     field(FLNK, "$(PREFIX):im:$(DEV_NAME):mon:trg")
-     field(TPRO, 0)
+      field(DESC, "Sync stat -> py")
+      field(DTYP, "pydev")
+      field(DOL, "$(PREFIX):inp:$(DEV_NAME):sync_stat")
+      field(OMSL, "closed_loop")
+      field(OUT,  "@update(dev_name='$(DEV_NAME)', sync_stat=%VAL%, tpro=%TPRO%)")
+      field(ZRST, "NoSync")
+      field(ONST, "Tracking")
+      field(TWST, "Synchronised")
+      field(ZRVL, 0)
+      field(ONVL, 1)
+      field(TWVL, 2)
 }
+
 
 record(fanout, "$(PREFIX):inp:$(DEV_NAME):trg")
 {
@@ -100,7 +108,7 @@ record(subArray, "$(PREFIX):inp:$(DEV_NAME):x")
 {
     field(DESC, "mirror: $(DEV_NAME) x value")
     field(EGU, "nm")
-    field(INP, "$(PREFIX):inp:$(DEV_NAME):posv")
+    field(INP, "$(PREFIX):inp:$(DEV_NAME):posv.A")
     field(FTVL, "LONG")
     field(MALM, 3)
     field(NELM, 1)
@@ -115,8 +123,8 @@ record(subArray, "$(PREFIX):inp:$(DEV_NAME):y")
 {
     field(DESC, "mirror: $(DEV_NAME) y value")
     field(EGU, "nm")
-    field(INP, "$(PREFIX):inp:$(DEV_NAME):posv")
-    field(INP, "$(DEV_NAME):posv")
+    field(INP, "$(PREFIX):inp:$(DEV_NAME):posv.A")
+    # field(INP, "$(DEV_NAME):posv")
     field(FTVL, "LONG")
     field(MALM, 3)
     field(NELM, 1)
@@ -131,8 +139,8 @@ record(subArray, "$(PREFIX):inp:$(DEV_NAME):cnt")
 {
     field(DESC, "mirror: $(DEV_NAME) cnt")
     field(EGU, "nm")
-    field(INP, "$(PREFIX):inp:$(DEV_NAME):posv")
-    field(INP, "$(DEV_NAME):posv")
+    field(INP, "$(PREFIX):inp:$(DEV_NAME):posv.A")
+    # field(INP, "$(DEV_NAME):posv")
     field(FTVL, "LONG")
     field(MALM, 3)
     field(NELM, 1)
@@ -147,12 +155,12 @@ record(subArray, "$(PREFIX):inp:$(DEV_NAME):cnt")
 record(stringin, "$(PREFIX):inp:$(DEV_NAME):name")
 {
     field(DESC, "mirror: name")
-    field(INP, {pva:{
-        pv:"$(DEV_NAME):pos",
-        field:"cfg.name",
-        proc:true,
-        }}
-    )
+    # field(INP, {pva:{
+    #     pv:"$(DEV_NAME):pos",
+    #     field:"cfg.name",
+    #     proc:true,
+    #     }}
+    # )
     field(VAL, "unknown")
     field(PINI, "YES")
     field(FLNK, "$(PREFIX):im:$(DEV_NAME):name")
@@ -165,10 +173,10 @@ record(fanout, "$(PREFIX):im:$(DEV_NAME):psh")
 {
     # should call to python ... python should start building the
     # internal data structure ... not a way yet to push directly
-    field(LNK0, "$(PREFIX):im:$(DEV_NAME):cnt")
-    field(LNK1, "$(PREFIX):im:$(DEV_NAME):x")
-    field(LNK2, "$(PREFIX):im:$(DEV_NAME):y")
-    field(LNK3, "$(PREFIX):im:$(DEV_NAME):ctl")
+    # field(LNK0, "$(PREFIX):im:$(DEV_NAME):cnt")
+    # field(LNK1, "$(PREFIX):im:$(DEV_NAME):x")
+    # field(LNK2, "$(PREFIX):im:$(DEV_NAME):y")
+    # field(LNK3, "$(PREFIX):im:$(DEV_NAME):ctl")
     field(LNK4, "$(PREFIX):im:$(DEV_NAME):mon:trg")
 }
 
@@ -238,6 +246,7 @@ record(stringout, "$(PREFIX):im:$(DEV_NAME):name")
     # field(TPRO, 1)
 }
 
+
 # Monitor: use a fixed value for count down
 # Reason: cont down is easy to see when it expirces: credit Fritz Lang
 # if required: could be an upcount with an countdown implemented by
@@ -250,20 +259,22 @@ record(longout, "$(PREFIX):im:$(DEV_NAME):mon:trg")
     # field(PINI, "YES")
     field(OUT, "$(PREFIX):im:$(DEV_NAME):mon:cnt_dwn.VAL PP")
     field(OMSL, "closed_loop")
+    field(TPRO, 0)
 }
 
 record(calcout, "$(PREFIX):im:$(DEV_NAME):mon:cnt_dwn")
 {
 
     field(DESC, "motr stat: counting down")
-    field(INPA, "$(PREFIX):im:(DEV_NAME):mon:trg NPP")
+    # field(INPA, "$(PREFIX):im:$(DEV_NAME):mon:trg NPP")
     field(CALC, "(VAL > 0) ? (VAL - 1) : 0")
     field(SCAN, ".5 second")
     field(DOPT, "Use CALC")
-    field(FLNK, "$(PREFIX):im:$(DEV_NAME):mon:is_act")
+    field(FLNK, "$(PREFIX):mon:$(DEV_NAME):is_act")
 }
 
-record(calcout, "$(PREFIX):im:$(DEV_NAME):mon:is_act")
+
+record(calcout, "$(PREFIX):mon:$(DEV_NAME):is_act")
 {
     field(DESC, "motr stat: active?")
     field(INPA, "$(PREFIX):im:$(DEV_NAME):mon:cnt_dwn")
@@ -276,6 +287,7 @@ record(calcout, "$(PREFIX):im:$(DEV_NAME):mon:is_act")
     field(OUT, "$(PREFIX):im:$(DEV_NAME):mon:active PP")
 }
 
+
 record(bo, "$(PREFIX):im:$(DEV_NAME):mon:active")
 {
     field(DESC, "motr stat: active -> py")
@@ -285,11 +297,12 @@ record(bo, "$(PREFIX):im:$(DEV_NAME):mon:active")
     # assume not sending by default
     field(VAL, 0)
     field(PINI, "YES")
-    # field(DOL, "$(PREFIX):im:$(DEV_NAME):mon:is_act")
+    field(DOL, "$(PREFIX):im:$(DEV_NAME):mon:is_act")
     field(OMSL, "closed_loop")
-    field(OUT, "@update(dev_name='$(DEV_NAME)', active=%VAL%)")
-    field(TPRO, 1)
+    field(OUT, "@update(dev_name='$(DEV_NAME)', active=%VAL%, tpro=%TPRO%)")
+    # field(TPRO, 1)
 }
+
 
 # pydevice does not yet honor VAL at default
 # need to get malte's patch into main
@@ -299,7 +312,7 @@ record(bo, "$(PREFIX):$(DEV_NAME):enabled:x")
     field(ONAM, "active")
     field(VAL, 1)
     field(PINI, "YES")
-    field(TPRO, 1)
+    # field(TPRO, 1)
     field(OUT, "$(PREFIX):im:$(DEV_NAME):enabled:x PP")
 }
 
@@ -309,7 +322,7 @@ record(bo, "$(PREFIX):$(DEV_NAME):enabled:y")
     field(ONAM, "active")
     field(VAL, 1)
     field(PINI, "YES")
-    field(TPRO, 1)
+    # field(TPRO, 1)
     field(OUT, "$(PREFIX):im:$(DEV_NAME):enabled:y PP")
 }
 
@@ -318,8 +331,8 @@ record(bo, "$(PREFIX):im:$(DEV_NAME):enabled:x")
     field(DTYP, "pydev")
     field(ZNAM, "inactive")
     field(ONAM, "active")
-    field(TPRO, 1)
-    field(OUT, "@update(dev_name='$(DEV_NAME)', enabled=%VAL%, plane='x')")
+    # field(TPRO, 1)
+    field(OUT, "@update(dev_name='$(DEV_NAME)', enabled=%VAL%, plane='x', tpro=%TPRO%)")
 }
 
 record(bo, "$(PREFIX):im:$(DEV_NAME):enabled:y")
@@ -327,6 +340,6 @@ record(bo, "$(PREFIX):im:$(DEV_NAME):enabled:y")
     field(DTYP, "pydev")
     field(ZNAM, "inactive")
     field(ONAM, "active")
-    field(TPRO, 1)
-    field(OUT, "@update(dev_name='$(DEV_NAME)', enabled=%VAL%, plane='y')")
+    # field(TPRO, 1)
+    field(OUT, "@update(dev_name='$(DEV_NAME)', enabled=%VAL%, plane='y', tpro=%TPRO%)")
 }
