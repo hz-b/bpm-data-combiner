@@ -25,6 +25,8 @@ dev_names_bessyii = [
     "BPMZ4T8R",
 ]
 
+dev_names = dev_names_mls
+
 # The BESSY II ring ... with the special ones missing
 # should get the standard names
 dev_names_for_test = [
