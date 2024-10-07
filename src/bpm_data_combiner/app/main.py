@@ -27,7 +27,9 @@ from .view import Views
 from .known_devices import dev_names as _dev_names
 import numpy as np
 from datetime import datetime
+import sys
 
+stream = sys.stdout
 
 config = Config()
 def cb(flag):
@@ -159,10 +161,16 @@ def process_reading(*, dev_name, reading):
 
 def process_active(*, dev_name, active):
     r = monitor_devices.set_active(dev_name, active)
+    return r
 
-
-def process_sync_stat(*, dev_name, sync_stat):
-    return monitor_devices.set_synchronisation_status(dev_name, sync_stat)
+def process_sync_stat(*, dev_name, sync_stat, tpro=False):
+    r = monitor_devices.set_synchronisation_status(dev_name, sync_stat)
+    r = r or sync_stat
+    if tpro:
+        stat = monitor_devices.devices_status[dev_name]
+        stream.write(f"{dev_name=} {sync_stat=} {r=} {stat=}\n")
+        stream.flush()
+    return r
 
 
 def process_enabled(*, dev_name, enabled, plane):
@@ -222,17 +230,20 @@ def update(*, dev_name, tpro=False, **kwargs):
     except:
         logger.error("Failed to prepare wrapper info")
         raise
+    r = None
     with UpdateContext(
         method=method,
         rbuffer=rbuffer,
         view=views.monitor_update_cmd_errors,
-        only_buffer=False,
+        only_buffer=not bool(tpro),
     ):
-        method(dev_name=dev_name, **kwargs)
+        r = method(dev_name=dev_name, **kwargs)
 
     # todo: does pydevice expects a return on the function ?
     # logger.info(f" update(dev_name {dev_name}, kwargs {kwargs}) succeded\n")
-    return  kwargs.get("val", True)
+    if r is None:
+        r = kwargs.get("val", True)
+    return r
 
 
 __all__ = ["update"]

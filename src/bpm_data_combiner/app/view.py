@@ -26,6 +26,7 @@ class ViewBPMMonitoring:
         names = list(names)
         label = self.prefix + ":" + "names"
         logger.debug("Update active view label %s, values %s", label, names)
+        # stream.write("Update active view label %s, values %s\n" % (label, names))
         pydev.iointr(label, names)
 
         # int number wrong by a factor of 2: why?
@@ -62,9 +63,11 @@ class ViewBPMDataCollection:
             # need to ensure that new data are only set when these changed
             label = f"{self.prefix}:{suffix}:valid"
             # arrays seem not yet to be supported by PyDevice
-            vals = [bool(v) for v in var.valid]
+            vals = [int(v) for v in var.valid]
             logger.debug("Update label %s, values %s", label, vals)
             pydev.iointr(label, vals)
+            stream.write("Update label %s, len(vals)=%s\n" %(label, len(vals)))
+            stream.flush()
 
             # How to treat masked values?
             values = var.values
