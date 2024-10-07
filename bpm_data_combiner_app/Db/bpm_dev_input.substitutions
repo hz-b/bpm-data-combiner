@@ -1,13 +1,36 @@
 file "db/bpm_dev_input_rec.db"
 {
 	pattern { DEV_NAME  }
-                { BPMZ5D8R  }
-                { BPMZ6D8R  }
-                { BPMZ7D8R  }
-                { BPMZ1T8R  }
-                { BPMZ2T8R  }
-                { BPMZ3T8R  }
-                { BPMZ4T8R  }
+# todo: use proper directory
+                { BPMZ2K3RP }
+                { BPMZ3K3RP }
+                { BPMZ4K3RP }
+                { BPMZ5K3RP }
+                { BPMZ6K3RP }
+                { BPMZ7K3RP }
+                { BPMZ1L4RP }
+                { BPMZ2L4RP }
+                { BPMZ3L4RP }
+                { BPMZ4L4RP }
+                { BPMZ5L4RP }
+                { BPMZ6L4RP }
+                { BPMZ7L4RP }
+                { BPMZ1K1RP }
+                { BPMZ2K1RP }
+                { BPMZ3K1RP }
+                { BPMZ4K1RP }
+                { BPMZ5K1RP }
+                { BPMZ6K1RP }
+                { BPMZ7K1RP }
+                { BPMZ1L2RP }
+                { BPMZ2L2RP }
+                { BPMZ3L2RP }
+                { BPMZ4L2RP }
+                { BPMZ5L2RP }
+                { BPMZ6L2RP }
+                { BPMZ7L2RP }
+                { BPMZ1K3RP }
+
 
 ## # The BESSY II ring ... with the special ones missing
 ##                 { BPMZ5D1R }
