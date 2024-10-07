@@ -60,3 +60,10 @@ class MonitorDevices:
     def set_synchronisation_status(self, dev_name: str, sync_stat: SynchronisationStatus):
         self.devices_status[dev_name].sync_stat =  SynchronisationStatus(sync_stat)
         logger.info(f'set {dev_name} to sync stat {self.devices_status[dev_name].sync_stat}')
+        self._status_changed()
+
+    def __repr__(self):
+        txt = f"{self.__class__.__name__}(devices=dict("
+        txt += ",".join([f"{name}=f{repr(dev)}" for name, dev in self.devices_status.items()])
+        txt += "))"
+        return txt

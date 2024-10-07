@@ -1,6 +1,21 @@
 #: Todo where to get the device names from
 #: use a pycalc record to push it in
-dev_names = [
+from pathlib import Path
+
+mls_names_file  = Path(__file__).parent / "mls_sparks"
+
+# a perhaps too simple parser
+# if you wwant's omething proper consider using
+# json
+# toml
+# happy
+# or a real database
+with open(mls_names_file, "rt") as fp:
+    dev_names_mls = [row.strip() for row in fp.readlines() if row[0] != '#' and row.strip()]
+
+print(dev_names_mls)
+
+dev_names_bessyii = [
     "BPMZ5D8R",
     "BPMZ6D8R",
     "BPMZ7D8R",
