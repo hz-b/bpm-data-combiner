@@ -3,11 +3,10 @@ record(waveform, "$(PREFIX):bdata")
 {
     field(DESC, "bdata values")
     field(DTYP, "pydev")
-    field(EGU, "??")
     field(EGU, "nm")
     field(FTVL, "DOUBLE")
     field(SCAN, "I/O Intr")
     field(INP,  "@pydev.iointr('$(PREFIX):bdata')")
-    field(NELM, 128)
+    field(NELM, 256)
     field(TPRO, 0)
 }
