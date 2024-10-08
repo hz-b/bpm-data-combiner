@@ -94,7 +94,7 @@ def cb(collection):
     for _, item in collection.items():
         logger.debug("new ready collection %s", item.cnt)
         break
-    data = collection_to_bpm_data_collection(collection, dev_name_index)
+    data = collection_to_bpm_data_collection(collection, dev_name_index, default_value=0)
     logger.debug("adding data %s", data)
     acc_ready.add(data)
     views.ready_data.update(data)

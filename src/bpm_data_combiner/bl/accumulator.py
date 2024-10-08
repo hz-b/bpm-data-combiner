@@ -8,9 +8,12 @@ from ..data_model.bpm_data_accumulation import (
 )
 from ..data_model.bpm_data_reading import BPMReading
 from .collector import _combine_collections_by_device_names
-from typing import Dict
-import numpy as np
 from .logger import logger
+
+from collections import deque
+import numpy as np
+from typing import Dict
+
 logger = logging.getLogger("bpm-data-combiner")
 
 
@@ -23,10 +26,13 @@ class Accumulator:
         self.collections = None
         # so collections allocator are handled in a single place
         self.swap(check_collection_length=False)
+        self.max_entries = max_entries
 
     def add(self, col: Dict[str, BPMReading]):
         logger.debug("Accumulator: adding collection!")
         self.collections.append(col)
+        if len(self.collections) > self.max_entries:
+            self.collections.popleft()
 
     def swap(self, check_collection_length: bool = True):
         """return collected collections, initialise internals to new"""
@@ -34,7 +40,7 @@ class Accumulator:
             assert len(self.collections) > 0
         # Data are processed: make object ready for further accumulation
         #: Todo: should it be protected by a lock?
-        collections, self.collections = self.collections, list()
+        collections, self.collections = self.collections, deque()
         return collections
 
     def get(self, swap=True) -> BPMDataAccumulation:
