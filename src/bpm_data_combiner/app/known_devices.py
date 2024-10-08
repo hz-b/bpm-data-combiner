@@ -1,6 +1,7 @@
 #: Todo where to get the device names from
 #: use a pycalc record to push it in
 from pathlib import Path
+from itertools import count
 
 mls_names_file  = Path(__file__).parent / "mls_sparks"
 
@@ -13,7 +14,17 @@ mls_names_file  = Path(__file__).parent / "mls_sparks"
 with open(mls_names_file, "rt") as fp:
     dev_names_mls = [row.strip() for row in fp.readlines() if row[0] != '#' and row.strip()]
 
-print(dev_names_mls)
+# insert the spare ones ...
+def add_spare(dev_names_mls):
+    n_per_segment = 7
+    segment_enumerate = count()
+    for cnt, name in enumerate(dev_names_mls):
+        if cnt > 0 and cnt % n_per_segment == 0 :
+            yield f"Spare_{next(segment_enumerate):1d}"
+        else:
+            yield name
+
+dev_names_mls = list(add_spare(dev_names_mls))
 
 dev_names_bessyii = [
     "BPMZ5D8R",
