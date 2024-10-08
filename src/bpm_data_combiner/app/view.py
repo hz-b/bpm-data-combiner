@@ -66,8 +66,6 @@ class ViewBPMDataCollection:
             vals = [int(v) for v in var.valid]
             logger.debug("Update label %s, values %s", label, vals)
             pydev.iointr(label, vals)
-            stream.write("Update label %s, len(vals)=%s\n" %(label, len(vals)))
-            stream.flush()
 
             # How to treat masked values?
             values = var.values
@@ -140,18 +138,20 @@ class ViewBPMDataAsBData:
         logger.debug("view bdata: publishing data %s", data)
         nm2mm = 1e-6
         n_entries = len(data.x.values)
-        return
-        n_bpms = 8
+        # MLS are 32 bpms ...
+        n_bpms = 32
         if n_entries > n_bpms:
             raise ValueError("number of bpms %s too many. max %s", n_entries, n_bpms)
 
         bdata = np.empty([8, n_bpms], dtype=float)
         bdata.fill(0.0)
+        # is this the correct way to convert the data ?
+        scale_bits = 2**15/10
         # flipping coordinate system to get the dispersion on the correct side
         # todo: check at which state this should be done
         # fmt:off
-        bdata[0, :n_entries] = - data.x.values * nm2mm
-        bdata[1, :n_entries] =   data.y.values * nm2mm
+        bdata[0, :n_entries] = - data.x.values * nm2mm * scale_bits
+        bdata[1, :n_entries] =   data.y.values * nm2mm * scale_bits
         # fmt:on
         # intensity z 1.3
         # bdata[2] = 3
@@ -165,11 +165,12 @@ class ViewBPMDataAsBData:
         # factor 100 seems to be enough.
         # I think I should add some check that the noise is large enough
         scale_rms = 20
-        bdata[6, :n_entries] = np.where(data.x.n_readings > 0, data.x.std * nm2mm * scale_rms, 0)
-        bdata[7, :n_entries] = np.where(data.y.n_readings > 0, data.y.std * nm2mm * scale_rms, 0)
+        # todo: invalid data: set rms to 0
+        bdata[6, :n_entries] = np.where(data.x.n_readings > 0, data.x.std * nm2mm * scale_bits * scale_rms, 0)
+        bdata[7, :n_entries] = np.where(data.y.n_readings > 0, data.y.std * nm2mm * scale_bits * scale_rms, 0)
 
         label = f"{self.prefix}"
-        bdata = [float(v) for v in bdata.ravel()]
+        bdata = [int(v) for v in bdata.ravel()]
         pydev.iointr(label, bdata)
         logger.debug("view bdata: label %s,  %d n_entries", label, n_entries)
         # logger.warning("view bdata: label %s bdata %s", label, bdata)
