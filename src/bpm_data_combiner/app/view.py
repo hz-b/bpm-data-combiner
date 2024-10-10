@@ -150,8 +150,11 @@ class ViewBPMDataAsBData:
         # flipping coordinate system to get the dispersion on the correct side
         # todo: check at which state this should be done
         # fmt:off
-        bdata[0, :n_entries] = - data.x.values * nm2mm * scale_bits
-        bdata[1, :n_entries] =   data.y.values * nm2mm * scale_bits
+        scale_x_axis=1./1.4671
+        def convert(data, scale_axis = 1.0):
+            return data * (nm2mm * scale_bits * scale_axis)
+        bdata[0, :n_entries] = - convert(data.x.values, scale_axis=scale_x_axis)
+        bdata[1, :n_entries] =   convert(data.y.values)
         # fmt:on
         # intensity z 1.3
         # bdata[2] = 3
@@ -166,8 +169,15 @@ class ViewBPMDataAsBData:
         # I think I should add some check that the noise is large enough
         scale_rms = 20
         # todo: invalid data: set rms to 0
-        bdata[6, :n_entries] = np.where(data.x.n_readings > 0, data.x.std * nm2mm * scale_bits * scale_rms, 0)
-        bdata[7, :n_entries] = np.where(data.y.n_readings > 0, data.y.std * nm2mm * scale_bits * scale_rms, 0)
+
+        def convert_noise(data, scale_axis = 1):
+            noise = convert(data.std, scale_axis = scale_axis * scale_rms)
+            noise[data.n_readings > 0] = np.clip(noise, 1, None)[data.n_readings>0]
+            # so sofb Orbit will consider it as not existing
+            noise[data.n_readings<= 0] = 0
+            return noise
+        bdata[6, :n_entries] = convert_noise(data.x, scale_axis=scale_x_axis)
+        bdata[7, :n_entries] = convert_noise(data.y)
 
         label = f"{self.prefix}"
         bdata = [int(v) for v in bdata.ravel()]
