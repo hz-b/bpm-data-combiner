@@ -10,6 +10,7 @@ DIRS += $(wildcard bpm_data_combiner_app)
 
 DIRS += $(wildcard *Top)
 DIRS += $(wildcard iocBoot)
+DIRS += src
 
 # The build order is controlled by these dependency rules:
 
