@@ -15,6 +15,8 @@ dbd/
 
 # history of ioc's
 .iocsh_history
+# using sumo means configure/RELEASE should not be changed manually
+configure/RELEASE
 # rsync-dist
 version
 #epics env build during make after a make clean
