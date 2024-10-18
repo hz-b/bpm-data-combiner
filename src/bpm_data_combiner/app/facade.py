@@ -38,6 +38,7 @@ class ValidCommands(Enum):
     sync_stat = "sync_stat"
     # requesting data
     periodic = "periodic"
+    cfg_comp_median = "cfg_comp_median"
 
 
 
@@ -84,6 +85,8 @@ class Facade(FacadeInterface):
                 raise AssertionError(f"plane {plane} unknown")
         elif cmd == ValidCommands.sync_stat:
             return self.dev_status(dev_name, StatusField.synchronised, kwargs["sync_stat"])
+        elif cmd == ValidCommands.cfg_comp_median:
+            self.config.request_median_computation(kwargs["cfg_comp_median"])
         elif cmd == ValidCommands.periodic:
             self.periodic_trigger()
         elif cmd == ValidCommands.reset:
