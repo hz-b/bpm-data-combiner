@@ -16,6 +16,10 @@ class SynchronisationStatus(IntEnum):
 
 @dataclass
 class MonitoredDevice:
+    """Info on status of currently monitored device
+
+    update methods return if the all changed the internal state
+    """
     # identifier for the device
     name: str
     # planes can be enabled separately
@@ -38,7 +42,23 @@ class MonitoredDevice:
     def usable(self) ->  bool:
         return self.synchronised and self.active
 
-    def update_status(self, plane, status) -> bool:
+    def update_active(self, active: bool) -> bool:
+        if self.active == active:
+            return False
+        else:
+            self.active = active
+            return True
+        raise AssertionError("should not end up here")
+
+    def update_synchronised(self, sync_stat: SynchronisationStatus) -> bool:
+        if self.sync_stat == sync_stat:
+            return False
+        else:
+            self.sync_stat = sync_stat
+            return True
+        raise AssertionError("should not end up here")
+
+    def update_plane(self, plane: PlaneNames, status: bool) -> bool:
         """update status as required, return if update was needed"""
 
         plane = PlaneNames(plane)

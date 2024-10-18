@@ -65,7 +65,6 @@ class Accumulator:
         x_valid = np.array([~bpm_data.x.valid for bpm_data in collections])
         y_valid = np.array([~bpm_data.y.valid for bpm_data in collections])
 
-
         return BPMDataAccumulation(
             x=BPMDataAccumulationForPlane(values=x_values, valid=~x_valid),
             y=BPMDataAccumulationForPlane(values=y_values, valid=~y_valid),

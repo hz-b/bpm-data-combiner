@@ -2,7 +2,7 @@
 """
 from typing import Sequence, Tuple
 
-from .monitor_devices import MonitorDevices
+from .monitor_devices_status import MonitorDevicesStatus
 from .event import Event
 import numpy as np
 
@@ -14,7 +14,7 @@ def offset_from_median(data: Sequence[int]) -> Tuple[int, Sequence[int]]:
 
 
 class MonitorDeviceSynchronisation:
-    def __init__(self, monitored_devices : MonitorDevices):
+    def __init__(self, monitored_devices : MonitorDevicesStatus):
         self.dev_names = [dev_stat.name for _, dev_stat in monitored_devices.devices_status.items()]
         self.dev_index = {name: cnt for cnt, name in enumerate(self.dev_names)}
         # todo: how to initialse these indices

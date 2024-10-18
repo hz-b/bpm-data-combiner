@@ -15,7 +15,7 @@ from ..bl.command_round_buffer import CommandRoundBuffer
 from ..bl.dispatcher import DispatcherCollection
 from ..bl.event import Event
 from ..bl.logger import logger
-from ..bl.monitor_devices import MonitorDevices
+from ..bl.monitor_devices import MonitorDevicesStatus
 from ..bl.monitor_synchronisation import MonitorDeviceSynchronisation, offset_from_median
 from ..bl.preprocessor import PreProcessor
 from ..bl.statistics import compute_mean_weights_for_planes
@@ -43,7 +43,7 @@ print(f"Known devices {list(dev_name_index)}")
 #       I think  I would do it for the part of describing
 #       interaction of collection further down
 dispatcher_collection = DispatcherCollection()
-monitor_devices = MonitorDevices([MonitoredDevice(name) for name in dev_name_index])
+monitor_devices = MonitorDevicesStatus([MonitoredDevice(name) for name in dev_name_index])
 monitor_device_synchronisation = MonitorDeviceSynchronisation(monitored_devices=monitor_devices)
 def process_mon_sync(data):
     if config.do_median_computation:
@@ -132,22 +132,6 @@ def cb_periodic_update_accumulated_ready(cnt : Optional[int]):
 periodic_event = Event(name="periodic_update_2sec")
 periodic_event.add_subscriber(cb_periodic_update_accumulated_ready)
 # fmt:on
-
-
-def process_cnt(*, dev_name, cnt):
-    return dispatcher_collection.get_dispatcher(dev_name).new_reading(cnt)
-
-
-def process_x_val(*, dev_name, x):
-    return dispatcher_collection.get_dispatcher(dev_name).update_x_val(x)
-
-
-def process_y_val(*, dev_name, y):
-    return dispatcher_collection.get_dispatcher(dev_name).update_y_val(y)
-
-
-def process_chk_cnt(*, dev_name, ctl):
-    return dispatcher_collection.get_dispatcher(dev_name).update_check(ctl)
 
 
 def process_reading(*, dev_name, reading):
