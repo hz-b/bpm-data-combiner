@@ -7,6 +7,7 @@ import logging
 import pydev
 
 from bpm_data_combiner.app.main import update, facade
+
 # activate all devices first
 
 for name in facade.dev_name_index:
@@ -38,7 +39,7 @@ def test20_main_behaved():
     N = 3
     for cnt in range(N):
         for dev_name in list(facade.dev_name_index):
-            update(dev_name=dev_name, reading=[cnt, 2*cnt, -cnt])
+            update(dev_name=dev_name, reading=[cnt, 2 * cnt, -cnt])
 
     for cnt in range(N):
         readings = facade.collector.get_collection(cnt)
@@ -50,20 +51,21 @@ def test30_main_interleaving():
 
     cnt = 4
     for dev_name in facade.dev_name_index:
-        update(dev_name=dev_name, reading=[cnt, 2*cnt, -cnt])
+        update(dev_name=dev_name, reading=[cnt, 2 * cnt, -cnt])
 
     readings = facade.collector.get_collection(cnt)
     assert readings.is_ready()
 
+
 def test40_monitor_collector_interaction():
-    """Test that collector will give ready data if devices are makred a inacrtive
-    """
+    """Test that collector will give ready data if devices are makred a inacrtive"""
 
     for dev_name in facade.dev_name_index:
         # Make sure that all are active
         update(dev_name=dev_name, active=True)
 
     chk = 0
+
     def cnt_called(*args, **kwargs):
         nonlocal chk
         chk += 1
@@ -89,16 +91,15 @@ def test40_monitor_collector_interaction():
 
 
 def test50_reading_single_device_misbehaved():
-    """the first device sending second data set before first is finished
-    """
+    """the first device sending second data set before first is finished"""
     dev_names = list(facade.dev_name_index)
     # Todo: check that it also works for index 0!
     dev_name = dev_names[1]
     cnt = 5
-    update(dev_name=dev_name, reading=[cnt, 10*cnt, 100 * cnt])
+    update(dev_name=dev_name, reading=[cnt, 10 * cnt, 100 * cnt])
 
     with pytest.raises(AssertionError) as ae:
-        update(dev_name=dev_name, reading=[cnt, 10*cnt, 100 * cnt])
+        update(dev_name=dev_name, reading=[cnt, 10 * cnt, 100 * cnt])
 
 
 def test001_check_stats():
@@ -147,7 +148,7 @@ def run_performance():
     cmp_dly = ComputeDelay(dt=timedelta(milliseconds=100))
     N = 10
     counter = itertools.count()
-    L = len(dev_name_index)
+    L = len(facade.dev_name_index)
     while True:
         for i in range(N):
             delay = cmp_dly.get_delay().total_seconds()
@@ -159,16 +160,13 @@ def run_performance():
             cnt = next(counter)
             for dev_name in facade.dev_name_index:
                 try:
-                    update(dev_name=dev_name, cnt=cnt)
-                    update(dev_name=dev_name, x=cnt)
-                    update(dev_name=dev_name, y=-cnt)
-                    update(dev_name=dev_name, ctl=cnt)
+                    update(dev_name=dev_name, reading=[cnt, 2*cnt, -cnt])
                 except:
                     logger.error(f"{dev_name=}, {cnt=}")
                     raise
 
         for cnt in range(N):
-            readings = col.get_collection(cnt)
+            readings = facade.collector.get_collection(cnt)
             assert readings.is_ready()
 
 
