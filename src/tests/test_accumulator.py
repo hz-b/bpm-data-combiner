@@ -1,8 +1,13 @@
+"""
+Todo:
+    follow split up: accumulation and data processing as in code
+
+"""
 import pytest
 import numpy as np
 from bpm_data_combiner.bl.accumulator import Accumulator
 from bpm_data_combiner.data_model.bpm_data_reading import BPMReading
-from bpm_data_combiner.post_processor.combine import collection_to_bpm_data_collection
+from bpm_data_combiner.post_processor.combine import collection_to_bpm_data_collection, accumulated_collections_to_array
 from bpm_data_combiner.post_processor.statistics import compute_mean_weights_for_planes
 
 dev_names_index = {f"a_test_{cnt:d}": cnt for cnt in range(10)}
@@ -10,7 +15,7 @@ dev_names_index = {f"a_test_{cnt:d}": cnt for cnt in range(10)}
 
 def test_accumulator_empty():
     """exception raised if no data available"""
-    acc = Accumulator(dev_names_index)
+    acc = Accumulator()
 
     with pytest.raises(AssertionError):
         acc.get()
@@ -18,7 +23,7 @@ def test_accumulator_empty():
 
 def test_accumulator_add():
     """Simple data, all from same devices"""
-    acc = Accumulator(dev_names_index)
+    acc = Accumulator()
 
     n = 3
 
@@ -33,7 +38,7 @@ def test_accumulator_add():
         }
         acc.add(collection_to_bpm_data_collection(d, dev_names_index))
 
-    rc = acc.get()
+    rc = accumulated_collections_to_array(acc.get(), dev_names_index)
     assert (np.array(rc.names) == np.array(list(dev_names_index))).all()
     assert (rc.x.values == test_data).all()
     assert (rc.y.values == -test_data).all()
@@ -45,7 +50,7 @@ def test_accumulator_add():
 
 def test_accumulator_entry_missing():
     """Simple data, all from same devices"""
-    acc = Accumulator(dev_names_index)
+    acc = Accumulator()
 
     L = len(dev_names_index)
     indices = np.arange(1, L + 1)
@@ -65,7 +70,8 @@ def test_accumulator_entry_missing():
 
     indices = np.arange(1, L + 1)
 
-    rc = acc.get()
+
+    rc = accumulated_collections_to_array(acc.get(), dev_names_index)
     assert (rc.names == np.array(list(dev_names_index))).all()
     # (1/2 * n * (n + 1) ) / n
     ref_val = (len(indices) + 1) / 2
@@ -76,7 +82,7 @@ def test_accumulator_entry_missing():
 
 def test_accumulator_devices_always_missing():
     """Simple data, all from same devices"""
-    acc = Accumulator(dev_names_index)
+    acc = Accumulator()
 
     L = len(dev_names_index)
     selection = np.ones(len(dev_names_index), dtype=bool)
@@ -95,7 +101,7 @@ def test_accumulator_devices_always_missing():
         }
         acc.add(collection_to_bpm_data_collection(d, dev_names_index))
 
-    r = acc.get()
+    r = accumulated_collections_to_array(acc.get(), dev_names_index)
 
     for valid in [r.x.valid, r.y.valid]:
         assert valid.shape == (len(test_data), len(selection))

@@ -1,9 +1,10 @@
 from typing import Sequence, Dict
 
 import numpy as np
-from bpm_data_combiner.data_model.bpm_data_collection import BPMDataCollection, BPMDataCollectionPlane
-from bpm_data_combiner.data_model.bpm_data_reading import BPMReading
 from numpy import ma as ma
+from ..data_model.bpm_data_accumulation import BPMDataAccumulation, BPMDataAccumulationForPlane
+from ..data_model.bpm_data_collection import BPMDataCollection, BPMDataCollectionPlane
+from ..data_model.bpm_data_reading import BPMReading
 
 
 def _combine_collections_by_device_names(
@@ -50,4 +51,22 @@ def collection_to_bpm_data_collection(
         names=list(dev_names_index),
         # assuming to be the same for both planes
         cnt=reading.cnt,
+    )
+
+
+def accumulated_collections_to_array(collections, dev_names_index):
+    counts = np.zeros(len(collections), dtype=np.int64)
+    for row, bpm_data in enumerate(collections):
+        counts[row] = bpm_data.identifer
+
+    x_values = np.array([bpm_data.x.values for bpm_data in collections])
+    y_values = np.array([bpm_data.y.values for bpm_data in collections])
+    x_valid = np.array([~bpm_data.x.valid for bpm_data in collections])
+    y_valid = np.array([~bpm_data.y.valid for bpm_data in collections])
+
+    return BPMDataAccumulation(
+        x=BPMDataAccumulationForPlane(values=x_values, valid=~x_valid),
+        y=BPMDataAccumulationForPlane(values=y_values, valid=~y_valid),
+        names=list(dev_names_index),
+        counts=counts,
     )

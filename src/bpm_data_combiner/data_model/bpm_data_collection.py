@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Sequence
+from typing import Sequence, Hashable
 
 
 @dataclass
@@ -17,6 +17,9 @@ class BPMDataCollection:
     names : Sequence[str]
     cnt: int
 
+    @property
+    def identifer(self) -> Hashable:
+        return self.cnt
 
 @dataclass
 class BPMDataCollectionStatsPlane:

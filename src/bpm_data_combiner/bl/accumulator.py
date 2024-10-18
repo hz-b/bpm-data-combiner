@@ -2,12 +2,10 @@
 """
 import logging
 
-from ..data_model.bpm_data_accumulation import (
+from bpm_data_combiner.data_model.bpm_data_accumulation import (
     BPMDataAccumulation,
     BPMDataAccumulationForPlane,
 )
-from ..data_model.bpm_data_reading import BPMReading
-from .logger import logger
 
 from collections import deque
 import numpy as np
@@ -17,17 +15,16 @@ logger = logging.getLogger("bpm-data-combiner")
 
 
 class Accumulator:
-    def __init__(self, dev_names_index: Dict[str, int], max_entries: int = 100):
+    def __init__(self, max_entries: int = 100):
         # Need to know all dev_names
         # I am using pandas Index for looking up position and handling
         # filling data at correct place
-        self.dev_names_index = dev_names_index
         self.collections = None
         # so collections allocator are handled in a single place
         self.swap(check_collection_length=False)
         self.max_entries = max_entries
 
-    def add(self, col: Dict[str, BPMReading]):
+    def add(self, col: Dict[str, object]):
         logger.debug("Accumulator: adding collection!")
         self.collections.append(col)
         if len(self.collections) > self.max_entries:
@@ -54,19 +51,5 @@ class Accumulator:
             collections = self.swap()
         else:
             collections = self.collections
+        return collections
 
-        counts = np.zeros(len(collections), dtype=np.int64)
-        for row, bpm_data in enumerate(collections):
-            counts[row] = bpm_data.id_
-
-        x_values = np.array([bpm_data.x.values for bpm_data in collections])
-        y_values = np.array([bpm_data.y.values for bpm_data in collections])
-        x_valid = np.array([~bpm_data.x.valid for bpm_data in collections])
-        y_valid = np.array([~bpm_data.y.valid for bpm_data in collections])
-
-        return BPMDataAccumulation(
-            x=BPMDataAccumulationForPlane(values=x_values, valid=~x_valid),
-            y=BPMDataAccumulationForPlane(values=y_values, valid=~y_valid),
-            names=list(self.dev_names_index),
-            counts=counts,
-        )
