@@ -11,7 +11,7 @@ epicsEnvSet("LOCATION","Helmholtz Zentrum Berlin / BESSY II")
 
 epicsEnvSet("PREFIX","OrbCol")
 epicsEnvSet("REMOTE","")
-epicsEnvSet("PYTHONPATH","$(TOP)/src")
+epicsEnvSet("PYTHONPATH","$(TOP)/src:$(TOP)/src_collector")
 # epicsEnvSet("IOC_NAME","${IOC_NAME}")
 
 ## Register all support components

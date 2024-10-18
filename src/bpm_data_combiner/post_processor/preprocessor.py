@@ -1,12 +1,14 @@
 from typing import Sequence, Hashable, Mapping
 
-from ..data_model.bpm_data_reading import BPMReading, BPMReadingBeingProcessed
-from ..data_model.monitored_device import MonitoredDevice
+from bpm_data_combiner.data_model.bpm_data_reading import BPMReading, BPMReadingBeingProcessed
+from bpm_data_combiner.monitor_devices.data_model.monitored_device import MonitoredDevice
 
 
 class PreProcessor:
     """process received data before passed further down the line
 
+    Todo:
+        make it a function ... Facade helps to achieve that
     Warning:
         Assumes that the enable changes for planes x and y are
         changed in the object that this object references to

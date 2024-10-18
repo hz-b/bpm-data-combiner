@@ -1,5 +1,7 @@
 from dataclasses import dataclass
-from typing import Optional, Union
+from typing import Optional, Union, Hashable
+
+from collector import CollectionItemInterface
 
 
 @dataclass
@@ -20,7 +22,7 @@ class BPMReadingBeingProcessed:
 
 
 @dataclass(frozen=True)
-class BPMReading:
+class BPMReading(CollectionItemInterface):
     """Representation of one bpm reading"""
 
     # Separate class: make it clear to further processing
@@ -37,5 +39,12 @@ class BPMReading:
     y: Union[int, None]
     dev_name: str
 
+    @property
+    def identifier(self) -> Hashable:
+        return self.cnt
+
+    @property
+    def source(self) -> Hashable:
+        return self.dev_name
 
 __all__ = ["BPMReading"]
