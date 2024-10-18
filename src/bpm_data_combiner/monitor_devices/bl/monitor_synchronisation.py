@@ -5,8 +5,6 @@ from typing import Sequence, Tuple
 from bpm_data_combiner.monitor_devices.bl.monitor_devices_status import MonitorDevicesStatus
 import numpy as np
 
-from collector.bl.event import Event
-
 
 def offset_from_median(data: Sequence[int]) -> Tuple[int, Sequence[int]]:
     data = np.asarray(data)
@@ -20,8 +18,9 @@ class MonitorDeviceSynchronisation:
         self.dev_index = {name: cnt for cnt, name in enumerate(self.dev_names)}
         # todo: how to initialse these indices
         self.lact_indices = np.zeros(len(self.dev_names), np.int32)
-        self.on_new_index = Event(name="monitor-synchronisation-on-new-device")
 
     def add_new_count(self, dev_name, reading_index):
         self.lact_indices[self.dev_index[dev_name]] = reading_index
-        self.on_new_index.trigger(self.lact_indices)
+
+    def get_last_indices(self):
+        return self.lact_indices

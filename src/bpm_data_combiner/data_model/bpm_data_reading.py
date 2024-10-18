@@ -43,6 +43,7 @@ class BPMReading(CollectionItemInterface):
     def identifier(self) -> Hashable:
         return self.cnt
 
+    @property
     def source(self) -> Hashable:
         return self.dev_name
 

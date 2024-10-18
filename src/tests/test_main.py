@@ -4,10 +4,16 @@ import pytest
 from time import sleep
 from sys import stdout
 import logging
-
-from bpm_data_combiner.app.main import update, dev_name_index, col, acc_ready
-
 import pydev
+
+from bpm_data_combiner.app.main import update, facade
+# activate all devices first
+
+for name in facade.dev_name_index:
+    facade.dev_status(name, "enabled", True)
+    facade.dev_status(name, "active", True)
+    facade.dev_status(name, "synchronised", 2)
+
 
 logger = logging.getLogger("bpm-data-combiner")
 
@@ -15,11 +21,11 @@ logger = logging.getLogger("bpm-data-combiner")
 def test10_main_dev_monitor():
     # Reset the states
     update(dev_name=None, reset=True)
-    for dev_name in list(dev_name_index):
+    for dev_name in list(facade.dev_name_index):
         update(dev_name=dev_name, enabled=False, plane="x")
         update(dev_name=dev_name, enabled=False, plane="y")
 
-    for dev_name in list(dev_name_index):
+    for dev_name in list(facade.dev_name_index):
         update(dev_name=dev_name, enabled=True, plane="x")
         update(dev_name=dev_name, enabled=True, plane="y")
 
@@ -31,15 +37,11 @@ def test20_main_behaved():
 
     N = 3
     for cnt in range(N):
-        for dev_name in list(dev_name_index):
-            update(dev_name=dev_name, cnt=cnt)
-            update(dev_name=dev_name, x=cnt)
-            update(dev_name=dev_name, y=-cnt)
-            print(f"{dev_name=} {cnt=} ")
-            update(dev_name=dev_name, ctl=cnt)
+        for dev_name in list(facade.dev_name_index):
+            update(dev_name=dev_name, reading=[cnt, 2*cnt, -cnt])
 
     for cnt in range(N):
-        readings = col.get_collection(cnt)
+        readings = facade.collector.get_collection(cnt)
         assert readings.is_ready()
 
 
@@ -47,22 +49,17 @@ def test30_main_interleaving():
     """Test that data are combined if the data of the devices are interleaved"""
 
     cnt = 4
-    for dev_name in dev_name_index:
-        update(dev_name=dev_name, cnt=cnt)
-    for dev_name in dev_name_index:
-        update(dev_name=dev_name, x=cnt)
-        update(dev_name=dev_name, y=-cnt)
-    for dev_name in dev_name_index:
-        update(dev_name=dev_name, ctl=cnt)
+    for dev_name in facade.dev_name_index:
+        update(dev_name=dev_name, reading=[cnt, 2*cnt, -cnt])
 
-    readings = col.get_collection(cnt)
+    readings = facade.collector.get_collection(cnt)
     assert readings.is_ready()
 
 def test40_monitor_collector_interaction():
     """Test that collector will give ready data if devices are makred a inacrtive
     """
 
-    for dev_name in dev_name_index:
+    for dev_name in facade.dev_name_index:
         # Make sure that all are active
         update(dev_name=dev_name, active=True)
 
@@ -71,21 +68,17 @@ def test40_monitor_collector_interaction():
         nonlocal chk
         chk += 1
 
-    col.on_ready.add_subscriber(cnt_called)
+    facade.collector.on_ready.add_subscriber(cnt_called)
     # Send data properly
     def send_data(dev_name, cnt, val):
-        update(dev_name=dev_name, cnt=cnt)
-        update(dev_name=dev_name, x=val)
-        update(dev_name=dev_name, y=-val)
-        update(dev_name=dev_name, ctl=cnt)
+        update(dev_name=dev_name, reading=[cnt, val, -val])
 
-
-    for val, dev_name in enumerate(dev_name_index):
+    for val, dev_name in enumerate(facade.dev_name_index):
         send_data(dev_name, 42, val)
     # All data sent.. so this should be now 1, cb evaluated once
     assert chk == 1
 
-    dev_names = list(dev_name_index)
+    dev_names = list(facade.dev_name_index)
     update(dev_name=dev_names[0], active=False)
     for cnt, dev_name in enumerate(dev_names[1:]):
         send_data(dev_name, 23, cnt)
@@ -98,15 +91,14 @@ def test40_monitor_collector_interaction():
 def test50_reading_single_device_misbehaved():
     """the first device sending second data set before first is finished
     """
-    dev_names = list(dev_name_index)
-    dev_name = dev_names[0]
+    dev_names = list(facade.dev_name_index)
+    # Todo: check that it also works for index 0!
+    dev_name = dev_names[1]
     cnt = 5
-    update(dev_name=dev_name, cnt=cnt)
-    update(dev_name=dev_name, x=-10 * cnt)
-    update(dev_name=dev_name, y=-100 * cnt)
+    update(dev_name=dev_name, reading=[cnt, 10*cnt, 100 * cnt])
 
     with pytest.raises(AssertionError) as ae:
-        update(dev_name=dev_name, cnt=cnt + 1)
+        update(dev_name=dev_name, reading=[cnt, 10*cnt, 100 * cnt])
 
 
 def test001_check_stats():
@@ -115,20 +107,20 @@ def test001_check_stats():
     update(dev_name=None, reset=True)
 
     # ensure that all devices are active
-    for dev_name in list(dev_name_index):
+    for dev_name in list(facade.dev_name_index):
         update(dev_name=dev_name, active=True)
+        update(dev_name=dev_name, sync_stat=2)
+        update(dev_name=dev_name, enabled=True, plane="x")
+        update(dev_name=dev_name, enabled=True, plane="y")
 
     N = 3
     for cnt in range(N):
-        for dev_name in list(dev_name_index):
-            update(dev_name=dev_name, cnt=cnt)
-            update(dev_name=dev_name, x=cnt)
-            update(dev_name=dev_name, y=-cnt)
+        for dev_name in list(facade.dev_name_index):
+            update(dev_name=dev_name, reading=[cnt, cnt, -cnt])
             print(f"{dev_name=} {cnt=} ")
-            update(dev_name=dev_name, ctl=cnt)
 
     for cnt in range(N):
-        readings = col.get_collection(cnt)
+        readings = facade.collector.get_collection(cnt)
         assert readings.is_ready()
 
     update(dev_name=None, periodic=True)
@@ -165,7 +157,7 @@ def run_performance():
             sleep(delay)
 
             cnt = next(counter)
-            for dev_name in dev_name_index:
+            for dev_name in facade.dev_name_index:
                 try:
                     update(dev_name=dev_name, cnt=cnt)
                     update(dev_name=dev_name, x=cnt)
