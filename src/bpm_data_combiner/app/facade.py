@@ -1,6 +1,6 @@
 from typing import Sequence, Union
 
-from ..interfaces.monitor_devices_status import MonitorDevicesStatusInterface, StatusField
+from bpm_data_combiner.monitor_devices.interfaces.monitor_devices_status import MonitorDevicesStatusInterface, StatusField
 from ..interfaces.facade import FacadeInterface
 
 

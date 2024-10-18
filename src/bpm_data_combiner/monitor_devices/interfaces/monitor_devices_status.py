@@ -6,6 +6,8 @@ from ..data_model.monitored_device import SynchronisationStatus
 
 
 class StatusField(Enum):
+    #: both planes
+    enabled = "enabled"
     enabled_x = "enabled_x"
     enabled_y = "enabled_y"
     synchronised = "synchronised"

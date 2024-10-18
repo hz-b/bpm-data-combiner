@@ -1,7 +1,7 @@
 from abc import ABCMeta, abstractmethod
 from typing import Sequence, Union
 
-from bpm_data_combiner.interfaces.monitor_devices_status import StatusField
+from bpm_data_combiner.monitor_devices.interfaces.monitor_devices_status import StatusField
 
 
 class FacadeInterface(metaclass=ABCMeta):

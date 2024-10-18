@@ -6,7 +6,6 @@ Todo:
 
 
 from typing import Optional, Sequence, Mapping
-import sys
 
 from .command_context_manager import UpdateContext
 from ..bl.accumulator import Accumulator
@@ -16,7 +15,7 @@ from ..bl.dispatcher import DispatcherCollection
 from ..bl.event import Event
 from ..bl.logger import logger
 from ..bl.monitor_devices import MonitorDevicesStatus
-from ..bl.monitor_synchronisation import MonitorDeviceSynchronisation, offset_from_median
+from bpm_data_combiner.monitor_devices.bl.monitor_synchronisation import MonitorDeviceSynchronisation, offset_from_median
 from ..bl.preprocessor import PreProcessor
 from ..bl.statistics import compute_mean_weights_for_planes
 from ..data_model.bpm_data_reading import BPMReading
@@ -25,7 +24,6 @@ from ..data_model.command import Command
 from .config import Config
 from .view import Views
 from .known_devices import dev_names as _dev_names
-import numpy as np
 from datetime import datetime
 import sys
 

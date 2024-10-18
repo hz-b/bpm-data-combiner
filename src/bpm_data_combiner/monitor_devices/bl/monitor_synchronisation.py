@@ -2,7 +2,7 @@
 """
 from typing import Sequence, Tuple
 
-from .monitor_devices_status import MonitorDevicesStatus
+from bpm_data_combiner.monitor_devices.bl.monitor_devices_status import MonitorDevicesStatus
 from .event import Event
 import numpy as np
 
