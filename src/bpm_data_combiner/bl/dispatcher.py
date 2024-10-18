@@ -65,7 +65,7 @@ class Dispatcher:
             raise AssertionError(f"Reading {r} not ready")
 
         r = BPMReading(
-            cnt=self.reading.cnt,
+            cnt=self.reading.id_,
             x=self.reading.x,
             y=self.reading.y,
             dev_name=self.dev_name,

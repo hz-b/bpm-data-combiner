@@ -68,15 +68,15 @@ col = Collector(
 )
 # fmt:off
 def update_collection_number(r: ReadingsCollection):
-    logger.info("collector new readings collection with number %d", r.cnt)
+    logger.info("collector new readings collection with number %d", r.id_)
     # sys.stdout.write(f"collector new readings collection with number  {r.cnt}")
     # sys.stdout.flush()
-    views.collector.update(r.cnt)
+    views.collector.update(r.id_)
 col.on_new_collection.add_subscriber(update_collection_number)
 # fmt:on
 # preprocessor: set x or y to None if disabled
 dispatcher_collection.subscribe(
-    lambda reading: col.new_reading(preprocessor.preprocess(reading))
+    lambda reading: col.new_collection(preprocessor.preprocess(reading))
 )
 
 #: accumulate data above threshold
@@ -92,7 +92,7 @@ def cb(collection):
     # Here we need to use dev_names and not the active ones
     # I guss there should be an exporter
     for _, item in collection.items():
-        logger.debug("new ready collection %s", item.cnt)
+        logger.debug("new ready collection %s", item.id_)
         break
     data = collection_to_bpm_data_collection(collection, dev_name_index, default_value=0)
     logger.debug("adding data %s", data)
@@ -138,7 +138,7 @@ def process_reading(*, dev_name, reading):
     cnt, x, y = reading
     logger.debug(f"new reading for dev %s cnt %s", dev_name, cnt)
     monitor_device_synchronisation.add_new_count(dev_name, cnt)
-    return col.new_reading(
+    return col.new_collection(
         preprocessor.preprocess(BPMReading(dev_name=dev_name, x=x, y=y, cnt=cnt))
     )
 

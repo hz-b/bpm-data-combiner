@@ -1,7 +1,7 @@
 from typing import Sequence, Hashable, Mapping
 
-from ..data_model.bpm_data_reading import BPMReading, BPMReadingBeingProcessed
-from ..data_model.monitored_device import MonitoredDevice
+from bpm_data_combiner.data_model.bpm_data_reading import BPMReading, BPMReadingBeingProcessed
+from bpm_data_combiner.data_model.monitored_device import MonitoredDevice
 
 
 class PreProcessor:

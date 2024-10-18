@@ -58,7 +58,7 @@ class Accumulator:
 
         counts = np.zeros(len(collections), dtype=np.int64)
         for row, bpm_data in enumerate(collections):
-            counts[row] = bpm_data.cnt
+            counts[row] = bpm_data.id_
 
         x_values = np.array([bpm_data.x.values for bpm_data in collections])
         y_values = np.array([bpm_data.y.values for bpm_data in collections])

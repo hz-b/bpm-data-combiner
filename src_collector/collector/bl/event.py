@@ -4,8 +4,10 @@ Only allows subscription to the event
 """
 from typing import Sequence, Callable
 
+from ..interfaces.event import EventInterface
 
-class Event:
+
+class Event(EventInterface):
     """A single event managing subscribers
 
     The subscribers will be called when :method:`trigger` is called.

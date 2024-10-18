@@ -3,8 +3,8 @@ from numpy import ma
 # which numpy version supports that ?
 # from numpy.typing import ArrayLike
 
-from ..data_model.bpm_data_accumulation import BPMDataAccumulationForPlane, BPMDataAccumulation
-from ..data_model.bpm_data_collection import BPMDataCollectionStatsPlane, BPMDataCollectionStats
+from bpm_data_combiner.data_model.bpm_data_accumulation import BPMDataAccumulationForPlane, BPMDataAccumulation
+from bpm_data_combiner.data_model.bpm_data_collection import BPMDataCollectionStatsPlane, BPMDataCollectionStats
 
 def compute_weights_scaled(values#: ArrayLike,
                            ,*, n_readings: int): # -> ArrayLike:
