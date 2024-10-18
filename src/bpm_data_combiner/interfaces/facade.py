@@ -10,7 +10,7 @@ class FacadeInterface(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def dev_status(self, dev_name: str, field: StatusField, value: Union[bool|int]) -> bool:
+    def dev_status(self, dev_name: str, field: StatusField, value: Union[bool,int]) -> bool:
         """
         returns if the device status needed to be updated
         """
