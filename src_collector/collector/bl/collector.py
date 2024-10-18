@@ -16,7 +16,7 @@ from typing import Sequence, Hashable
 
 from ..bl.collection_for_one_id import CollectionForOneId
 from ..bl.event import Event
-from ..data_model.collection_item import CollectionItem
+from ..interfaces.collection_item import CollectionItemInterface
 from ..interfaces.collector import CollectorInterface
 
 
@@ -67,8 +67,8 @@ class Collector(CollectorInterface):
         assert col.active or col.ready
         return col
 
-    def new_collection(self, val: CollectionItem):
-        rc = self._get_collection(val.id_)
+    def new_collection(self, val: CollectionItemInterface):
+        rc = self._get_collection(val.identifier)
         rc.add_reading(val)
         if rc.ready:
             self.on_ready.trigger(rc.data())

@@ -7,7 +7,6 @@ from ..data_model.bpm_data_accumulation import (
     BPMDataAccumulationForPlane,
 )
 from ..data_model.bpm_data_reading import BPMReading
-from .collector import _combine_collections_by_device_names
 from .logger import logger
 
 from collections import deque

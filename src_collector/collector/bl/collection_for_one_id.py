@@ -1,6 +1,6 @@
 from typing import Sequence, Hashable, Dict
 import logging
-from ..data_model.collection_item import CollectionItem
+from collector.interfaces.collection_item import CollectionItemInterface
 from ..errors import UnknownDeviceNameError, DoubleSubmissionError
 from ..interfaces.collection_for_one_id import CollectionForOneIdInterface
 
@@ -33,7 +33,7 @@ class CollectionForOneId(CollectionForOneIdInterface):
         self._above_threshold = False
         self._is_active = True
 
-    def add_reading(self, item: CollectionItem):
+    def add_reading(self, item: CollectionItemInterface):
         """cmd.dev_name
 
         Todo: should disabled data be discarded?
@@ -56,7 +56,7 @@ class CollectionForOneId(CollectionForOneIdInterface):
         self.collection[name] = item
         self._ready, self._above_threshold = self.is_ready()
 
-    def data(self) -> Dict[str, CollectionItem]:
+    def data(self) -> Dict[str, CollectionItemInterface]:
         return self.collection
 
     def is_ready(self) -> (bool, bool):

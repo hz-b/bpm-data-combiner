@@ -1,9 +1,9 @@
 import pytest
 import numpy as np
 from bpm_data_combiner.bl.accumulator import Accumulator
-from bpm_data_combiner.bl.collector import collection_to_bpm_data_collection
-from bpm_data_combiner.bl.statistics import compute_mean_weights_for_planes
 from bpm_data_combiner.data_model.bpm_data_reading import BPMReading
+from bpm_data_combiner.post_processor.combine import collection_to_bpm_data_collection
+from bpm_data_combiner.post_processor.statistics import compute_mean_weights_for_planes
 
 dev_names_index = {f"a_test_{cnt:d}": cnt for cnt in range(10)}
 
