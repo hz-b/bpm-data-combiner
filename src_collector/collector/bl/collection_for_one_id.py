@@ -16,29 +16,29 @@ class CollectionForOneId(CollectionForOneIdInterface):
     def __init__(
         self,
         *,
-        device_names: Sequence[str],
+        source_names: Sequence[str],
         threshold: int = None,
         id: Hashable,
     ):
         self.collection = dict()
-        self.device_names = set(device_names)
+        self.device_names = set(source_names)
         # for debug purposes
         self.id = id
 
         if threshold is None:
-            threshold = max(1, len(device_names) // 2)
+            threshold = max(1, len(source_names) // 2)
         self.threshold = threshold
 
         self._ready = False
         self._above_threshold = False
         self._is_active = True
 
-    def add_reading(self, item: CollectionItemInterface):
+    def add_item(self, item: CollectionItemInterface):
         """cmd.dev_name
 
         Todo: should disabled data be discarded?
         """
-        name = item.name
+        name = item.source
         # data from known / expected device
         if name not in self.device_names:
             logger.info(

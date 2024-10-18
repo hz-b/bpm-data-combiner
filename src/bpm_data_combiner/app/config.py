@@ -1,4 +1,4 @@
-from ..bl.event import Event
+from collector.bl.event import Event
 
 
 class Config:

@@ -7,23 +7,24 @@ Todo:
 
 from typing import Optional, Sequence, Mapping
 
+from bpm_data_combiner.monitor_devices.bl.monitor_devices_status import MonitorDevicesStatus
+from bpm_data_combiner.monitor_devices.data_model.monitored_device import MonitoredDevice
+from bpm_data_combiner.post_processor.combine import collection_to_bpm_data_collection
+from bpm_data_combiner.post_processor.preprocessor import PreProcessor
+from bpm_data_combiner.post_processor.statistics import compute_mean_weights_for_planes
+
+from collector import Collector
+from collector.bl.event import Event
 from .command_context_manager import UpdateContext
 from ..bl.accumulator import Accumulator
-from ..bl.collector import Collector, ReadingsCollection, collection_to_bpm_data_collection
 from ..bl.command_round_buffer import CommandRoundBuffer
-from ..bl.dispatcher import DispatcherCollection
-from ..bl.event import Event
 from ..bl.logger import logger
-from ..bl.monitor_devices import MonitorDevicesStatus
 from bpm_data_combiner.monitor_devices.bl.monitor_synchronisation import MonitorDeviceSynchronisation, offset_from_median
-from ..bl.preprocessor import PreProcessor
-from ..bl.statistics import compute_mean_weights_for_planes
 from ..data_model.bpm_data_reading import BPMReading
-from ..data_model.monitored_device import MonitoredDevice
 from ..data_model.command import Command
 from .config import Config
+from .known_devices import dev_names_bessyii as _dev_names
 from .view import Views
-from .known_devices import dev_names as _dev_names
 from datetime import datetime
 import sys
 
@@ -40,7 +41,7 @@ print(f"Known devices {list(dev_name_index)}")
 # ToDo: would a proper message bus simplify the code
 #       I think  I would do it for the part of describing
 #       interaction of collection further down
-dispatcher_collection = DispatcherCollection()
+
 monitor_devices = MonitorDevicesStatus([MonitoredDevice(name) for name in dev_name_index])
 monitor_device_synchronisation = MonitorDeviceSynchronisation(monitored_devices=monitor_devices)
 def process_mon_sync(data):
@@ -74,7 +75,7 @@ col.on_new_collection.add_subscriber(update_collection_number)
 # fmt:on
 # preprocessor: set x or y to None if disabled
 dispatcher_collection.subscribe(
-    lambda reading: col.new_collection(preprocessor.preprocess(reading))
+    lambda reading: col.new_item(preprocessor.preprocess(reading))
 )
 
 #: accumulate data above threshold
@@ -101,28 +102,13 @@ col.on_ready.add_subscriber(cb)
 # fmt:on
 
 
-# fmt:off
-def cb(names):
-    logger.debug("Monitoring devices, active ones: %s", names)
-    views.monitor_bpms.update(
-        names=[ds.name for _, ds in monitor_devices.devices_status.items()],
-        active=[ds.active for _, ds in monitor_devices.devices_status.items()],
-        synchronised=[ds.synchronised for _, ds in monitor_devices.devices_status.items()],
-        usable=[ds.usable for _, ds in monitor_devices.devices_status.items()],
-    )
-monitor_devices.on_status_change.add_subscriber(cb)
-# fmt:on
+
 
 
 # fmt:off
 def cb_periodic_update_accumulated_ready(cnt : Optional[int]):
     """
     """
-    stat_data = compute_mean_weights_for_planes(acc_ready.get())
-    views.periodic_data.update(stat_data)
-    logger.debug("pushing stat data to bdata_view")
-    views.bdata.update(stat_data)
-    logger.debug("pushing stat data to bdata_view done")
 
 # could do that directly too ... but appetite comes with eating
 # so let's have a common point to see what all shall be processed
@@ -136,7 +122,7 @@ def process_reading(*, dev_name, reading):
     cnt, x, y = reading
     logger.debug(f"new reading for dev %s cnt %s", dev_name, cnt)
     monitor_device_synchronisation.add_new_count(dev_name, cnt)
-    return col.new_collection(
+    return col.new_item(
         preprocessor.preprocess(BPMReading(dev_name=dev_name, x=x, y=y, cnt=cnt))
     )
 
@@ -172,10 +158,6 @@ def process_compute_median(*, dev_name, cfg_comp_median):
 
 cmds = dict(
     # handling a single reading
-    cnt=process_cnt,
-    x=process_x_val,
-    y=process_y_val,
-    ctl=process_chk_cnt,
     # handling device status monitoring
     enabled=process_enabled,
     active=process_active,

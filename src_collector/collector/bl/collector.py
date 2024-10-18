@@ -16,9 +16,9 @@ from typing import Sequence, Hashable
 
 from ..bl.collection_for_one_id import CollectionForOneId
 from ..bl.event import Event
+from ..interfaces.collection_for_one_id import CollectionForOneIdInterface
 from ..interfaces.collection_item import CollectionItemInterface
 from ..interfaces.collector import CollectorInterface
-
 
 
 class Collector(CollectorInterface):
@@ -43,13 +43,12 @@ class Collector(CollectorInterface):
     ):
         self._device_names = devices_names
         self.on_new_collection = Event(name="on_new_collection")
-        self.on_above_threshold = Event(name="reading_collection_on_threshold")
         self.on_ready = Event(name="reading_collection_on_ready")
 
         @functools.lru_cache(maxsize=max_collections)
-        def _get_collection(cnt: Hashable):
+        def _get_collection(cnt: Hashable) -> CollectionForOneIdInterface:
             r = CollectionForOneId(
-                device_names=self.device_names,
+                source_names=self.device_names,
                 threshold=threshold,
                 id=cnt,
             )
@@ -67,13 +66,11 @@ class Collector(CollectorInterface):
         assert col.active or col.ready
         return col
 
-    def new_collection(self, val: CollectionItemInterface):
+    def new_item(self, val: CollectionItemInterface):
         rc = self._get_collection(val.identifier)
-        rc.add_reading(val)
+        rc.add_item(val)
         if rc.ready:
             self.on_ready.trigger(rc.data())
-        if rc.above_threshold:
-            self.on_above_threshold.trigger(rc.data())
 
     @property
     def device_names(self):

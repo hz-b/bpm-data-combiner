@@ -3,8 +3,9 @@
 from typing import Sequence, Tuple
 
 from bpm_data_combiner.monitor_devices.bl.monitor_devices_status import MonitorDevicesStatus
-from .event import Event
 import numpy as np
+
+from collector.bl.event import Event
 
 
 def offset_from_median(data: Sequence[int]) -> Tuple[int, Sequence[int]]:

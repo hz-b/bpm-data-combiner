@@ -1,6 +1,6 @@
 from abc import ABCMeta, abstractmethod
 from enum import Enum
-from typing import Union
+from typing import Union, Sequence
 
 from ..data_model.monitored_device import SynchronisationStatus
 
@@ -40,3 +40,8 @@ class MonitorDevicesStatusInterface(metaclass=ABCMeta):
         """
         pass
 
+    @abstractmethod
+    def get_devicenames(self) -> Sequence[str]:
+        """names of currently usable devices
+        """
+        pass
