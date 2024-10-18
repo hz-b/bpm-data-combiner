@@ -2,7 +2,7 @@ from typing import Sequence, Hashable, Dict
 import logging
 from ..data_model.collection_item import CollectionItem
 from ..errors import UnknownDeviceNameError, DoubleSubmissionError
-from ..interfaces.colletion_for_one_id import CollectionForOneIdInterface
+from ..interfaces.collection_for_one_id import CollectionForOneIdInterface
 
 logger = logging.getLogger("combiner")
 
