@@ -21,7 +21,7 @@ class CollectionForOneId(CollectionForOneIdInterface):
         id: Hashable,
     ):
         self.collection = dict()
-        self.device_names = set(source_names)
+        self.source_names = set(source_names)
         # for debug purposes
         self.id = id
 
@@ -40,10 +40,10 @@ class CollectionForOneId(CollectionForOneIdInterface):
         """
         name = item.source
         # data from known / expected device
-        if name not in self.device_names:
+        if name not in self.source_names:
             logger.info(
                 "Collector: expecting following device names %s; unknown name %s",
-                self.device_names,
+                self.source_names,
                 name,
             )
             raise UnknownDeviceNameError(f"Unknown or unusable device {name}")
@@ -61,7 +61,7 @@ class CollectionForOneId(CollectionForOneIdInterface):
 
     def is_ready(self) -> (bool, bool):
         """Compare to device list and see if all names are in"""
-        L = len(self.device_names.difference(self.collection.keys()))
+        L = len(self.source_names.difference(self.collection.keys()))
         return L == 0, L < self.threshold
 
     @property
