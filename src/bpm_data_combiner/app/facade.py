@@ -43,24 +43,33 @@ class ValidCommands(Enum):
 
 
 class Facade(FacadeInterface):
-    def __init__(self, *, prefix="OrbCol", device_names=Sequence[str]):
-        self.dev_name_index = {name: idx for idx, name in enumerate(device_names)}
+    def __init__(self, *, prefix="OrbCol"):
         self.config = Config()
-        self.monitor_devices = MonitorDevicesStatus(
-            [MonitoredDevice(name) for name in self.dev_name_index]
-        )
+        self.accumulator = Accumulator()
+
+        self.views = Views(prefix="prefix")
+
+        # These need to know which devices are available
+        # initalise with empty
+        self.monitor_devices = MonitorDevicesStatus()
+        self.dev_name_index = dict()
+
+        # These need to know which devices are usable
         self.monitor_device_synchronisation = MonitorDeviceSynchronisation(
             monitored_devices=self.monitor_devices
         )
-        self.collector = Collector(devices_names=self.monitor_devices.get_devicenames())
-        self.accumulator = Accumulator()
-        # Why does it need it always? I think it can be only a function now
+
+        self.collector = Collector(devices_names=self.monitor_devices.get_device_names())
+        # todo: see self._on_new_collection_ready()
+        self.collector.on_ready.add_subscriber(self._on_new_collection_ready)
+        # Todo: make it a function and move it to on_collection_ready
         self.preprocessor = PreProcessor(
             devices_status=self.monitor_devices.devices_status
         )
 
-        self.collector.on_ready.add_subscriber(self._on_new_collection_ready)
-        self.views = Views(prefix="prefix")
+    def set_device_names(self, device_names=Sequence[str]):
+        self.dev_name_index = {name: idx for idx, name in enumerate(device_names)}
+        self.monitor_devices.set_device_names(device_names)
 
     def update(self, *, cmd, dev_name, tpro, **kwargs):
         cmd = ValidCommands(cmd)
@@ -101,6 +110,8 @@ class Facade(FacadeInterface):
     def new_value(self, dev_name: str, value: Sequence[int]):
         cnt, x, y = value
         # when the one collection is ready it
+        # Todo: evaluate if a collection is ready
+        #       if so trigger self._on_new_collection_ready()
         self.collector.new_item(BPMReading(cnt=cnt, x=x, y=y, dev_name=dev_name))
         if self.config.do_median_computation:
             self.monitor_device_synchronisation.add_new_count(dev_name, cnt)
@@ -130,10 +141,11 @@ class Facade(FacadeInterface):
         )
         self.accumulator.add(data)
         self.views.ready_data.update(data)
+        # Todo: add preprocessor step
 
     def _on_device_status_changed(self):
         # collector needs to know which devices are active
-        dev_names = self.monitor_devices.get_devicenames()
+        dev_names = self.monitor_devices.get_device_names()
         # needs to know which are active
         self.collector.device_names = dev_names
         # needs to know which are active

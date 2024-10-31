@@ -6,10 +6,15 @@ from bpm_data_combiner.monitor_devices.interfaces.monitor_devices_status import 
 
 class MonitorDevicesStatus(MonitorDevicesStatusInterface):
 
-    def __init__(self, devices_status: Sequence[MonitoredDevice]):
-        self.devices_status = {dev.name: dev for dev in devices_status}
+    def __init__(self, device_names : Sequence[str] = None):
+        self.devices_status = None
+        _dn = device_names or []
+        self.set_device_names(_dn)
 
-    def get_devicenames(self) -> Sequence[str]:
+    def set_device_names(self, device_names : Sequence[str]):
+        self.devices_status = {name: MonitoredDevice(name) for name in device_names}
+
+    def get_device_names(self) -> Sequence[str]:
         """
 
         Todo:

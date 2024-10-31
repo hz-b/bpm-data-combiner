@@ -14,7 +14,8 @@ from .known_devices import dev_names_bessyii as dev_names
 
 stream = sys.stdout
 
-facade = Facade(device_names=dev_names)
+facade = Facade()
+facade.set_device_names(device_names=dev_names)
 rbuffer = CommandRoundBuffer(maxsize=50)
 
 
