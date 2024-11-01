@@ -10,12 +10,10 @@ from ..bl.command_round_buffer import CommandRoundBuffer
 from ..data_model.command import Command
 from .command_context_manager import UpdateContext
 from .facade import Facade, logger
-from .known_devices import dev_names_bessyii as dev_names
 
 stream = sys.stdout
 
 facade = Facade()
-facade.set_device_names(device_names=dev_names)
 rbuffer = CommandRoundBuffer(maxsize=50)
 
 

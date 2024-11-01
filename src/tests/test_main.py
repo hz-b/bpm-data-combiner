@@ -7,7 +7,9 @@ import logging
 import pydev
 
 from bpm_data_combiner.app.main import update, facade
+from known_devices import dev_names_bessyii as dev_names
 
+facade.set_device_names(device_names=dev_names)
 # activate all devices first
 
 for name in facade.dev_name_index:
