@@ -4,23 +4,6 @@ from typing import Optional, Union, Hashable
 from collector import CollectionItemInterface
 
 
-@dataclass
-class BPMReadingBeingProcessed:
-    """don't use this class use :class:`BPMReading` instead"""
-
-    #: time count: 0.1 s since device epoc
-    #: i.e. since it was last triggered to synchronise
-    cnt: int
-    dev_name : str
-    #: x position in nano meter
-    x: Optional[int] = None
-    #: y position in nano meter
-    y: Optional[int] = None
-
-    def ready(self, chk_cnt):
-        return self.x is not None and self.y is not None and self.cnt == chk_cnt
-
-
 @dataclass(frozen=True)
 class BPMReading(CollectionItemInterface):
     """Representation of one bpm reading"""
@@ -46,5 +29,6 @@ class BPMReading(CollectionItemInterface):
     @property
     def source(self) -> Hashable:
         return self.dev_name
+
 
 __all__ = ["BPMReading"]
