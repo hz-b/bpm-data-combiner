@@ -59,9 +59,12 @@ class CollectionForOneId(CollectionForOneIdInterface):
     def data(self) -> Dict[str, CollectionItemInterface]:
         return self.collection
 
+    def sources_missing(self):
+        return self.source_names.difference(self.collection.keys())
+
     def is_ready(self) -> (bool, bool):
         """Compare to device list and see if all names are in"""
-        L = len(self.source_names.difference(self.collection.keys()))
+        L = len(self.sources_missing())
         return L == 0, L < self.threshold
 
     @property
@@ -82,3 +85,12 @@ class CollectionForOneId(CollectionForOneIdInterface):
             check if it should be removed
         """
         return not self.ready
+
+    def __repr__(self):
+        return (
+            f"{self.__class__.__name__}("
+                f"id={self.id},"
+                f" ready={self.ready},"
+                f" sources_missing={self.sources_missing()}"
+            ")"
+        )

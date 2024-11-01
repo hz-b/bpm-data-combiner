@@ -52,12 +52,14 @@ class Collector(CollectorInterface):
             return r
 
         self._get_collection = _get_collection
+        self.last_cnt = None
 
     def reset(self):
         self._get_collection.cache_clear()
 
     def get_collection(self, cnt: Hashable):
         col = self._get_collection(cnt)
+        self.last_cnt = cnt
         #: todo: I think this is always true
         assert col.active or col.ready
         return col
@@ -79,3 +81,11 @@ class Collector(CollectorInterface):
     @device_names.setter
     def device_names(self, device_names: Sequence[str]):
         self._device_names = device_names
+
+    def __repr__(self):
+        return (
+            f"{self.__class__.__name__}("
+                f"device_names={self.device_names},"
+                f" last_cnt={self.last_cnt}"
+            ")"
+        )

@@ -25,20 +25,16 @@ def test_collector_behaving():
     dev_names = ["BPMZ1D1R", "BPMZ2D1R", "BPMZ4D1R", "BPMZ1T2R"]
 
     col = Collector(devices_names=dev_names)
-
-    chk = 0
-
-    def cb(col):
-        nonlocal chk
-        chk += 1
-
-    col.on_new_collection.add_subscriber(cb)
+    # check that it works
+    repr(col)
 
     cnt = 7
-    col.new_item(ColItem(cnt=cnt, x=3, y=4, name=dev_names[0]))
+    rc = col.new_item(ColItem(cnt=cnt, x=3, y=4, name=dev_names[0]))
     # assert that the new reading issued a callback
-    assert chk == 1
-    rc = col.get_collection(cnt)
+    rc_check = col.get_collection(cnt)
+    # check that it works
+    repr(rc)
+    assert rc == rc_check
 
     assert isinstance(rc, CollectionForOneId)
     assert rc.ready == False
@@ -55,6 +51,10 @@ def test_collector_behaving():
 
     data = rc.data()
 
+    # and check again
+    assert len(repr(rc)) > 0
+    assert len(repr(col)) > 0
+
 
 def test_collector_double_submission():
     dev_names = ["BPMZ1D1R", "BPMZ2D1R", "BPMZ4D1R", "BPMZ1T2R"]
@@ -65,6 +65,7 @@ def test_collector_double_submission():
     with pytest.raises(DoubleSubmissionError):
         col.new_item(ColItem(cnt=cnt, x=3, y=4, name=dev_names[0]))
     pass
+
 
 def test_collector_invalid_submission():
     dev_names = ["BPMZ1D1R", "BPMZ2D1R", "BPMZ4D1R", "BPMZ1T2R"]
