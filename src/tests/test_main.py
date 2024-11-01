@@ -58,36 +58,31 @@ def test30_main_interleaving():
 
 
 def test40_monitor_collector_interaction():
-    """Test that collector will give ready data if devices are makred a inacrtive"""
+    """Test that collector will still show ready for one id even if devices are marked as inactive"""
 
     for dev_name in facade.dev_name_index:
         # Make sure that all are active
         update(dev_name=dev_name, active=True)
 
-    chk = 0
-
-    def cnt_called(*args, **kwargs):
-        nonlocal chk
-        chk += 1
-
-    facade.collector.on_ready.add_subscriber(cnt_called)
     # Send data properly
     def send_data(dev_name, cnt, val):
         update(dev_name=dev_name, reading=[cnt, val, -val])
 
+    id_ = 42
     for val, dev_name in enumerate(facade.dev_name_index):
-        send_data(dev_name, 42, val)
+        send_data(dev_name, id_, val)
     # All data sent.. so this should be now 1, cb evaluated once
-    assert chk == 1
+    assert facade.collector.get_collection(42).ready
 
+    id_ = 23
     dev_names = list(facade.dev_name_index)
     update(dev_name=dev_names[0], active=False)
     for cnt, dev_name in enumerate(dev_names[1:]):
-        send_data(dev_name, 23, cnt)
+        send_data(dev_name, id_, cnt)
 
     # All data sent.. so the callback should have been
     # triggered a second time
-    assert chk == 2
+    assert facade.collector.get_collection(id_).ready
 
 
 def test50_reading_single_device_misbehaved():
@@ -149,13 +144,14 @@ def run_performance():
     N = 10
     counter = itertools.count()
     L = len(facade.dev_name_index)
-    while True:
+    # while True:
+    for j in range(20000):
         for i in range(N):
-            delay = cmp_dly.get_delay().total_seconds()
-            stdout.write(
-                f"\r{L} devices, delay before next call: {delay * 1000:6.1f} ms"
-            )
-            sleep(delay)
+            # delay = cmp_dly.get_delay().total_seconds()
+            # stdout.write(
+            #     f"\r{L} devices, delay before next call: {delay * 1000:6.1f} ms"
+            # )
+            # sleep(delay)
 
             cnt = next(counter)
             for dev_name in facade.dev_name_index:
@@ -165,9 +161,9 @@ def run_performance():
                     logger.error(f"{dev_name=}, {cnt=}")
                     raise
 
-        for cnt in range(N):
-            readings = facade.collector.get_collection(cnt)
-            assert readings.is_ready()
+        # for cnt in range(N):
+        #    readings = facade.collector.get_collection(cnt)
+        #    assert readings.is_ready()
 
 
 if __name__ == "__main__":

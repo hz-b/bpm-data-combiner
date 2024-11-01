@@ -60,8 +60,6 @@ class Facade(FacadeInterface):
         )
 
         self.collector = Collector(devices_names=self.monitor_devices.get_device_names())
-        # todo: see self._on_new_collection_ready()
-        self.collector.on_ready.add_subscriber(self._on_new_collection_ready)
         # Todo: make it a function and move it to on_collection_ready
         self.preprocessor = PreProcessor(
             devices_status=self.monitor_devices.devices_status
@@ -112,7 +110,9 @@ class Facade(FacadeInterface):
         # when the one collection is ready it
         # Todo: evaluate if a collection is ready
         #       if so trigger self._on_new_collection_ready()
-        self.collector.new_item(BPMReading(cnt=cnt, x=x, y=y, dev_name=dev_name))
+        collection = self.collector.new_item(BPMReading(cnt=cnt, x=x, y=y, dev_name=dev_name))
+        if collection.ready:
+            self._on_new_collection_ready(collection.data())
         if self.config.do_median_computation:
             self.monitor_device_synchronisation.add_new_count(dev_name, cnt)
             self.compute_show_median()

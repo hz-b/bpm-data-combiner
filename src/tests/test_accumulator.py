@@ -40,8 +40,8 @@ def test_accumulator_add():
 
     rc = accumulated_collections_to_array(acc.get(), dev_names_index)
     assert (np.array(rc.names) == np.array(list(dev_names_index))).all()
-    assert (rc.x.values == test_data).all()
-    assert (rc.y.values == -test_data).all()
+    assert (rc.x.values.astype(int) == test_data).all()
+    assert (rc.y.values.astype(int) == -test_data).all()
 
     # check stats too
     # (1/2 * n * (n + 1) ) / n

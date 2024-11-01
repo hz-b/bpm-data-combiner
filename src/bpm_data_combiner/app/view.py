@@ -4,6 +4,7 @@ from ..bl.logger import logger
 from ..data_model.bpm_data_collection import BPMDataCollection, BPMDataCollectionStats
 
 import pydev
+pydev_supports_sequence = True
 
 import sys
 stream = sys.stdout
@@ -63,26 +64,23 @@ class ViewBPMDataCollection:
             # need to ensure that new data are only set when these changed
             label = f"{self.prefix}:{suffix}:valid"
             # arrays seem not yet to be supported by PyDevice
-            vals = [int(v) for v in var.valid]
+            if pydev_supports_sequence:
+                vals = var.valid.astype(int)
+            else:
+                vals = [int(v) for v in var.valid]
             logger.debug("Update label %s, values %s", label, vals)
             pydev.iointr(label, vals)
-            stream.write("Update label %s, len(vals)=%s\n" %(label, len(vals)))
-            stream.flush()
-
-            # How to treat masked values?
-            values = var.values
-            if not (~values.mask).all():
-                # unmaks them and assume that the default value
-                # will tell the user something is wrong
-                # furthermore there is still the mask
-                values = values.copy()
-                values.mask = False
+            # stream.write("Update label %s, len(vals)=%s\n" %(label, len(vals)))
+            # stream.flush()
 
             label = f"{self.prefix}:{suffix}:values"
             # Todo: check if the conversion is still required given that
             # PyDevice seems not support array.
             # Todo: find out why.
-            values = [int(v) for v in values]
+            if pydev_supports_sequence:
+                values = var.values.astype(int)
+            else:
+                values = [int(v) for v in values]
             logger.debug("Update label %s, values %s", label, values)
             pydev.iointr(label, values)
 
@@ -91,6 +89,9 @@ class ViewBPMDataCollection:
         logger.debug("Update label=%s, cnt=%s type %s", label, cnt, type(cnt))
         pydev.iointr(label, cnt)
 
+        # Todo: avoid to publish names at every turn
+        #
+        return
         label = self.prefix + ":names"
         names_byte_encoded = string_array_to_bytes(data.names)
         logger.debug("Update label=%s, names=%s", label, names_byte_encoded)
