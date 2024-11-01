@@ -12,7 +12,7 @@ from bpm_data_combiner.monitor_devices.data_model.monitored_device import (
 
 from ..bl.accumulator import Accumulator
 from ..data_model.bpm_data_reading import BPMReading
-from ..interfaces.facade import FacadeInterface
+from ..interfaces.controller import ControllerInterface
 from ..monitor_devices.bl.monitor_devices_status import MonitorDevicesStatus
 from ..monitor_devices.interfaces.monitor_devices_status import (
     MonitorDevicesStatusInterface,
@@ -43,7 +43,7 @@ class ValidCommands(Enum):
 
 
 
-class Facade(FacadeInterface):
+class Controller(ControllerInterface):
     def __init__(self, *, prefix="OrbCol"):
         self.config = Config()
         self.accumulator = Accumulator()

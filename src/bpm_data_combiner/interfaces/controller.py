@@ -4,7 +4,7 @@ from typing import Sequence, Union
 from bpm_data_combiner.monitor_devices.interfaces.monitor_devices_status import StatusField
 
 
-class FacadeInterface(metaclass=ABCMeta):
+class ControllerInterface(metaclass=ABCMeta):
     @abstractmethod
     def new_value(self, dev_name: str, value: Sequence[float]):
         pass
