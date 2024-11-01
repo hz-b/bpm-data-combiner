@@ -39,6 +39,7 @@ class ValidCommands(Enum):
     # requesting data
     periodic = "periodic"
     cfg_comp_median = "cfg_comp_median"
+    known_device_names = "known_device_names"
 
 
 
@@ -69,7 +70,17 @@ class Facade(FacadeInterface):
         self.dev_name_index = {name: idx for idx, name in enumerate(device_names)}
         self.monitor_devices.set_device_names(device_names)
 
-    def update(self, *, cmd, dev_name, tpro, **kwargs):
+    def update(self, *, dev_name, tpro=False, **kwargs):
+        """
+
+        compatible to main.update facilitates testing
+        """
+        # extraction of command from kwargs should be the sole
+        # code duplication to main.update
+        cmd = next(iter(kwargs))
+        self._update(cmd=cmd, dev_name=dev_name, tpro=tpro, **kwargs)
+
+    def _update(self, *, cmd, dev_name, tpro, **kwargs):
         cmd = ValidCommands(cmd)
         if cmd == ValidCommands.reading:
             return self.new_value(dev_name=dev_name, value=kwargs["reading"])
@@ -92,6 +103,8 @@ class Facade(FacadeInterface):
                 raise AssertionError(f"plane {plane} unknown")
         elif cmd == ValidCommands.sync_stat:
             return self.dev_status(dev_name, StatusField.synchronised, kwargs["sync_stat"])
+        elif cmd == ValidCommands.known_device_names:
+            return self.set_device_names(device_names=kwargs["known_device_names"])
         elif cmd == ValidCommands.cfg_comp_median:
             self.config.request_median_computation(kwargs["cfg_comp_median"])
         elif cmd == ValidCommands.periodic:
