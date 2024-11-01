@@ -15,7 +15,6 @@ import functools
 from typing import Sequence, Hashable
 
 from ..bl.collection_for_one_id import CollectionForOneId
-from ..bl.event import Event
 from ..interfaces.collection_for_one_id import CollectionForOneIdInterface
 from ..interfaces.collection_item import CollectionItemInterface
 from ..interfaces.collector import CollectorInterface
@@ -42,8 +41,6 @@ class Collector(CollectorInterface):
         max_collections: int = 50,
     ):
         self._device_names = devices_names
-        self.on_new_collection = Event(name="on_new_collection")
-        self.on_ready = Event(name="reading_collection_on_ready")
 
         @functools.lru_cache(maxsize=max_collections)
         def _get_collection(cnt: Hashable) -> CollectionForOneIdInterface:
@@ -52,7 +49,6 @@ class Collector(CollectorInterface):
                 threshold=threshold,
                 id=cnt,
             )
-            self.on_new_collection.trigger(r)
             return r
 
         self._get_collection = _get_collection
@@ -66,11 +62,15 @@ class Collector(CollectorInterface):
         assert col.active or col.ready
         return col
 
-    def new_item(self, val: CollectionItemInterface):
+    def new_item(self, val: CollectionItemInterface) -> CollectionForOneIdInterface:
+        """
+
+        Returns:
+            collection for this identifer: user can check if it is ready or not
+        """
         rc = self._get_collection(val.identifier)
         rc.add_item(val)
-        if rc.ready:
-            self.on_ready.trigger(rc.data())
+        return rc
 
     @property
     def device_names(self):
