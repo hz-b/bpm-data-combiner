@@ -8,11 +8,13 @@ Identifiers are
 Shall still work if packages arrive out of order
 """
 from .bl.collector import Collector
-from collector.interfaces.collection_item import CollectionItemInterface
+from .interfaces.collection_item import CollectionItemInterface
+from .interfaces.collector import CollectorInterface
 from .errors import DoubleSubmissionError, UnknownDeviceNameError
 
 __all__ = [
     "CollectionItemInterface",
+    "CollectorInterface",
     "Collector",
     "DoubleSubmissionError",
     "UnknownDeviceNameError",

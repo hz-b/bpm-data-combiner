@@ -41,7 +41,7 @@ class MonitorDevicesStatusInterface(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def get_devicenames(self) -> Sequence[str]:
+    def get_device_names(self) -> Sequence[str]:
         """names of currently usable devices
         """
         pass

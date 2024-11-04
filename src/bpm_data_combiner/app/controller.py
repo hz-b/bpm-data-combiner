@@ -1,32 +1,23 @@
 from enum import Enum
-from typing import Sequence, Union
 import logging
+from typing import Sequence, Union, Tuple
 
-from bpm_data_combiner.app.config import Config
-from bpm_data_combiner.monitor_devices.bl.monitor_synchronisation import (
-    MonitorDeviceSynchronisation, offset_from_median,
-)
-from bpm_data_combiner.monitor_devices.data_model.monitored_device import (
-    MonitoredDevice,
-)
-
-from ..bl.accumulator import Accumulator
-from ..data_model.bpm_data_reading import BPMReading
-from ..interfaces.facade import FacadeInterface
-from ..monitor_devices.bl.monitor_devices_status import MonitorDevicesStatus
-from ..monitor_devices.interfaces.monitor_devices_status import (
-    MonitorDevicesStatusInterface,
-    StatusField,
-)
-from ..post_processor.combine import collection_to_bpm_data_collection, accumulated_collections_to_array
-from ..post_processor.preprocessor import PreProcessor
-from ..post_processor.statistics import compute_mean_weights_for_planes
-
-from .view import Views
+import numpy as np
 
 from collector import Collector, CollectionItemInterface
 
+from ..bl.accumulator import Accumulator
+from ..interfaces.controller import ControllerInterface
+from ..monitor_devices import MonitorDevicesStatus, MonitorDeviceSynchronisation, StatusField
+from ..post_processor.combine import collection_to_bpm_data_collection, accumulated_collections_to_array
+from ..post_processor.handle_active_planes import pass_data_for_active_planes
+from ..post_processor.statistics import compute_mean_weights_for_planes
+
+from .config import Config
+from .view import Views
+
 logger = logging.getLogger("bpm-data-combiner")
+
 
 class ValidCommands(Enum):
     # Device data
@@ -39,30 +30,43 @@ class ValidCommands(Enum):
     # requesting data
     periodic = "periodic"
     cfg_comp_median = "cfg_comp_median"
+    known_device_names = "known_device_names"
 
 
-
-class Facade(FacadeInterface):
-    def __init__(self, *, prefix="OrbCol", device_names=Sequence[str]):
-        self.dev_name_index = {name: idx for idx, name in enumerate(device_names)}
+class Controller(ControllerInterface):
+    def __init__(self, *, prefix="OrbCol"):
         self.config = Config()
-        self.monitor_devices = MonitorDevicesStatus(
-            [MonitoredDevice(name) for name in self.dev_name_index]
-        )
+        self.accumulator = Accumulator()
+
+        self.views = Views(prefix="prefix")
+
+        # These need to know which devices are available
+        # initalise with empty
+        self.monitor_devices = MonitorDevicesStatus()
+        self.dev_name_index = dict()
+
+        # These need to know which devices are usable
         self.monitor_device_synchronisation = MonitorDeviceSynchronisation(
             monitored_devices=self.monitor_devices
         )
-        self.collector = Collector(devices_names=self.monitor_devices.get_devicenames())
-        self.accumulator = Accumulator()
-        # Why does it need it always? I think it can be only a function now
-        self.preprocessor = PreProcessor(
-            devices_status=self.monitor_devices.devices_status
-        )
 
-        self.collector.on_ready.add_subscriber(self._on_new_collection_ready)
-        self.views = Views(prefix="prefix")
+        self.collector = Collector(devices_names=self.monitor_devices.get_device_names())
 
-    def update(self, *, cmd, dev_name, tpro, **kwargs):
+    def set_device_names(self, device_names=Sequence[str]):
+        self.dev_name_index = {name: idx for idx, name in enumerate(device_names)}
+        self.monitor_devices.set_device_names(device_names)
+
+    def update(self, *, dev_name, tpro=False, **kwargs):
+        """
+
+        compatible to main.update facilitates testing
+        """
+        # extraction of command from kwargs should be the sole
+        # code duplication to main.update
+        cmd = next(iter(kwargs))
+        self._update(cmd=cmd, dev_name=dev_name, tpro=tpro, **kwargs)
+
+    def _update(self, *, cmd, dev_name, tpro, **kwargs):
         cmd = ValidCommands(cmd)
         if cmd == ValidCommands.reading:
             return self.new_value(dev_name=dev_name, value=kwargs["reading"])
@@ -85,6 +89,8 @@ class Facade(FacadeInterface):
                 raise AssertionError(f"plane {plane} unknown")
         elif cmd == ValidCommands.sync_stat:
             return self.dev_status(dev_name, StatusField.synchronised, kwargs["sync_stat"])
+        elif cmd == ValidCommands.known_device_names:
+            return self.set_device_names(device_names=kwargs["known_device_names"])
         elif cmd == ValidCommands.cfg_comp_median:
             self.config.request_median_computation(kwargs["cfg_comp_median"])
         elif cmd == ValidCommands.periodic:
@@ -100,8 +106,14 @@ class Facade(FacadeInterface):
 
     def new_value(self, dev_name: str, value: Sequence[int]):
         cnt, x, y = value
-        # when the one collection is ready it
-        self.collector.new_item(BPMReading(cnt=cnt, x=x, y=y, dev_name=dev_name))
+        collection = self.collector.new_item(
+            pass_data_for_active_planes(
+                cnt, x, y,
+                device_status=self.monitor_devices.devices_status[dev_name]
+            )
+        )
+        if collection.ready:
+            self._on_new_collection_ready(collection.data())
         if self.config.do_median_computation:
             self.monitor_device_synchronisation.add_new_count(dev_name, cnt)
             self.compute_show_median()
@@ -130,14 +142,14 @@ class Facade(FacadeInterface):
         )
         self.accumulator.add(data)
         self.views.ready_data.update(data)
+        # Todo: add preprocessor step
 
     def _on_device_status_changed(self):
         # collector needs to know which devices are active
-        dev_names = self.monitor_devices.get_devicenames()
+        dev_names = self.monitor_devices.get_device_names()
         # needs to know which are active
         self.collector.device_names = dev_names
         # needs to know which are active
-        self.preprocessor.device_names = dev_names
         devices = self.monitor_devices.devices_status
         self.views.monitor_bpms.update(
             names=[ds.name for _, ds in devices.items()],
@@ -148,6 +160,6 @@ class Facade(FacadeInterface):
 
     def compute_show_median(self):
         self.views.monitor_device_sync.update(
-            *offset_from_median(self.monitor_device_synchronisation.get_last_indices())
+            *self.monitor_device_synchronisation.offset_from_median()
         )
 

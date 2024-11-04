@@ -9,6 +9,7 @@ class CollectionItemInterface(metaclass=ABCMeta):
     @abstractmethod
     def identifier(self) -> Hashable:
         pass
+
     @property
     @abstractmethod
     def source(self) -> Hashable:

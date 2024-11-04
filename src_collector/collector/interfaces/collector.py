@@ -1,12 +1,15 @@
 from abc import ABCMeta, abstractmethod
 
-from collector.interfaces.collection_item import CollectionItemInterface
+from .collection_for_one_id import CollectionForOneIdInterface
+from .collection_item import CollectionItemInterface
 
 
 class CollectorInterface(metaclass=ABCMeta):
     @abstractmethod
-    def new_item(self, val: CollectionItemInterface) -> tuple[bool, bool]:
+    def new_item(self, val: CollectionItemInterface) -> CollectionForOneIdInterface:
         """
-        returns if
-            already finished ?
+        returns: collection
+
+        returns the collection the items was stuffed in. The user can then
+        inspect if this collection is already ready.
         """

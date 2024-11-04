@@ -9,12 +9,11 @@ import sys
 from ..bl.command_round_buffer import CommandRoundBuffer
 from ..data_model.command import Command
 from .command_context_manager import UpdateContext
-from .facade import Facade, logger
-from .known_devices import dev_names_bessyii as dev_names
+from .controller import Controller, logger
 
 stream = sys.stdout
 
-facade = Facade(device_names=dev_names)
+controller = Controller()
 rbuffer = CommandRoundBuffer(maxsize=50)
 
 
@@ -34,10 +33,10 @@ def update(*, dev_name, tpro=False, **kwargs):
     with UpdateContext(
         method=None,
         rbuffer=rbuffer,
-        view=facade.views.monitor_update_cmd_errors,
+        view=controller.views.monitor_update_cmd_errors,
         only_buffer=not bool(tpro),
     ):
-        r = facade.update(cmd=cmd, dev_name=dev_name, tpro=tpro, **kwargs)
+        r = controller.update(dev_name=dev_name, tpro=tpro, **kwargs)
 
     # todo: does pydevice expects a return on the function ?
     if r is None:

@@ -28,12 +28,12 @@ def test_monitored_device_active():
     assert m.usable
 
 def test_get_devices():
-    mon_dev = MonitorDevicesStatus([MonitoredDevice(name) for name in _names])
+    mon_dev = MonitorDevicesStatus(_names)
 
     for name in _names:
         # should flag that an update was required
         assert mon_dev.update(name, "active", True)
-    names = mon_dev.get_devicenames()
+    names = mon_dev.get_device_names()
     assert len(names) == 0
 
     # only if synchronised and active they are considered
@@ -41,12 +41,12 @@ def test_get_devices():
         # should flag that an update was required
         assert mon_dev.update(name, "synchronised",  2)
 
-    names = mon_dev.get_devicenames()
+    names = mon_dev.get_device_names()
     assert len(names) == 2
 
 
 def test_monitor_enable_disable():
-    mon_dev = MonitorDevicesStatus([MonitoredDevice(name) for name in _names])
+    mon_dev = MonitorDevicesStatus(_names)
 
     # should be enabled by default ... check method works, and flags no change
     assert not mon_dev.update("Test2", StatusField.enabled, True)
@@ -78,7 +78,7 @@ def test_monitor_enable_disable():
 
 
 def test_monitor_active():
-    mon_dev = MonitorDevicesStatus([MonitoredDevice(name) for name in _names])
+    mon_dev = MonitorDevicesStatus(_names)
     assert not mon_dev.devices_status["Test1"].active
 
     # should signal update
@@ -92,7 +92,7 @@ def test_monitor_active():
     assert not mon_dev.devices_status["Test2"].active
 
 def test_monitor_synchronised():
-    mon_dev = MonitorDevicesStatus([MonitoredDevice(name) for name in _names])
+    mon_dev = MonitorDevicesStatus(_names)
     for _, md in mon_dev.devices_status.items():
         assert md.enabled
         assert not md.active
@@ -114,9 +114,9 @@ def test_monitor_synchronised():
     assert not md2.synchronised
 
 def test_monitor_usable():
-    mon_dev = MonitorDevicesStatus([MonitoredDevice(name) for name in _names])
+    mon_dev = MonitorDevicesStatus(_names)
     assert mon_dev.update("Test2", "active", True)
     assert not mon_dev.update("Test2", StatusField.active, True)
     assert mon_dev.update("Test2", "synchronised", 2)
-    for val, chk in zip_longest(mon_dev.get_devicenames(), ["Test2"]):
+    for val, chk in zip_longest(mon_dev.get_device_names(), ["Test2"]):
         assert val == chk
