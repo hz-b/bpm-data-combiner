@@ -8,6 +8,8 @@ record(pycalc, "$(PREFIX):inp:$(DEV_NAME):posv")
       field(FTA, LONG)
       field(MEA, 3)
       field(CALC, "update(dev_name='$(DEV_NAME)', reading=%A%, tpro=%TPRO%)")
+      # trigger heart beat monitor
+      field(FLNK, "$(PREFIX):im:$(DEV_NAME):mon:trg")
       # field(TPRO, 1)
 }
 
