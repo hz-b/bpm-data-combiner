@@ -1,11 +1,12 @@
 from enum import Enum
 import logging
-from typing import Sequence, Union
+from typing import Sequence, Union, Tuple
+
+import numpy as np
 
 from collector import Collector, CollectionItemInterface
 
 from ..bl.accumulator import Accumulator
-from ..data_model.bpm_data_reading import BPMReading
 from ..interfaces.controller import ControllerInterface
 from ..monitor_devices import MonitorDevicesStatus, MonitorDeviceSynchronisation, StatusField
 from ..post_processor.combine import collection_to_bpm_data_collection, accumulated_collections_to_array
@@ -159,6 +160,6 @@ class Controller(ControllerInterface):
 
     def compute_show_median(self):
         self.views.monitor_device_sync.update(
-            *offset_from_median(self.monitor_device_synchronisation.get_last_indices())
+            *self.monitor_device_synchronisation.offset_from_median()
         )
 
