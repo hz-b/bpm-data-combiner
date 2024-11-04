@@ -22,6 +22,11 @@ bpm_data_combiner_registerRecordDeviceDriver pdbbase
 ## dbLoadRecords("db/iocAdminSoft.db", "IOC=$(IOC_NAME)")
 ## dbLoadRecords("db/iocRelease.db", "IOC=$(IOC_NAME)")
 
+# names of the bpms ... mls version
+dbLoadTemplate("db/bpm_names_mls_gen.substitutions", "PREFIX=$(PREFIX)")
+dbLoadRecords("db/bpm_names_mls.db", "PREFIX=$(PREFIX)")
+
+dbLoadTemplate("db/bpm_dev_input.substitutions", "PREFIX=$(PREFIX)")
 ## Load record instances
 dbLoadTemplate("db/bpm_dev_input.substitutions", "PREFIX=$(PREFIX)")
 # dbLoadRecords("db/bpm_dev_input_offbeat.db", "PREFIX=$(PREFIX)")
@@ -29,7 +34,7 @@ dbLoadTemplate("db/bpm.substitutions", "PREFIX=$(PREFIX)")
 dbLoadRecords("db/bpm_monitor_overview.db", "PREFIX=$(PREFIX),VIEW=mon")
 dbLoadRecords("db/view.db", "PREFIX=$(PREFIX)")
 dbLoadRecords("db/bpm_periodic.db", "PREFIX=$(PREFIX)")
-dbLoadRecords("db/bpm_cfg.db", "PREFIX=$(PREFIX)")
+dbLoadRecords("db/bpm_cfg.db", "PREFIX=$(PREFIX),MACHINE=mls")
 dbLoadRecords("db/bpm_bdata.db", "PREFIX=$(PREFIX)")
 
 pydev("from bpm_data_combiner.app import main ")

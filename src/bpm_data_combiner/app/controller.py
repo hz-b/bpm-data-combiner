@@ -55,6 +55,9 @@ class Controller(ControllerInterface):
     def set_device_names(self, device_names=Sequence[str]):
         self.dev_name_index = {name: idx for idx, name in enumerate(device_names)}
         self.monitor_devices.set_device_names(device_names)
+        # that names etc. get published
+        self._on_device_status_changed()
+        return len(device_names)
 
     def update(self, *, dev_name, tpro=False, **kwargs):
         """
@@ -64,7 +67,7 @@ class Controller(ControllerInterface):
         # extraction of command from kwargs should be the sole
         # code duplication to main.update
         cmd = next(iter(kwargs))
-        self._update(cmd=cmd, dev_name=dev_name, tpro=tpro, **kwargs)
+        return self._update(cmd=cmd, dev_name=dev_name, tpro=tpro, **kwargs)
 
     def _update(self, *, cmd, dev_name, tpro, **kwargs):
         cmd = ValidCommands(cmd)
