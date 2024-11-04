@@ -4,9 +4,9 @@ from ..bl.logger import logger
 from ..data_model.bpm_data_collection import BPMDataCollection, BPMDataCollectionStats
 
 import pydev
-pydev_supports_sequence = True
-
 import sys
+
+pydev_supports_sequence = True
 stream = sys.stdout
 
 
@@ -18,12 +18,14 @@ class ViewBPMMonitoring:
     def __init__(self, prefix: str):
         self.prefix = prefix
 
-    def update(self, *,
-               names: Sequence[str],
-               active: Sequence[bool],
-               synchronised: Sequence[bool],
-               usable: Sequence[bool],
-               ):
+    def update(
+        self,
+        *,
+        names: Sequence[str],
+        active: Sequence[bool],
+        synchronised: Sequence[bool],
+        usable: Sequence[bool],
+    ):
         # names = string_array_to_bytes(names)
         names = list(names)
         label = self.prefix + ":" + "names"
@@ -48,7 +50,6 @@ class ViewBPMMonitoring:
         label = self.prefix + ":" + "usable"
         logger.debug("Update active view label %s, values %s", label, usable)
         pydev.iointr(label, usable.tolist())
-
 
 
 class ViewBPMDataCollection:
@@ -134,53 +135,16 @@ class ViewBPMDataAsBData:
     def __init__(self, prefix: str):
         self.prefix = prefix
 
-    def update(self, data: BPMDataCollectionStats, *, n_bpms, scale_x_axis):
-        """prepare data as expected
-        """
-        logger.debug("view bdata: publishing data %s", data)
-        nm2mm = 1e-6
-        n_entries = len(data.x.values)
-        if n_entries > n_bpms:
-            raise ValueError("number of bpms %s too many. max %s", n_entries, n_bpms)
-
-        bdata = np.empty([8, n_bpms], dtype=float)
-        bdata.fill(0.0)
-        # is this the correct way to convert the data ?
-        scale_bits = 2**15/10
-
-        # flipping coordinate system to get the dispersion on the correct side
-        # todo: check at which state this should be done
-        # fmt:off
-        def convert(data, scale_axis = 1.0):
-            return data * (nm2mm * scale_bits * scale_axis)
-        bdata[0, :n_entries] = - convert(data.x.values, scale_axis=scale_x_axis)
-        bdata[1, :n_entries] =   convert(data.y.values)
-        # fmt:on
-        # intensity z 1.3
-        # bdata[2] = 3
-        # intensityz z 1.3
-        # bdata[3] = 3
-        # AGC status needs to be three for valid data
-        # todo: find out what to set if only one plane is valid?
-        bdata[4,:n_entries] = np.where((data.x.n_readings > 0) | (data.y.n_readings > 0), 3, 0)
-        bdata[4, -1] = 2
-        # scale rms so that the slow orbit feedback accepts the data
-        # factor 100 seems to be enough.
-        # I think I should add some check that the noise is large enough
-        scale_rms = 20
-        def convert_noise(data, scale_axis = 1):
-            noise = convert(data.std, scale_axis = scale_axis * scale_rms)
-            noise[data.n_readings > 0] = np.clip(noise, 1, None)[data.n_readings>0]
-            # so sofb Orbit will consider it as not existing
-            noise[data.n_readings<= 0] = 0
-            return noise
-        bdata[6, :n_entries] = convert_noise(data.x, scale_axis=scale_x_axis)
-        bdata[7, :n_entries] = convert_noise(data.y)
+    def update(self, bdata: Sequence[int]):
+        """prepare data as expected"""
+        logger.debug("view bdata: publishing data %s", bdata)
 
         label = f"{self.prefix}"
-        bdata = [float(v) for v in bdata.ravel().astype(np.int16)]
+        bdata = np.asarray(bdata).astype(np.int16)
+        if not pydev_supports_sequence:
+            bdata = [int(v) for v in bdata]
         pydev.iointr(label, bdata)
-        logger.debug("view bdata: label %s,  %d n_entries", label, n_entries)
+        logger.debug("view bdata: label %s, %d n_entries", label, len(bdata))
 
 
 class ViewStringBuffer:
@@ -209,8 +173,8 @@ class ViewDeviceSynchronisation:
     def update(self, median: int, offset_from_median: Sequence[np.int32]):
         # stream.write(f"updating {self.prefix} with median {median}\n")
         # stream.flush()
-        pydev.iointr(self.prefix + ':median', median)
-        pydev.iointr(self.prefix + ':offset', list(offset_from_median))
+        pydev.iointr(self.prefix + ":median", median)
+        pydev.iointr(self.prefix + ":offset", list(offset_from_median))
 
 
 class ViewConfiguration:
@@ -220,7 +184,7 @@ class ViewConfiguration:
     def update(self, median_computation: bool):
         stream.write(f"updating {self.prefix} with median {median_computation}\n")
         stream.flush()
-        pydev.iointr(self.prefix + ':comp:median', bool(median_computation))
+        pydev.iointr(self.prefix + ":comp:median", bool(median_computation))
 
 
 class Views:
