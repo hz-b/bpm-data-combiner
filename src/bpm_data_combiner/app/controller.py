@@ -38,7 +38,7 @@ class Controller(ControllerInterface):
         self.config = Config()
         self.accumulator = Accumulator()
 
-        self.views = Views(prefix="prefix")
+        self.views = Views(prefix=prefix)
 
         # These need to know which devices are available
         # initalise with empty
@@ -50,11 +50,12 @@ class Controller(ControllerInterface):
             monitored_devices=self.monitor_devices
         )
 
-        self.collector = Collector(devices_names=self.monitor_devices.get_device_names())
+        self.collector = Collector(devices_names=[])
 
     def set_device_names(self, device_names=Sequence[str]):
         self.dev_name_index = {name: idx for idx, name in enumerate(device_names)}
         self.monitor_devices.set_device_names(device_names)
+        self.collector.devices_names = device_names
         # that names etc. get published
         self._on_device_status_changed()
         return len(device_names)
@@ -136,7 +137,8 @@ class Controller(ControllerInterface):
         stat_data = compute_mean_weights_for_planes(data)
         self.views.periodic_data.update(stat_data)
         logger.debug("pushing stat data to bdata_view")
-        self.views.bdata.update(stat_data)
+        #: todo ... need to get kwargs from config
+        self.views.bdata.update(stat_data, n_bpms=32, scale_x_axis=1./1.4671)
         logger.debug("pushing stat data to bdata_view done")
 
     def _on_new_collection_ready(self, col: CollectionItemInterface):
@@ -145,7 +147,6 @@ class Controller(ControllerInterface):
         )
         self.accumulator.add(data)
         self.views.ready_data.update(data)
-        # Todo: add preprocessor step
 
     def _on_device_status_changed(self):
         # collector needs to know which devices are active
