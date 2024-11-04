@@ -6,6 +6,7 @@ include $(TOP)/configure/CONFIG
 # Install databases, templates & substitutions like this
 DB += bpm_dev_sim.db
 DB += bpm_dev_sim.rec
+DB += bpm_sector_names_all.db
 
 # If <anyname>.db template is not named <anyname>*.template add
 # <anyname>_TEMPLATE = <templatename>

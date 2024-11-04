@@ -14,7 +14,10 @@ record(bo, "$(PREFIX):cfg:comp:median")
 record(pycalc, "${PREFIX}:cfg:bpm_names")
 {
     field(DESC, "BPM names to facade")
-    field(INPA, "${PREFIX}:bpm:nams:all CPP")
+    field(INPA, "${PREFIX}:$(MACHINE):bpm:nams:all CPP")
+    field(FTA, "STRING")
+    field(MEA, 128)
     field(CALC, "update(dev_name=None, known_device_names=%A%)")
+    field(TPRO, 1)
 }
 
