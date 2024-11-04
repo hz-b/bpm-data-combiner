@@ -22,6 +22,11 @@ DB += bpm_data_combinerVersion.db
 DB += view.db
 DB += bpm_cfg.db
 
+# create the names of the BPM's of MLS
+DB += bpm_names_mls_rec.db
+DB += bpm_names_mls_gen.substitutions
+DB += bpm_names_mls.db
+
 # follow description https://www.slac.stanford.edu/grp/ssrl/spear/epics/site/devIocStats/README_iocAdmin
 # IOCstats / admin
 # (soft    IOCs)

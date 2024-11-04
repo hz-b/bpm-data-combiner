@@ -10,3 +10,11 @@ record(bo, "$(PREFIX):cfg:comp:median")
     field(OUT, "@update(dev_name=None, cfg_comp_median=%VAL%, tpro=%TPRO%)")
     field(TPRO, 1)
 }
+
+record(pycalc, "${PREFIX}:cfg:bpm_names")
+{
+    field(DESC, "BPM names to facade")
+    field(INPA, "${PREFIX}:bpm:nams:all CPP")
+    field(CALC, "update(dev_name=None, known_device_names=%A%)")
+}
+

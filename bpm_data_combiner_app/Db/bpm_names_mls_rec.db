@@ -1,0 +1,9 @@
+record(waveform, "$(PREFIX):mls:bpm:nams:sec:$(SEC_NUM)")
+{
+    field(DESC, "create bpm names that mls knows about")
+    field(INP, "['BPMZ1$(SEC_TYP)$(SEC_NUM)RP', 'BPMZ2$(SEC_TYP)$(SEC_NUM)RP', 'BPMZ3$(SEC_TYP)$(SEC_NUM)RP', 'BPMZ4$(SEC_TYP)$(SEC_NUM)RP', 'BPMZ5$(SEC_TYP)$(SEC_NUM)RP', 'BPMZ6$(SEC_TYP)$(SEC_NUM)RP', 'BPMZ7$(SEC_TYP)$(SEC_NUM)RP']")
+    field(FTVL, "STRING")
+    field(NELM, 8)
+    field(PINI, "YES")
+    field(FLNK, "$(PREFIX):mls:bpm:nams:all")
+}
