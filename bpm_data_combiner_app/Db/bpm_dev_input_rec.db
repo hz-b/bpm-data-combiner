@@ -8,7 +8,6 @@ record(pycalc, "$(PREFIX):inp:$(DEV_NAME):posv")
       field(FTA, LONG)
       field(MEA, 3)
       field(CALC, "update(dev_name='$(DEV_NAME)', reading=%A%, tpro=%TPRO%)")
-      field(FLNK, "$(PREFIX):inp:$(DEV_NAME):trg")
       # field(TPRO, 1)
 }
 
@@ -59,67 +58,6 @@ record(stringin, "$(PREFIX):inp:$(DEV_NAME):name")
     field(FLNK, "$(PREFIX):im:$(DEV_NAME):name")
     field(VAL, "unknown")
     field(PINI, "YES")
-}
-
-# Now the records to push the info further to python
-record(fanout, "$(PREFIX):im:$(DEV_NAME):psh")
-{
-    # should call to python ... python should start building the
-    # internal data structure ... not a way yet to push directly
-    # field(LNK0, "$(PREFIX):im:$(DEV_NAME):cnt")
-    # field(LNK1, "$(PREFIX):im:$(DEV_NAME):x")
-    # field(LNK2, "$(PREFIX):im:$(DEV_NAME):y")
-    # field(LNK3, "$(PREFIX):im:$(DEV_NAME):ctl")
-    field(LNK4, "$(PREFIX):im:$(DEV_NAME):mon:trg")
-}
-
-record(longout, "$(PREFIX):im:$(DEV_NAME):x")
-{
-    field(DESC, "push to py: x")
-    field(DTYP, "pydev")
-    field(DOL, "$(PREFIX):inp:$(DEV_NAME):x")
-    field(OMSL, "closed_loop")
-    field(OUT, "@update(dev_name='$(DEV_NAME)', x=%VAL%)")
-    field(VAL, -1)
-    # field(PINI, "YES")
-    # field(TPRO, 1)
-}
-
-record(longout, "$(PREFIX):im:$(DEV_NAME):y")
-{
-    field(DESC, "push to py: y")
-    field(DTYP, "pydev")
-    field(DOL, "$(PREFIX):inp:$(DEV_NAME):y")
-    field(OMSL, "closed_loop")
-    field(OUT, "@update(dev_name='$(DEV_NAME)', y=%VAL%)")
-    field(VAL, -1)
-    # field(PINI, "YES")
-    # field(TPRO, 1)
-}
-
-record(longout, "$(PREFIX):im:$(DEV_NAME):cnt")
-{
-    field(DESC, "push to py: cnt")
-    field(DTYP, "pydev")
-    field(DOL, "$(PREFIX):inp:$(DEV_NAME):cnt")
-    field(OMSL, "closed_loop")
-    field(OUT, "@update(dev_name='$(DEV_NAME)', cnt=%VAL%)")
-    field(VAL, -1)
-    # field(PINI, "YES")
-    # field(TPRO, 1)
-}
-
-# informs python side: a new measurement hand over finished
-record(longout, "$(PREFIX):im:$(DEV_NAME):ctl")
-{
-    field(DESC, "push to py: ctl")
-    field(DTYP, "pydev")
-    field(DOL, "$(PREFIX):inp:$(DEV_NAME):cnt")
-    field(OMSL, "closed_loop")
-    field(OUT, "@update(dev_name='$(DEV_NAME)', ctl=%VAL%)")
-    field(VAL, -1)
-    # field(PINI, "YES")
-    # field(TPRO, 1)
 }
 
 # This is forwarded to python solely to be able to check that the
