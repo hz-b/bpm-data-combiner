@@ -2,14 +2,22 @@
 TOP = .
 include $(TOP)/configure/CONFIG
 
+# configuration for rsync-dist
+# BESSY rules uses RS_NAMES_% for an activate-version.% call. Lets use the familiar NAMES with a default
+NAMES ?= SIOC42CP
+RS_NAMES_MLS = $(NAMES)
+
+
 # Directories to build, any order
 DIRS += configure
 DIRS += $(wildcard *Sup)
 # DIRS += $(wildcard *_app)
-DIRS += $(wildcard bpm_data_combiner_app)
+DIRS += bpm_data_combiner_app
+DIRS += support_modules_app
 
 DIRS += $(wildcard *Top)
 DIRS += $(wildcard iocBoot)
+DIRS += src
 
 # The build order is controlled by these dependency rules:
 
@@ -31,3 +39,7 @@ iocBoot_DEPEND_DIRS += $(filter %App,$(DIRS))
 # Add any additional dependency rules here:
 
 include $(TOP)/configure/RULES_TOP
+
+# Overwrite the rsync-dist rule from BESSYRULES, because this is not darcs
+rsync-dist.%:
+	$(RSYNC_DIST) dist --version-file=$(RSYNC_DIST_VERSION_FILE) --progress --checksum -w $(FILES_OPT_$*)

@@ -1,0 +1,19 @@
+{
+    "alias": [
+        "BASE:EPICS_BASE"
+    ],
+    "module": [
+        "APPS_IOCWATCH:R3-6",
+        "AUTOSAVE:R5-10",
+        "BASE:R7-0-8-bessy2",
+        "BESSYRULES:R3-21",
+        "CAPUTLOG:R3-5",
+        "CONCAT:R2-1-4",
+        "DEVIOCSTATS:R3-1-16-bessy1",
+        "DISTVERSION:R2-3",
+        "PYDEVICE:R1.3.2-bessy1",
+        "TOOLS_DBOPT:R0-5",
+        "TOOLS_MSI:R1-5-bessy3"
+    ],
+    "buildtag-stem": "BPM_collector_MLS"
+}
