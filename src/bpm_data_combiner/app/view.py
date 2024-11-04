@@ -9,6 +9,7 @@ pydev_supports_sequence = True
 import sys
 stream = sys.stdout
 
+
 def string_array_to_bytes(names: Sequence[str], *, encoding="utf8"):
     return [bytes(name, encoding) for name in names]
 
@@ -27,7 +28,6 @@ class ViewBPMMonitoring:
         names = list(names)
         label = self.prefix + ":" + "names"
         logger.debug("Update active view label %s, values %s", label, names)
-        # stream.write("Update active view label %s, values %s\n" % (label, names))
         pydev.iointr(label, names)
 
         # int number wrong by a factor of 2: why?
@@ -80,7 +80,7 @@ class ViewBPMDataCollection:
             if pydev_supports_sequence:
                 values = var.values.astype(int)
             else:
-                values = [int(v) for v in values]
+                values = [int(v) for v in var.values]
             logger.debug("Update label %s, values %s", label, values)
             pydev.iointr(label, values)
 
@@ -91,7 +91,6 @@ class ViewBPMDataCollection:
 
         # Todo: avoid to publish names at every turn
         #
-        return
         label = self.prefix + ":names"
         names_byte_encoded = string_array_to_bytes(data.names)
         logger.debug("Update label=%s, names=%s", label, names_byte_encoded)
@@ -135,24 +134,27 @@ class ViewBPMDataAsBData:
     def __init__(self, prefix: str):
         self.prefix = prefix
 
-    def update(self, data: BPMDataCollectionStats):
+    def update(self, data: BPMDataCollectionStats, *, n_bpms, scale_x_axis):
         """prepare data as expected
         """
         logger.debug("view bdata: publishing data %s", data)
         nm2mm = 1e-6
         n_entries = len(data.x.values)
-        return
-        n_bpms = 8
         if n_entries > n_bpms:
             raise ValueError("number of bpms %s too many. max %s", n_entries, n_bpms)
 
         bdata = np.empty([8, n_bpms], dtype=float)
         bdata.fill(0.0)
+        # is this the correct way to convert the data ?
+        scale_bits = 2**15/10
+
         # flipping coordinate system to get the dispersion on the correct side
         # todo: check at which state this should be done
         # fmt:off
-        bdata[0, :n_entries] = - data.x.values * nm2mm
-        bdata[1, :n_entries] =   data.y.values * nm2mm
+        def convert(data, scale_axis = 1.0):
+            return data * (nm2mm * scale_bits * scale_axis)
+        bdata[0, :n_entries] = - convert(data.x.values, scale_axis=scale_x_axis)
+        bdata[1, :n_entries] =   convert(data.y.values)
         # fmt:on
         # intensity z 1.3
         # bdata[2] = 3
@@ -166,14 +168,19 @@ class ViewBPMDataAsBData:
         # factor 100 seems to be enough.
         # I think I should add some check that the noise is large enough
         scale_rms = 20
-        bdata[6, :n_entries] = np.where(data.x.n_readings > 0, data.x.std * nm2mm * scale_rms, 0)
-        bdata[7, :n_entries] = np.where(data.y.n_readings > 0, data.y.std * nm2mm * scale_rms, 0)
+        def convert_noise(data, scale_axis = 1):
+            noise = convert(data.std, scale_axis = scale_axis * scale_rms)
+            noise[data.n_readings > 0] = np.clip(noise, 1, None)[data.n_readings>0]
+            # so sofb Orbit will consider it as not existing
+            noise[data.n_readings<= 0] = 0
+            return noise
+        bdata[6, :n_entries] = convert_noise(data.x, scale_axis=scale_x_axis)
+        bdata[7, :n_entries] = convert_noise(data.y)
 
         label = f"{self.prefix}"
-        bdata = [float(v) for v in bdata.ravel()]
+        bdata = [float(v) for v in bdata.ravel().astype(np.int16)]
         pydev.iointr(label, bdata)
         logger.debug("view bdata: label %s,  %d n_entries", label, n_entries)
-        # logger.warning("view bdata: label %s bdata %s", label, bdata)
 
 
 class ViewStringBuffer:
