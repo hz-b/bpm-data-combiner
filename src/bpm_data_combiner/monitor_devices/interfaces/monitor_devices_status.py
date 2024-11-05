@@ -43,5 +43,8 @@ class MonitorDevicesStatusInterface(metaclass=ABCMeta):
     @abstractmethod
     def get_device_names(self) -> Sequence[str]:
         """names of currently usable devices
+
+        Todo: should one provide device name index instead?
+              does it belong here
         """
         pass

@@ -1,18 +1,25 @@
 from enum import Enum
 import logging
-from typing import Sequence, Union, Tuple
+from typing import Sequence, Union
 
-import numpy as np
 
 from collector import Collector, CollectionItemInterface
 
 from ..bl.accumulator import Accumulator
 from ..interfaces.controller import ControllerInterface
-from ..monitor_devices import MonitorDevicesStatus, MonitorDeviceSynchronisation, StatusField
-from ..post_processor.combine import collection_to_bpm_data_collection, accumulated_collections_to_array
+from ..monitor_devices import (
+    MonitorDevicesStatus,
+    MonitorDeviceSynchronisation,
+    StatusField,
+)
+from ..post_processor.combine import (
+    collection_to_bpm_data_collection,
+    accumulated_collections_to_array,
+)
 from ..post_processor.handle_active_planes import pass_data_for_active_planes
 from ..post_processor.statistics import compute_mean_weights_for_planes
 
+from .bdata import stat_data_to_bdata
 from .config import Config
 from .view import Views
 
@@ -92,7 +99,9 @@ class Controller(ControllerInterface):
             else:
                 raise AssertionError(f"plane {plane} unknown")
         elif cmd == ValidCommands.sync_stat:
-            return self.dev_status(dev_name, StatusField.synchronised, kwargs["sync_stat"])
+            return self.dev_status(
+                dev_name, StatusField.synchronised, kwargs["sync_stat"]
+            )
         elif cmd == ValidCommands.known_device_names:
             return self.set_device_names(device_names=kwargs["known_device_names"])
         elif cmd == ValidCommands.cfg_comp_median:
@@ -112,8 +121,7 @@ class Controller(ControllerInterface):
         cnt, x, y = value
         collection = self.collector.new_item(
             pass_data_for_active_planes(
-                cnt, x, y,
-                device_status=self.monitor_devices.devices_status[dev_name]
+                cnt, x, y, device_status=self.monitor_devices.devices_status[dev_name]
             )
         )
         if collection.ready:
@@ -133,12 +141,20 @@ class Controller(ControllerInterface):
 
     def periodic_trigger(self):
         """Present new (averaged) bpm data on periodic trigger"""
-        data = accumulated_collections_to_array(self.accumulator.get(), dev_names_index=self.dev_name_index)
+        data = accumulated_collections_to_array(
+            self.accumulator.get(), dev_names_index=self.dev_name_index
+        )
         stat_data = compute_mean_weights_for_planes(data)
         self.views.periodic_data.update(stat_data)
         logger.debug("pushing stat data to bdata_view")
         #: todo ... need to get kwargs from config
-        self.views.bdata.update(stat_data, n_bpms=32, scale_x_axis=1./1.4671)
+        bdata = stat_data_to_bdata(
+            stat_data,
+            device_index=self.dev_name_index,
+            n_bpms=32,
+            scale_x_axis=1.0 / 1.4671,
+        )
+        self.views.bdata.update(bdata.ravel())
         logger.debug("pushing stat data to bdata_view done")
 
     def _on_new_collection_ready(self, col: CollectionItemInterface):
@@ -166,4 +182,3 @@ class Controller(ControllerInterface):
         self.views.monitor_device_sync.update(
             *self.monitor_device_synchronisation.offset_from_median()
         )
-
