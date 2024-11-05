@@ -1,7 +1,5 @@
 from typing import Sequence, Mapping
-
 import numpy as np
-
 
 from ..data_model.bpm_data_collection import BPMDataCollectionStats
 
@@ -21,7 +19,7 @@ def convert(data: Sequence[float], scale_axis: float = 1.0):
     Todo:
         include conversion to np.int16 at this stage?
     """
-    return np.asarray(data) * (nm2mm * scale_bits * scale_axis)
+    return (np.asarray(data) * (nm2mm * scale_bits * scale_axis)).astype(np.int16)
 
 
 def convert_noise(data, scale_axis: float = 1):
@@ -53,7 +51,7 @@ def stat_data_to_bdata(
     if n_entries > n_bpms:
         raise ValueError("number of bpms %s too many. max %s", n_entries, n_bpms)
 
-    bdata = np.empty([8, n_bpms], dtype=float)
+    bdata = np.empty([8, n_bpms], dtype=np.int16)
     bdata.fill(0.0)
 
     indices = [device_index[name] for name in data.names]
