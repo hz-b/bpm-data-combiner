@@ -4,10 +4,9 @@ Assuming that all update is a thin wrapper around
 :meth:`Facade.update`
 Assuming that test_facade tests all the different update calls
 """
-from copy import copy
 import numpy as np
-from bpm_data_combiner.app.main import update, controller
-from known_devices import dev_names_bessyii as dev_names
+from bpm_data_combiner.app.main import update
+from bpm_data_combiner.app.known_devices import dev_names_bessyii as dev_names
 
 
 def test10_update_reset():

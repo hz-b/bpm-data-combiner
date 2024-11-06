@@ -13,7 +13,7 @@ mls_names_file  = Path(__file__).parent / "mls_sparks"
 with open(mls_names_file, "rt") as fp:
     dev_names_mls = [row.strip() for row in fp.readlines() if row[0] != '#' and row.strip()]
 
-print(dev_names_mls)
+# print(dev_names_mls)
 
 dev_names_bessyii = [
     "BPMZ5D8R",

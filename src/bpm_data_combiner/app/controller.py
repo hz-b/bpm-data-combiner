@@ -1,12 +1,11 @@
 from enum import Enum
 import logging
 from typing import Sequence, Union
-
-
 from collector import Collector, CollectionItemInterface
 
+from .bpm_inputs import BPMInput
 from ..bl.accumulator import Accumulator
-from ..interfaces.controller import ControllerInterface
+from ..interfaces.controller import ControllerInterface, ValidCommands
 from ..monitor_devices import (
     MonitorDevicesStatus,
     MonitorDeviceSynchronisation,
@@ -26,22 +25,8 @@ from .view import Views
 logger = logging.getLogger("bpm-data-combiner")
 
 
-class ValidCommands(Enum):
-    # Device data
-    reading = "reading"
-    # Device status
-    active = "active"
-    enabled = "enabled"
-    reset = "reset"
-    sync_stat = "sync_stat"
-    # requesting data
-    periodic = "periodic"
-    cfg_comp_median = "cfg_comp_median"
-    known_device_names = "known_device_names"
-
-
 class Controller(ControllerInterface):
-    def __init__(self, *, prefix="OrbCol"):
+    def __init__(self, *, prefix="OrbCol", device_names: Sequence[str]):
         self.config = Config()
         self.accumulator = Accumulator()
 
@@ -58,6 +43,9 @@ class Controller(ControllerInterface):
         )
 
         self.collector = Collector(devices_names=[])
+        self.set_device_names(device_names=device_names)
+        self._init_devices(device_names=device_names)
+        logger.warning("Controller init finished")
 
     def set_device_names(self, device_names=Sequence[str]):
         self.dev_name_index = {name: idx for idx, name in enumerate(device_names)}
@@ -66,6 +54,28 @@ class Controller(ControllerInterface):
         # that names etc. get published
         self._on_device_status_changed()
         return len(device_names)
+
+    def _init_devices(self, device_names):
+        self.devices = {
+            name : BPMInput(bpm_name=name, controller=self) for name in device_names
+        }
+        logger.warning("Known bpms: %s", list(self.devices))
+
+    def heart_beat(self):
+        """
+        distribute heart beat to all that require it
+        combine it and put it into status ...
+
+        Todo:
+            refactor bpm's ... a controller for each of them?
+
+        Warning:
+            check that new data sets the device as active again
+        """
+        for _, dev in self.devices.items():
+            dev.status.step()
+            if not dev.status.status():
+                self.update(dev_name=dev.bpm_name, active=False)
 
     def update(self, *, dev_name, tpro=False, **kwargs):
         """
@@ -77,7 +87,7 @@ class Controller(ControllerInterface):
         cmd = next(iter(kwargs))
         return self._update(cmd=cmd, dev_name=dev_name, tpro=tpro, **kwargs)
 
-    def _update(self, *, cmd, dev_name, tpro, **kwargs):
+    def _update(self, *, cmd, dev_name, tpro=False, **kwargs):
         cmd = ValidCommands(cmd)
         if cmd == ValidCommands.reading:
             return self.new_value(dev_name=dev_name, value=kwargs["reading"])
@@ -119,6 +129,9 @@ class Controller(ControllerInterface):
 
     def new_value(self, dev_name: str, value: Sequence[int]):
         cnt, x, y = value
+        # should be handled by monitor_device status
+        self.devices[dev_name].status.reset()
+        self.monitor_devices.update(dev_name=dev_name, field=StatusField.active, flag=True)
         collection = self.collector.new_item(
             pass_data_for_active_planes(
                 cnt, x, y, device_status=self.monitor_devices.devices_status[dev_name]

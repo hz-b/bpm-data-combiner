@@ -1,7 +1,22 @@
 from abc import ABCMeta, abstractmethod
+from enum import Enum
 from typing import Sequence, Union
 
 from bpm_data_combiner.monitor_devices.interfaces.monitor_devices_status import StatusField
+
+
+class ValidCommands(Enum):
+    # Device data
+    reading = "reading"
+    # Device status
+    active = "active"
+    enabled = "enabled"
+    reset = "reset"
+    sync_stat = "sync_stat"
+    # requesting data
+    periodic = "periodic"
+    cfg_comp_median = "cfg_comp_median"
+    known_device_names = "known_device_names"
 
 
 class ControllerInterface(metaclass=ABCMeta):
@@ -14,4 +29,8 @@ class ControllerInterface(metaclass=ABCMeta):
         """
         returns if the device status needed to be updated
         """
+        pass
+
+    @abstractmethod
+    def update(self, *, dev_name, tpro=False, **kwargs):
         pass

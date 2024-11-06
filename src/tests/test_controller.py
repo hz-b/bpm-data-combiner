@@ -1,14 +1,11 @@
 from datetime import timedelta, datetime
 import itertools
 import pytest
-from time import sleep
-from sys import stdout
 import logging
-import pydev
 from copy import copy
 
 from bpm_data_combiner.app.main import controller as _controller
-from known_devices import dev_names_bessyii as dev_names
+from bpm_data_combiner.app.known_devices import dev_names_bessyii as dev_names
 
 logger = logging.getLogger("bpm-data-combiner")
 
