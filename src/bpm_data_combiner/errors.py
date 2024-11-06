@@ -1,0 +1,2 @@
+class NoCollectionsError(Exception):
+    pass

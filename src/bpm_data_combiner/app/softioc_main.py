@@ -1,28 +1,18 @@
 import asyncio
-import logging
 
+from aioca import camonitor
 from softioc import softioc, builder, asyncio_dispatcher
-from aioca import camonitor, DBR_LONG
 
 from collector import UnknownDeviceNameError
 from .controller import Controller
 from .known_devices import dev_names_mls as _dev_names
 from .known_devices import dev_names_bessyii as _dev_names
-
-logger = logging.getLogger("bpm-data-combiner")
-
-dispatcher = asyncio_dispatcher.AsyncioDispatcher()
-
-builder.SetDeviceName("OrbCol")
-
-controller = Controller(prefix="", device_names=_dev_names)
-
-builder.LoadDatabase()
-softioc.iocInit(dispatcher)
+from ..errors import NoCollectionsError
+from ..bl.logger import logger
 
 
 # each one separately ... waiting eternally for ca monitor to make the connection
-async def bpm_data_receive(dev_name):
+async def bpm_data_receive(controller, dev_name):
     def new_reading(value):
         try:
             controller.update(dev_name=dev_name, reading=value)
@@ -31,13 +21,12 @@ async def bpm_data_receive(dev_name):
         except Exception as exc:
             logger.error(f"processing new data for {dev_name}:{type(exc)}, {exc}")
             raise exc
-        # print(f"bpm data: {dev_name}, {value}")
 
     data_pv = dev_name + ":posv"
-    camonitor(pv=data_pv, callback=new_reading)
+    camonitor(data_pv, new_reading)
+    print(f"bpm data from: {dev_name} using {data_pv}")
 
-
-async def bpm_data_sync_stat(dev_name):
+async def bpm_data_sync_stat(controller, dev_name):
     def sync_stat(value):
         print(f"bpm sync_stat: {dev_name}, {value}")
         try:
@@ -51,7 +40,7 @@ async def bpm_data_sync_stat(dev_name):
     print(f"monitoring bpm sync_stat: {dev_name} using {sync_stat_pv}")
 
 
-async def heart_beat():
+async def heart_beat(controller):
     """For processing if devices are active
     needs to be called periodically
     """
@@ -59,18 +48,32 @@ async def heart_beat():
         controller.heart_beat()
         await asyncio.sleep(.5)
 
-async def periodic_update():
+
+async def periodic_update(controller):
     while True:
         # first data after 2 seconds ...
         await asyncio.sleep(2.0)
-        controller.periodic_trigger()
+        try:
+            controller.periodic_trigger()
+        except NoCollectionsError as nc:
+            logger.error(f"periodic trigger raised NoCollectionsError {nc}")
+        except Exception as exc:
+            raise
 
-for dev_name in list(controller.dev_name_index):
-    dispatcher(bpm_data_receive, func_args=(dev_name,))
-    dispatcher(bpm_data_sync_stat, func_args=(dev_name,))
 
-dispatcher(heart_beat)
-dispatcher(periodic_update)
+def main():
+    dispatcher = asyncio_dispatcher.AsyncioDispatcher()
+    builder.SetDeviceName("OrbCol")
+    controller = Controller(prefix="", device_names=_dev_names)
+    builder.LoadDatabase()
+    softioc.iocInit(dispatcher)
 
-# Finally leave the IOC running with an interactive shell.
-softioc.interactive_ioc(globals())
+    # print(f"bpm data: {dev_name}, {value}")
+    for dev_name in list(controller.dev_name_index):
+        dispatcher(bpm_data_receive, func_args=(controller, dev_name,))
+        dispatcher(bpm_data_sync_stat, func_args=(controller, dev_name,))
+    dispatcher(heart_beat, func_args=(controller,))
+    dispatcher(periodic_update, func_args=(controller,))
+
+    # Finally leave the IOC running with an interactive shell.
+    softioc.interactive_ioc(globals())

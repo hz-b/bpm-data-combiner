@@ -1,10 +1,10 @@
 from enum import Enum
-import logging
 from typing import Sequence, Union
 from collector import Collector, CollectionItemInterface
 
 from .bpm_inputs import BPMInput
 from ..bl.accumulator import Accumulator
+from ..bl.logger import logger
 from ..interfaces.controller import ControllerInterface, ValidCommands
 from ..monitor_devices import (
     MonitorDevicesStatus,
@@ -21,8 +21,6 @@ from ..post_processor.statistics import compute_mean_weights_for_planes
 from .bdata import stat_data_to_bdata
 from .config import Config
 from .view import Views
-
-logger = logging.getLogger("bpm-data-combiner")
 
 
 class Controller(ControllerInterface):
@@ -57,7 +55,7 @@ class Controller(ControllerInterface):
 
     def _init_devices(self, device_names):
         self.devices = {
-            name : BPMInput(bpm_name=name, controller=self) for name in device_names
+            name : BPMInput(bpm_name=name) for name in device_names
         }
         logger.warning("Known bpms: %s", list(self.devices))
 

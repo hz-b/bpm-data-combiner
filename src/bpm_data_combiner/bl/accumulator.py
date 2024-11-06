@@ -1,17 +1,13 @@
 """Accumulate collected readings: to provide mean data
 """
-import logging
-
-from bpm_data_combiner.data_model.bpm_data_accumulation import (
+from ..bl.logger import logger
+from ..data_model.bpm_data_accumulation import (
     BPMDataAccumulation,
-    BPMDataAccumulationForPlane,
 )
+from ..errors import NoCollectionsError
 
 from collections import deque
-import numpy as np
 from typing import Dict
-
-logger = logging.getLogger("bpm-data-combiner")
 
 
 class Accumulator:
@@ -33,7 +29,9 @@ class Accumulator:
     def swap(self, check_collection_length: bool = True):
         """return collected collections, initialise internals to new"""
         if check_collection_length:
-            assert len(self.collections) > 0
+            if len(self.collections) == 0:
+                raise NoCollectionsError("accumulator: have no collections ready")
+
         # Data are processed: make object ready for further accumulation
         #: Todo: should it be protected by a lock?
         collections, self.collections = self.collections, deque()

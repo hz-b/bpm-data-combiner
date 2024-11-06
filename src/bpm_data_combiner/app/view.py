@@ -122,7 +122,7 @@ class ViewBPMDataAsBData:
     def update(self, bdata: Sequence[int]):
         """prepare data as expected"""
         bdata = np.asarray(bdata).astype(np.int16)
-        logger.warning("publishing bdata {bdata}")
+        logger.debug("publishing bdata")
         self.bdata.set(bdata)
 
 
