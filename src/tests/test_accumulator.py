@@ -7,6 +7,7 @@ import pytest
 import numpy as np
 from bpm_data_combiner.bl.accumulator import Accumulator
 from bpm_data_combiner.data_model.bpm_data_reading import BPMReading
+from bpm_data_combiner.errors import NoCollectionsError
 from bpm_data_combiner.post_processor.combine import collection_to_bpm_data_collection, accumulated_collections_to_array
 from bpm_data_combiner.post_processor.statistics import compute_mean_weights_for_planes
 
@@ -17,7 +18,7 @@ def test_accumulator_empty():
     """exception raised if no data available"""
     acc = Accumulator()
 
-    with pytest.raises(AssertionError):
+    with pytest.raises(NoCollectionsError):
         acc.get()
 
 

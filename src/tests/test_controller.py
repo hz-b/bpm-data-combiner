@@ -134,12 +134,25 @@ def test40_monitor_collector_interaction():
 
     id_ = 23
     dev_names = list(controller.dev_name_index)
-    controller.update(dev_name=dev_names[0], active=False)
+    # controller.update(dev_name=dev_names[0], active=False)
+    # should be above max heart beat
+    for cnt in range(42):
+        controller.heart_beat()
+        if not len(controller.monitor_devices.get_device_names()):
+            # all devices expired
+            break
+    else:
+        raise AssertionError("Devices did not get expired?")
+
     for cnt, dev_name in enumerate(dev_names[1:]):
         send_data(dev_name, id_, cnt)
+        assert len(controller.monitor_devices.get_device_names()) == cnt+1
 
     # All data sent.. so the callback should have been
     # triggered a second time
+    assert not  controller.collector.get_collection(id_).ready
+    # send the very last one
+    send_data(dev_names[0], id_, cnt)
     assert controller.collector.get_collection(id_).ready
 
 

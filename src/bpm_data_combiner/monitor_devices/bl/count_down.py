@@ -13,3 +13,5 @@ class CountDown:
     def status(self) -> int:
         return self.max_steps - self.value
 
+    def set_expired(self) -> None:
+        self.value = self.max_steps

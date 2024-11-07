@@ -1,21 +1,21 @@
 from itertools import zip_longest
 
-from bpm_data_combiner.monitor_devices.bl.monitor_devices_status import MonitorDevicesStatus
-from bpm_data_combiner.monitor_devices.data_model.monitored_device import MonitoredDevice
-from bpm_data_combiner.monitor_devices.interfaces.monitor_devices_status import StatusField
+from bpm_data_combiner.monitor_devices.bl.monitor_device_status_collection import MonitorDeviceStatusCollection
+from bpm_data_combiner.monitor_devices.bl.monitor_device_status_collection import StatusField
+from bpm_data_combiner.monitor_devices.bl.monitored_device_status import MonitoredDeviceStatus
 
 _names = ["Test1", "Test2"]
 
 
 def test_monitored_device_active():
-    m = MonitoredDevice("md1")
+    m = MonitoredDeviceStatus("md1")
     assert not m.usable
     assert not m.active
     assert not m.synchronised
     # both planes enabled by default
     assert m.enabled
-
     # should flag that change was done
+
     assert m.update_active(True)
     # should flag that change was done
     assert m.update_synchronised(1)
@@ -28,7 +28,7 @@ def test_monitored_device_active():
     assert m.usable
 
 def test_get_devices():
-    mon_dev = MonitorDevicesStatus(_names)
+    mon_dev = MonitorDeviceStatusCollection(_names)
 
     for name in _names:
         # should flag that an update was required
@@ -46,7 +46,7 @@ def test_get_devices():
 
 
 def test_monitor_enable_disable():
-    mon_dev = MonitorDevicesStatus(_names)
+    mon_dev = MonitorDeviceStatusCollection(_names)
 
     # should be enabled by default ... check method works, and flags no change
     assert not mon_dev.update("Test2", StatusField.enabled, True)
@@ -78,7 +78,7 @@ def test_monitor_enable_disable():
 
 
 def test_monitor_active():
-    mon_dev = MonitorDevicesStatus(_names)
+    mon_dev = MonitorDeviceStatusCollection(_names)
     assert not mon_dev.devices_status["Test1"].active
 
     # should signal update
@@ -92,7 +92,7 @@ def test_monitor_active():
     assert not mon_dev.devices_status["Test2"].active
 
 def test_monitor_synchronised():
-    mon_dev = MonitorDevicesStatus(_names)
+    mon_dev = MonitorDeviceStatusCollection(_names)
     for _, md in mon_dev.devices_status.items():
         assert md.enabled
         assert not md.active
@@ -114,7 +114,7 @@ def test_monitor_synchronised():
     assert not md2.synchronised
 
 def test_monitor_usable():
-    mon_dev = MonitorDevicesStatus(_names)
+    mon_dev = MonitorDeviceStatusCollection(_names)
     assert mon_dev.update("Test2", "active", True)
     assert not mon_dev.update("Test2", StatusField.active, True)
     assert mon_dev.update("Test2", "synchronised", 2)

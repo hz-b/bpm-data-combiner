@@ -7,7 +7,7 @@ from ..bl.accumulator import Accumulator
 from ..bl.logger import logger
 from ..interfaces.controller import ControllerInterface, ValidCommands
 from ..monitor_devices import (
-    MonitorDevicesStatus,
+    MonitorDeviceStatusCollection,
     MonitorDeviceSynchronisation,
     StatusField,
 )
@@ -32,7 +32,7 @@ class Controller(ControllerInterface):
 
         # These need to know which devices are available
         # initalise with empty
-        self.monitor_devices = MonitorDevicesStatus()
+        self.monitor_devices = MonitorDeviceStatusCollection()
         self.dev_name_index = dict()
 
         # These need to know which devices are usable
@@ -70,10 +70,7 @@ class Controller(ControllerInterface):
         Warning:
             check that new data sets the device as active again
         """
-        for _, dev in self.devices.items():
-            dev.status.step()
-            if not dev.status.status():
-                self.update(dev_name=dev.bpm_name, active=False)
+        self.monitor_devices.heart_beat()
 
     def update(self, *, dev_name, tpro=False, **kwargs):
         """
@@ -128,7 +125,6 @@ class Controller(ControllerInterface):
     def new_value(self, dev_name: str, value: Sequence[int]):
         cnt, x, y = value
         # should be handled by monitor_device status
-        self.devices[dev_name].status.reset()
         self.monitor_devices.update(dev_name=dev_name, field=StatusField.active, flag=True)
         collection = self.collector.new_item(
             pass_data_for_active_planes(

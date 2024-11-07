@@ -13,7 +13,7 @@ from .controller import Controller, logger
 
 stream = sys.stdout
 
-controller = Controller()
+controller = Controller(device_names=[])
 rbuffer = CommandRoundBuffer(maxsize=50)
 
 

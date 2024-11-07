@@ -1,4 +1,4 @@
-from bpm_data_combiner.app.count_down import CountDown
+from bpm_data_combiner.monitor_devices.bl.count_down import CountDown
 
 
 def test_count_down():
@@ -13,3 +13,9 @@ def test_count_down():
     cnt_dwn.step()
     assert not cnt_dwn.status()
 
+
+def test_count_down_set_expired():
+    cnt_dwn = CountDown(max_steps=42)
+    assert cnt_dwn.status()
+    cnt_dwn.set_expired()
+    assert not cnt_dwn.status()

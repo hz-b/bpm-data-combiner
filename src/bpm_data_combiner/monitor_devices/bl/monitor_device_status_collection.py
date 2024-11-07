@@ -1,18 +1,24 @@
 from typing import Sequence, Union
 
-from ..data_model.monitored_device import MonitoredDevice, SynchronisationStatus, PlaneNames
-from bpm_data_combiner.monitor_devices.interfaces.monitor_devices_status import MonitorDevicesStatusInterface, StatusField
+from ..bl.monitored_device_status import SynchronisationStatus, PlaneNames, MonitoredDeviceStatus
+from ...monitor_devices.interfaces.monitor_device_status_collection import MonitorDeviceStatusCollectionInterface, \
+    StatusField
 
 
-class MonitorDevicesStatus(MonitorDevicesStatusInterface):
+class MonitorDeviceStatusCollection(MonitorDeviceStatusCollectionInterface):
 
-    def __init__(self, device_names : Sequence[str] = None):
+    def __init__(self, device_names : Sequence[str] = None, max_steps=20):
+        """
+        Args:
+            device_names: sequence of names of the devices
+            max_steps:
+        """
         self.devices_status = None
         _dn = device_names or []
         self.set_device_names(_dn)
 
     def set_device_names(self, device_names : Sequence[str]):
-        self.devices_status = {name: MonitoredDevice(name) for name in device_names}
+        self.devices_status = {name: MonitoredDeviceStatus(name) for name in device_names}
 
     def get_device_names(self) -> Sequence[str]:
         """
@@ -50,6 +56,9 @@ class MonitorDevicesStatus(MonitorDevicesStatusInterface):
 
         return updated
 
+    def heart_beat(self):
+        for _, ds in self.devices_status.items():
+            ds.heart_beat()
 
     def __repr__(self):
         txt = f"{self.__class__.__name__}(devices=dict("

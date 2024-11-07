@@ -2,7 +2,7 @@ from abc import ABCMeta, abstractmethod
 from enum import Enum
 from typing import Sequence, Union
 
-from bpm_data_combiner.monitor_devices.interfaces.monitor_devices_status import StatusField
+from ..monitor_devices.interfaces.monitor_device_status_collection import StatusField
 
 
 class ValidCommands(Enum):

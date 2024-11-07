@@ -2,8 +2,10 @@
 """
 from typing import Sequence, Tuple
 
-from bpm_data_combiner.monitor_devices.bl.monitor_devices_status import MonitorDevicesStatus
 import numpy as np
+
+from ...monitor_devices.interfaces.monitor_device_status_collection import \
+    MonitorDeviceStatusCollectionInterface
 
 
 def offset_from_median(data: Sequence[int]) -> Tuple[int, Sequence[int]]:
@@ -13,7 +15,7 @@ def offset_from_median(data: Sequence[int]) -> Tuple[int, Sequence[int]]:
 
 
 class MonitorDeviceSynchronisation:
-    def __init__(self, monitored_devices : MonitorDevicesStatus):
+    def __init__(self, monitored_devices : MonitorDeviceStatusCollectionInterface):
         self.dev_names = [dev_stat.name for _, dev_stat in monitored_devices.devices_status.items()]
         self.dev_index = {name: cnt for cnt, name in enumerate(self.dev_names)}
         # todo: how to initialise these indices

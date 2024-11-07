@@ -1,4 +1,4 @@
-from .count_down import CountDown
+from bpm_data_combiner.monitor_devices.bl.count_down import CountDown
 
 
 class BPMInput:

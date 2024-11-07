@@ -14,7 +14,7 @@ class StatusField(Enum):
     active = "active"
 
 
-class MonitorDevicesStatusInterface(metaclass=ABCMeta):
+class MonitorDeviceStatusCollectionInterface(metaclass=ABCMeta):
     """Expects to be informed on devices status, passes it on to event subscribes
 
     Gets informed if a device is
@@ -48,3 +48,9 @@ class MonitorDevicesStatusInterface(metaclass=ABCMeta):
               does it belong here
         """
         pass
+
+    @abstractmethod
+    def heart_beat(self):
+        """called periodically. device status then needs to see
+                if device is still considered alive or not
+                """

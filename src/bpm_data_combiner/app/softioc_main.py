@@ -26,6 +26,7 @@ async def bpm_data_receive(controller, dev_name):
     camonitor(data_pv, new_reading)
     print(f"bpm data from: {dev_name} using {data_pv}")
 
+
 async def bpm_data_sync_stat(controller, dev_name):
     def sync_stat(value):
         print(f"bpm sync_stat: {dev_name}, {value}")
