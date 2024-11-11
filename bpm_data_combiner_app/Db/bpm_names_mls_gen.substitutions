@@ -1,8 +1,0 @@
-file "db/bpm_names_mls_rec.db"
-{
-	pattern { SEC_TYP SEC_NUM }
-		{ K       3       }
-		{ L       4       }
-		{ K       1       }
-		{ L       2       }
-}

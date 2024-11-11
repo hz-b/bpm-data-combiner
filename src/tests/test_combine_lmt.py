@@ -1,5 +1,7 @@
 import numpy as np
 
+from bpm_data_combiner.app.util import combine_counts
+
 
 def combine_int8(high, low):
     return (high << 8) | np.array(low).astype(np.uint8)
@@ -44,3 +46,5 @@ def test_combine_int32():
     ):
 # fmt:on
         assert combine_int32(0, low) == ref
+        assert combine_counts(0, low) == ref
+        assert combine_counts(1, low) == ref + 0xffffffff + 1

@@ -24,7 +24,7 @@ class ColItem(CollectionItemInterface):
 def test_collector_behaving():
     dev_names = ["BPMZ1D1R", "BPMZ2D1R", "BPMZ4D1R", "BPMZ1T2R"]
 
-    col = Collector(devices_names=dev_names)
+    col = Collector(device_names=dev_names)
     # check that it works
     repr(col)
 
@@ -58,7 +58,7 @@ def test_collector_behaving():
 
 def test_collector_double_submission():
     dev_names = ["BPMZ1D1R", "BPMZ2D1R", "BPMZ4D1R", "BPMZ1T2R"]
-    col = Collector(devices_names=dev_names)
+    col = Collector(device_names=dev_names)
     cnt = -19
     col.new_item(ColItem(cnt=cnt, x=3, y=4, name=dev_names[0]))
 
@@ -69,7 +69,7 @@ def test_collector_double_submission():
 
 def test_collector_invalid_submission():
     dev_names = ["BPMZ1D1R", "BPMZ2D1R", "BPMZ4D1R", "BPMZ1T2R"]
-    col = Collector(devices_names=dev_names)
+    col = Collector(device_names=dev_names)
     cnt = 23
 
     with pytest.raises(AssertionError):

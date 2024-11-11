@@ -1,5 +1,8 @@
 from datetime import timedelta, datetime
 import itertools
+from typing import Sequence
+
+import numpy as np
 import pytest
 import logging
 from copy import copy
@@ -63,7 +66,7 @@ def test05_check_stats():
     N = 3
     for cnt in range(N):
         for dev_name in list(controller.dev_name_index):
-            controller.update(dev_name=dev_name, reading=[cnt, cnt, -cnt])
+            controller.update(dev_name=dev_name, reading=create_reading(cnt, cnt, -cnt))
             print(f"{dev_name=} {cnt=} ")
 
     for cnt in range(N):
@@ -85,6 +88,14 @@ def test10_main_dev_monitor():
         controller.update(dev_name=dev_name, enabled=True, plane="y")
 
 
+def create_reading(cnt, x, y) -> Sequence[int]:
+    """return the vector of length 10
+    """
+    cnt_h = cnt >> 32
+    cnt_l = cnt & 0xffffffff
+    return np.array([cnt_h, cnt_l, x, y] + [0] * 2 + [0] * 4, dtype=np.int32)
+
+
 def test20_main_behaved():
     """test that data stream is assembled to combined data"""
     controller = get_controller()
@@ -94,7 +105,7 @@ def test20_main_behaved():
     N = 3
     for cnt in range(N):
         for dev_name in list(controller.dev_name_index):
-            controller.update(dev_name=dev_name, reading=[cnt, 2 * cnt, -cnt])
+            controller.update(dev_name=dev_name, reading=create_reading(cnt, 2 * cnt, -cnt))
 
     for cnt in range(N):
         readings = controller.collector.get_collection(cnt)
@@ -108,7 +119,7 @@ def test30_main_interleaving():
 
     cnt = 4
     for dev_name in controller.dev_name_index:
-        controller.update(dev_name=dev_name, reading=[cnt, 2 * cnt, -cnt])
+        controller.update(dev_name=dev_name, reading=create_reading(cnt, 2 * cnt, -cnt))
 
     readings = controller.collector.get_collection(cnt)
     assert readings.is_ready()
@@ -124,7 +135,8 @@ def test40_monitor_collector_interaction():
 
     # Send data properly
     def send_data(dev_name, cnt, val):
-        controller.update(dev_name=dev_name, reading=[cnt, val, -val])
+        tmp = create_reading(cnt, val, -val)
+        controller.update(dev_name=dev_name, reading=tmp)
 
     id_ = 42
     for val, dev_name in enumerate(controller.dev_name_index):
@@ -164,10 +176,10 @@ def test50_reading_single_device_misbehaved():
     # Todo: check that it also works for index 0!
     dev_name = dev_names[1]
     cnt = 5
-    controller.update(dev_name=dev_name, reading=[cnt, 10 * cnt, 100 * cnt])
+    controller.update(dev_name=dev_name, reading=create_reading(cnt, 10 * cnt, 100 * cnt))
 
     with pytest.raises(AssertionError) as ae:
-        controller.update(dev_name=dev_name, reading=[cnt, 10 * cnt, 100 * cnt])
+        controller.update(dev_name=dev_name, reading=create_reading(cnt, 10 * cnt, 100 * cnt))
 
 
 

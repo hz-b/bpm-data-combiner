@@ -47,7 +47,7 @@ def stat_data_to_bdata(
         do I need to map data to positions again?
         How is stat handling it
     """
-    n_entries = len(data.x.values)
+    n_entries = len(data.pos.x.values)
     if n_entries > n_bpms:
         raise ValueError("number of bpms %s too many. max %s", n_entries, n_bpms)
 
@@ -58,8 +58,8 @@ def stat_data_to_bdata(
     # flipping coordinate system to get the dispersion on the correct side
     # todo: check at which state this should be done
     # fmt:off
-    bdata[0, indices] = - convert(data.x.values, scale_axis=scale_x_axis)
-    bdata[1, indices] =   convert(data.y.values)
+    bdata[0, indices] = - convert(data.pos.x.values, scale_axis=scale_x_axis)
+    bdata[1, indices] =   convert(data.pos.y.values)
     # fmt:on
     # intensity z 1.3
     # bdata[2] = 3
@@ -68,12 +68,12 @@ def stat_data_to_bdata(
     # AGC status needs to be three for valid data
     # todo: find out what to set if only one plane is valid?
     bdata[4, indices] = np.where(
-        (data.x.n_readings > 0) | (data.y.n_readings > 0), 3, 0
+        (data.pos.x.n_readings > 0) | (data.pos.y.n_readings > 0), 3, 0
     )
     bdata[4, -1] = 2
 
-    bdata[6, indices] = convert_noise(data.x, scale_axis=scale_x_axis)
-    bdata[7, indices] = convert_noise(data.y)
+    bdata[6, indices] = convert_noise(data.pos.x, scale_axis=scale_x_axis)
+    bdata[7, indices] = convert_noise(data.pos.y)
 
     return bdata
 

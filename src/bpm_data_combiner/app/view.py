@@ -5,8 +5,9 @@ from typing import Sequence
 from softioc import builder
 
 from ..bl.logger import logger
-from ..data_model.bpm_data_collection import BPMDataCollection, BPMDataCollectionStats, BPMDataCollectionPlane, \
-    BPMDataCollectionStatsPlane
+from ..data_model.bpm_data_collection import BPMDataCollection, BPMDataCollectionStats, BPMDataCollectionSignal, \
+    BPMDataCollectionStatsSignal, BPMDataCollectionPos, BPMDataCollectionQuality, BPMDataCollectionButtons, \
+    BPMDataCollectionStatsPos, BPMDataCollectionStatsQuality, BPMDataCollectionStatsButtons
 
 
 def string_array_to_bytes(names: Sequence[str], *, encoding="utf8"):
@@ -42,37 +43,70 @@ class ViewBPMMonitoring:
         self.synchronised.set(synchronised)
         self.usable.set(usable)
 
-
-class ViewBPMDataCollectionPlane:
+class ViewBPMDataCollectionSignal:
     def __init__(self, prefix: str):
         self.vals = builder.WaveformIn(
-            f"{prefix}:values", initial_value=[0.0] * 128, length=128
+            f"{prefix}:values",
+            initial_value=[0.0] * 128,
+            length=128
         )
         self.valid = builder.WaveformIn(
             f"{prefix}:valid", initial_value=[0.0] * 128, length=128
         )
 
-    def update(self, vals: BPMDataCollectionPlane):
+    def update(self, vals: BPMDataCollectionSignal):
         self.vals.set(vals.values)
         self.valid.set(vals.valid)
+
+class ViewBPMDataCollectionPos:
+    def __init__(self, prefix: str):
+        self.x = ViewBPMDataCollectionSignal(f"{prefix}:x")
+        self.y = ViewBPMDataCollectionSignal(f"{prefix}:y")
+
+    def update(self, pos: BPMDataCollectionPos):
+        self.x.update(pos.x)
+        self.y.update(pos.y)
+
+class ViewBPMDataCollectionQuality:
+    def __init__(self, prefix: str):
+        self.q = ViewBPMDataCollectionSignal(f"{prefix}:q")
+        self.sum = ViewBPMDataCollectionSignal(f"{prefix}:sum")
+
+    def update(self, q: BPMDataCollectionQuality):
+        self.q.update(q.q)
+        self.sum.update(q.sum)
+
+class ViewBPMDataCollectionButtons:
+    def __init__(self, prefix: str):
+        self.a = ViewBPMDataCollectionSignal(f"{prefix}:a")
+        self.b = ViewBPMDataCollectionSignal(f"{prefix}:b")
+        self.c = ViewBPMDataCollectionSignal(f"{prefix}:c")
+        self.d = ViewBPMDataCollectionSignal(f"{prefix}:d")
+
+    def update(self, buttons: BPMDataCollectionButtons):
+        self.a.update(buttons.a)
+        self.b.update(buttons.b)
+        self.c.update(buttons.c)
+        self.d.update(buttons.d)
 
 
 class ViewBPMDataCollection:
     def __init__(self, prefix: str):
-        self.x = ViewBPMDataCollectionPlane(f"{prefix}:x")
-        self.y = ViewBPMDataCollectionPlane(f"{prefix}:y")
         self.names = builder.WaveformIn(f"{prefix}:name", initial_value=[""], length=128)
         self.cnt = builder.longIn(f"{prefix}:cnt", initial_value=0)
+        self.pos = ViewBPMDataCollectionPos(f"{prefix}:pos")
+        self.quality = ViewBPMDataCollectionQuality(f"{prefix}:q")
+        self.buttons = ViewBPMDataCollectionButtons(f"{prefix}:btn")
 
     def update(self, data: BPMDataCollection):
-        self.x.update(data.x)
-        self.y.update(data.y)
+        self.pos.update(data.pos)
+        self.quality.update(data.quality)
+        self.buttons.update(data.buttons)
         self.names.set(data.names)
         self.cnt.set(data.cnt)
 
 
-
-class ViewBPMDataCollectionStatsPlane:
+class ViewBPMDataCollectionStatsSignal:
     def __init__(self, prefix: str):
         self.values = builder.WaveformIn(
             f"{prefix}:values", initial_value=[0.0]* 128, length=128
@@ -84,21 +118,56 @@ class ViewBPMDataCollectionStatsPlane:
             f"{prefix}:n_readings", initial_value=[0.0]* 128, length=128
         )
 
-    def update(self, data: BPMDataCollectionStatsPlane):
+    def update(self, data: BPMDataCollectionStatsSignal):
         self.values.set(data.values)
         self.std.set(data.std)
         self.n_readings.set(data.n_readings)
 
 
+class ViewBPMDataCollectionStatsPos:
+    def __init__(self, prefix: str):
+        self.x = ViewBPMDataCollectionStatsSignal(f"{prefix}:x")
+        self.y = ViewBPMDataCollectionStatsSignal(f"{prefix}:y")
+
+    def update(self, pos: BPMDataCollectionStatsPos):
+        self.x.update(pos.x)
+        self.y.update(pos.y)
+
+class ViewBPMDataCollectionStatsQuality:
+    def __init__(self, prefix: str):
+        self.sum = ViewBPMDataCollectionStatsSignal(f"{prefix}:q")
+        self.q = ViewBPMDataCollectionStatsSignal(f"{prefix}:sum")
+
+    def update(self, q: BPMDataCollectionStatsQuality):
+        self.sum.update(q.sum)
+        self.q.update(q.q)
+
+
+class ViewBPMDataCollectionStatsButtons:
+    def __init__(self, prefix: str):
+        self.a = ViewBPMDataCollectionStatsSignal(f"{prefix}:a")
+        self.b = ViewBPMDataCollectionStatsSignal(f"{prefix}:b")
+        self.c = ViewBPMDataCollectionStatsSignal(f"{prefix}:c")
+        self.d = ViewBPMDataCollectionStatsSignal(f"{prefix}:d")
+
+    def update(self, buttons: BPMDataCollectionStatsButtons):
+        self.a.update(buttons.a)
+        self.b.update(buttons.b)
+        self.c.update(buttons.c)
+        self.d.update(buttons.d)
+
+
 class ViewBPMDataCollectionStats:
     def __init__(self, prefix: str):
-        self.x = ViewBPMDataCollectionStatsPlane(f"{prefix}:x")
-        self.y = ViewBPMDataCollectionStatsPlane(f"{prefix}:y")
+        self.pos = ViewBPMDataCollectionStatsPos(f"{prefix}:pos")
+        self.quality = ViewBPMDataCollectionStatsQuality(f"{prefix}:q")
+        self.buttons = ViewBPMDataCollectionStatsButtons(f"{prefix}:btn")
         self.names = builder.WaveformIn(f"{prefix}:name", initial_value=[""], length=128)
 
     def update(self, data: BPMDataCollectionStats):
-        self.x.update(data.x)
-        self.y.update(data.y)
+        self.pos.update(data.pos)
+        self.quality.update(data.quality)
+        self.buttons.update(data.buttons)
         self.names.set(data.names)
 
 

@@ -1,1 +1,0 @@
-device(lsi,INST_IO,devbpm_dev_simVersion,"bpm_dev_sim version")
