@@ -5,6 +5,44 @@ from collector import CollectionItemInterface
 
 
 @dataclass(frozen=True)
+class BPMReadingButtons:
+    """
+
+    Todo:
+        * could there be a better name for the position ?
+        * quadrants?
+        * top / bottom
+        * inner / outer
+    """
+    a: int
+    b: int
+    c: int
+    d: int
+
+
+@dataclass(frozen=True)
+class BPMReadingPos:
+    """
+
+    Todo:
+        * better naming?
+        * horizontal / vertical ?
+        * plane 1 / 2 / 3
+    """
+    x: Union[int, None]
+    y: Union[int, None]
+
+
+@dataclass(frozen=True)
+class BPMReadingQuality:
+    """
+    Todo: find a better name for it
+    """
+    sum: int
+    q: int
+
+
+@dataclass(frozen=True)
 class BPMReading(CollectionItemInterface):
     """Representation of one bpm reading"""
 
@@ -17,9 +55,9 @@ class BPMReading(CollectionItemInterface):
     #: i.e. since it was last triggered to synchronise
     cnt: int
     #: x position in nano meter
-    x: Union[int, None]
-    #: y position in nano meter
-    y: Union[int, None]
+    pos: BPMReadingPos
+    quality : BPMReadingQuality
+    buttons : BPMReadingButtons
     dev_name: str
 
     @property

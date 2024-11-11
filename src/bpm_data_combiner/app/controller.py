@@ -1,10 +1,14 @@
 from enum import Enum
 from typing import Sequence, Union
+
+import numpy as np
 from collector import Collector, CollectionItemInterface
 
 from .bpm_inputs import BPMInput
+from .util import combine_counts
 from ..bl.accumulator import Accumulator
 from ..bl.logger import logger
+from ..data_model.bpm_data_reading import BPMReadingButtons, BPMReadingQuality, BPMReading
 from ..interfaces.controller import ControllerInterface, ValidCommands
 from ..monitor_devices import (
     MonitorDeviceStatusCollection,
@@ -16,7 +20,7 @@ from ..post_processor.combine import (
     accumulated_collections_to_array,
 )
 from ..post_processor.handle_active_planes import pass_data_for_active_planes
-from ..post_processor.statistics import compute_mean_weights_for_planes
+from ..post_processor.statistics import compute_mean_weights_for_signals
 
 from .bdata import stat_data_to_bdata
 from .config import Config
@@ -40,7 +44,7 @@ class Controller(ControllerInterface):
             monitored_devices=self.monitor_devices
         )
 
-        self.collector = Collector(devices_names=[])
+        self.collector = Collector(device_names=[])
         self.set_device_names(device_names=device_names)
         self._init_devices(device_names=device_names)
         logger.warning("Controller init finished")
@@ -48,7 +52,7 @@ class Controller(ControllerInterface):
     def set_device_names(self, device_names=Sequence[str]):
         self.dev_name_index = {name: idx for idx, name in enumerate(device_names)}
         self.monitor_devices.set_device_names(device_names)
-        self.collector.devices_names = device_names
+        self.collector.device_names = device_names
         # that names etc. get published
         self._on_device_status_changed()
         return len(device_names)
@@ -85,7 +89,7 @@ class Controller(ControllerInterface):
     def _update(self, *, cmd, dev_name, tpro=False, **kwargs):
         cmd = ValidCommands(cmd)
         if cmd == ValidCommands.reading:
-            return self.new_value(dev_name=dev_name, value=kwargs["reading"])
+            return self.new_value(dev_name=dev_name, values=kwargs["reading"])
         elif cmd == ValidCommands.active:
             return self.dev_status(
                 dev_name=dev_name, field=StatusField.active, value=kwargs["active"]
@@ -122,13 +126,19 @@ class Controller(ControllerInterface):
         self.collector.reset()
         self.accumulator.swap(check_collection_length=False)
 
-    def new_value(self, dev_name: str, value: Sequence[int]):
-        cnt, x, y = value
+    def new_value(self, dev_name: str, values: np.ndarray[np.int32]):
+        cnt_h, cnt_l, x, y, sum, q, a, b, c, d = values
+        cnt = combine_counts(cnt_h, cnt_l)
         # should be handled by monitor_device status
         self.monitor_devices.update(dev_name=dev_name, field=StatusField.active, flag=True)
         collection = self.collector.new_item(
-            pass_data_for_active_planes(
-                cnt, x, y, device_status=self.monitor_devices.devices_status[dev_name]
+            BPMReading(
+            # int64(cnt) != int(cnt) at least for functools.lru_cache
+                cnt=int(cnt),
+                dev_name=dev_name,
+                pos=pass_data_for_active_planes(x,y,device_status=self.monitor_devices.devices_status[dev_name]),
+                quality=BPMReadingQuality(sum=sum, q=q),
+                buttons=BPMReadingButtons(a=a, b=b, c=c, d=d)
             )
         )
         if collection.ready:
@@ -151,7 +161,7 @@ class Controller(ControllerInterface):
         data = accumulated_collections_to_array(
             self.accumulator.get(), dev_names_index=self.dev_name_index
         )
-        stat_data = compute_mean_weights_for_planes(data)
+        stat_data = compute_mean_weights_for_signals(data)
         self.views.periodic_data.update(stat_data)
         logger.debug("pushing stat data to bdata_view")
         #: todo ... need to get kwargs from config
