@@ -94,6 +94,7 @@ class ViewBPMDataCollection:
     def __init__(self, prefix: str):
         self.names = builder.WaveformIn(f"{prefix}:name", initial_value=[""], length=128)
         self.cnt = builder.longIn(f"{prefix}:cnt", initial_value=0)
+        self.cnt_h = builder.longIn(f"{prefix}:cnt_h", initial_value=0)
         self.pos = ViewBPMDataCollectionPos(f"{prefix}:pos")
         self.quality = ViewBPMDataCollectionQuality(f"{prefix}:q")
         self.buttons = ViewBPMDataCollectionButtons(f"{prefix}:btn")
@@ -103,7 +104,8 @@ class ViewBPMDataCollection:
         self.quality.update(data.quality)
         self.buttons.update(data.buttons)
         self.names.set(data.names)
-        self.cnt.set(data.cnt)
+        self.cnt.set(data.cnt & 0xffffffff)
+        self.cnt_h.set(data.cnt >>32)
 
 
 class ViewBPMDataCollectionStatsSignal:

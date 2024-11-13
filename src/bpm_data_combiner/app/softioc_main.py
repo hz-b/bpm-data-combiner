@@ -6,16 +6,16 @@ from softioc import softioc, builder, asyncio_dispatcher
 from collector import UnknownDeviceNameError
 from .controller import Controller
 from .known_devices import dev_names_mls as _dev_names
-from .known_devices import dev_names_bessyii as _dev_names
+# from .known_devices import dev_names_bessyii as _dev_names
 from ..errors import NoCollectionsError
 from ..bl.logger import logger
 
 
 # each one separately ... waiting eternally for ca monitor to make the connection
 async def bpm_data_receive(controller, dev_name):
-    def new_reading(value):
+    def new_reading(values):
         try:
-            controller.update(dev_name=dev_name, reading=value)
+            controller.update(dev_name=dev_name, reading=values)
         except UnknownDeviceNameError as exc:
             logger.warning(f"Could not update data for {dev_name}: {exc}")
         except Exception as exc:
