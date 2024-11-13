@@ -36,11 +36,11 @@ class Collector(CollectorInterface):
     def __init__(
         self,
         *,
-        devices_names: Sequence[str],
+        device_names: Sequence[str],
         threshold: float = None,
         max_collections: int = 50,
     ):
-        self._device_names = devices_names
+        self._device_names = device_names
 
         @functools.lru_cache(maxsize=max_collections)
         def _get_collection(cnt: Hashable) -> CollectionForOneIdInterface:
