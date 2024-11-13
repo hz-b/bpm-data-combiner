@@ -58,7 +58,7 @@ def stat_data_to_bdata(
     # flipping coordinate system to get the dispersion on the correct side
     # todo: check at which state this should be done
     # fmt:off
-    bdata[0, indices] = - convert(data.pos.x.values, scale_axis=scale_x_axis)
+    bdata[0, indices] =   convert(data.pos.x.values, scale_axis=scale_x_axis)
     bdata[1, indices] =   convert(data.pos.y.values)
     # fmt:on
     # intensity z 1.3
