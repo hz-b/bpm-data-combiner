@@ -3,7 +3,7 @@ import asyncio
 from aioca import camonitor
 from softioc import softioc, builder, asyncio_dispatcher
 
-from collector import UnknownDeviceNameError
+from collector import UnknownDeviceNameError,  DoubleSubmissionError
 from .controller import Controller
 from .known_devices import dev_names_mls as _dev_names
 # from .known_devices import dev_names_bessyii as _dev_names
@@ -16,6 +16,8 @@ async def bpm_data_receive(controller, dev_name):
     def new_reading(values):
         try:
             controller.update(dev_name=dev_name, reading=values)
+        except DoubleSubmissionError as exc:
+            logger.warning(f"Could not update data for {dev_name}: {exc}")
         except UnknownDeviceNameError as exc:
             logger.warning(f"Could not update data for {dev_name}: {exc}")
         except Exception as exc:
@@ -29,7 +31,7 @@ async def bpm_data_receive(controller, dev_name):
 
 async def bpm_data_sync_stat(controller, dev_name):
     def sync_stat(value):
-        print(f"bpm sync_stat: {dev_name}, {value}")
+        # print(f"bpm sync_stat: {dev_name}, {value}")
         try:
             controller.update(dev_name=dev_name, sync_stat=value)
         except UnknownDeviceNameError as exc:

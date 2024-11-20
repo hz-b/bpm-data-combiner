@@ -130,7 +130,8 @@ class Controller(ControllerInterface):
         cnt_h, cnt_l, x, y, sum, q, a, b, c, d = values
         cnt = combine_counts(cnt_h, cnt_l)
         # should be handled by monitor_device status
-        self.monitor_devices.update(dev_name=dev_name, field=StatusField.active, flag=True)
+        self.dev_status(dev_name=dev_name, field=StatusField.active, value=True)
+
         collection = self.collector.new_item(
             BPMReading(
             # int64(cnt) != int(cnt) at least for functools.lru_cache
@@ -153,6 +154,7 @@ class Controller(ControllerInterface):
         """gives feedback if device monitor status changed"""
         status_changed = self.monitor_devices.update(dev_name, field, value)
         if status_changed:
+            logger.info("Updating device status: triggered by %s", dev_name)
             self._on_device_status_changed()
         return status_changed
 
@@ -175,10 +177,12 @@ class Controller(ControllerInterface):
         logger.debug("pushing stat data to bdata_view done")
 
     def _on_new_collection_ready(self, col: CollectionItemInterface):
+        logger.debug("New collection ready!")
         data = collection_to_bpm_data_collection(
             col, self.dev_name_index, default_value=0
         )
         self.accumulator.add(data)
+        logger.info("added collection, accumulator length now %s", len(self.accumulator))
         self.views.ready_data.update(data)
 
     def _on_device_status_changed(self):
