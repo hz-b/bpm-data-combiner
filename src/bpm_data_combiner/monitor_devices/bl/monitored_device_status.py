@@ -50,7 +50,7 @@ class MonitoredDeviceStatus(MonitoredDeviceWithPlanesStatusInterface):
 
     @property
     def usable(self) ->  bool:
-        return self.synchronised and self.count_down.status()
+        return self.active
 
     def update_active(self, active: bool) -> bool:
         if not active:
