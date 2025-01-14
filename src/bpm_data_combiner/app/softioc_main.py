@@ -55,7 +55,7 @@ async def heart_beat(controller):
 async def periodic_update(controller):
     while True:
         # first data after 2 seconds ...
-        await asyncio.sleep(2.0)
+        await asyncio.sleep(0.5)
         try:
             controller.periodic_trigger()
         except NoCollectionsError as nc:
@@ -68,6 +68,13 @@ def main():
     dispatcher = asyncio_dispatcher.AsyncioDispatcher()
     builder.SetDeviceName("OrbCol")
     controller = Controller(prefix="", device_names=_dev_names)
+    # deselect some bpms
+    for dev_name in ["BPMZ4L4RP"]:
+        continue
+        controller.update(dev_name=dev_name, enabled=False, plane="x")
+        controller.update(dev_name=dev_name, enabled=False, plane="y")
+
+
     builder.LoadDatabase()
     softioc.iocInit(dispatcher)
 
@@ -76,6 +83,7 @@ def main():
         dispatcher(bpm_data_receive, func_args=(controller, dev_name,))
         dispatcher(bpm_data_sync_stat, func_args=(controller, dev_name,))
     dispatcher(heart_beat, func_args=(controller,))
+    # todo: check if controller does not call it by itself
     dispatcher(periodic_update, func_args=(controller,))
 
     # Finally leave the IOC running with an interactive shell.
