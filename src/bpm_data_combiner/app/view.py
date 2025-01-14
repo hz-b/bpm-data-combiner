@@ -93,6 +93,7 @@ class ViewBPMDataCollectionButtons:
 class ViewBPMDataCollection:
     def __init__(self, prefix: str):
         self.names = builder.WaveformIn(f"{prefix}:name", initial_value=[""], length=128)
+        # Todo: add a int64 type if available
         self.cnt = builder.longIn(f"{prefix}:cnt", initial_value=0)
         self.cnt_h = builder.longIn(f"{prefix}:cnt_h", initial_value=0)
         self.pos = ViewBPMDataCollectionPos(f"{prefix}:pos")
@@ -104,6 +105,7 @@ class ViewBPMDataCollection:
         self.quality.update(data.quality)
         self.buttons.update(data.buttons)
         self.names.set(data.names)
+        #: Todo set a int64 type if available
         self.cnt.set(data.cnt & 0xffffffff)
         self.cnt_h.set(data.cnt >>32)
 
