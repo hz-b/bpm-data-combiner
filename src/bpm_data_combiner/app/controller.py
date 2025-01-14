@@ -128,6 +128,9 @@ class Controller(ControllerInterface):
 
     def new_value(self, dev_name: str, values: np.ndarray[np.int32]):
         cnt_h, cnt_l, x, y, sum, q, a, b, c, d = values
+        # todo: only do it here!
+        # x-plane correction
+        x = -x 
         cnt = combine_counts(cnt_h, cnt_l)
         # should be handled by monitor_device status
         self.dev_status(dev_name=dev_name, field=StatusField.active, value=True)
@@ -184,7 +187,8 @@ class Controller(ControllerInterface):
         self.accumulator.add(data)
         logger.info("added collection, accumulator length now %s", len(self.accumulator))
         self.views.ready_data.update(data)
-
+        # self.periodic_trigger()
+        
     def _on_device_status_changed(self):
         # collector needs to know which devices are active
         dev_names = self.monitor_devices.get_device_names()
