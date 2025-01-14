@@ -6,7 +6,7 @@ from softioc import softioc, builder, asyncio_dispatcher
 from collector import UnknownDeviceNameError
 from .controller import Controller
 from .known_devices import dev_names_mls as _dev_names
-from .known_devices import dev_names_bessyii as _dev_names
+# from .known_devices import dev_names_bessyii as _dev_names
 from ..errors import NoCollectionsError
 from ..bl.logger import logger
 

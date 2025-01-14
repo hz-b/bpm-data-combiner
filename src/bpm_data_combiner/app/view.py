@@ -93,7 +93,8 @@ class ViewBPMDataCollectionButtons:
 class ViewBPMDataCollection:
     def __init__(self, prefix: str):
         self.names = builder.WaveformIn(f"{prefix}:name", initial_value=[""], length=128)
-        self.cnt = builder.longIn(f"{prefix}:cnt", initial_value=0)
+        # todo: handle if builder does not know this type
+        self.cnt = builder.int64In(f"{prefix}:cnt", initial_value=0)
         self.pos = ViewBPMDataCollectionPos(f"{prefix}:pos")
         self.quality = ViewBPMDataCollectionQuality(f"{prefix}:q")
         self.buttons = ViewBPMDataCollectionButtons(f"{prefix}:btn")
@@ -108,8 +109,10 @@ class ViewBPMDataCollection:
 
 class ViewBPMDataCollectionStatsSignal:
     def __init__(self, prefix: str):
+        # kwargs = { "Q:group" :  ':{"x": {+channel:"VAL", +trigger:""}}'}
         self.values = builder.WaveformIn(
-            f"{prefix}:values", initial_value=[0.0]* 128, length=128
+            f"{prefix}:values", initial_value=[0.0]* 128, length=128,
+          #  **kwargs
         )
         self.std = builder.WaveformIn(
             f"{prefix}:std", initial_value=[0.0]* 128, length=128
