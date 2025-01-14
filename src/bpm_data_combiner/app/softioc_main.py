@@ -3,7 +3,7 @@ import asyncio
 from aioca import camonitor
 from softioc import softioc, builder, asyncio_dispatcher
 
-from collector import UnknownDeviceNameError
+from collector import UnknownDeviceNameError,  DoubleSubmissionError
 from .controller import Controller
 from .known_devices import dev_names_mls as _dev_names
 # from .known_devices import dev_names_bessyii as _dev_names
@@ -13,9 +13,11 @@ from ..bl.logger import logger
 
 # each one separately ... waiting eternally for ca monitor to make the connection
 async def bpm_data_receive(controller, dev_name):
-    def new_reading(value):
+    def new_reading(values):
         try:
-            controller.update(dev_name=dev_name, reading=value)
+            controller.update(dev_name=dev_name, reading=values)
+        except DoubleSubmissionError as exc:
+            logger.warning(f"Could not update data for {dev_name}: {exc}")
         except UnknownDeviceNameError as exc:
             logger.warning(f"Could not update data for {dev_name}: {exc}")
         except Exception as exc:
@@ -29,7 +31,7 @@ async def bpm_data_receive(controller, dev_name):
 
 async def bpm_data_sync_stat(controller, dev_name):
     def sync_stat(value):
-        print(f"bpm sync_stat: {dev_name}, {value}")
+        # print(f"bpm sync_stat: {dev_name}, {value}")
         try:
             controller.update(dev_name=dev_name, sync_stat=value)
         except UnknownDeviceNameError as exc:
@@ -53,7 +55,7 @@ async def heart_beat(controller):
 async def periodic_update(controller):
     while True:
         # first data after 2 seconds ...
-        await asyncio.sleep(2.0)
+        await asyncio.sleep(0.5)
         try:
             controller.periodic_trigger()
         except NoCollectionsError as nc:
@@ -66,6 +68,13 @@ def main():
     dispatcher = asyncio_dispatcher.AsyncioDispatcher()
     builder.SetDeviceName("OrbCol")
     controller = Controller(prefix="", device_names=_dev_names)
+    # deselect some bpms
+    for dev_name in ["BPMZ4L4RP"]:
+        continue
+        controller.update(dev_name=dev_name, enabled=False, plane="x")
+        controller.update(dev_name=dev_name, enabled=False, plane="y")
+
+
     builder.LoadDatabase()
     softioc.iocInit(dispatcher)
 
@@ -74,6 +83,7 @@ def main():
         dispatcher(bpm_data_receive, func_args=(controller, dev_name,))
         dispatcher(bpm_data_sync_stat, func_args=(controller, dev_name,))
     dispatcher(heart_beat, func_args=(controller,))
+    # todo: check if controller does not call it by itself
     dispatcher(periodic_update, func_args=(controller,))
 
     # Finally leave the IOC running with an interactive shell.

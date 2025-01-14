@@ -51,3 +51,5 @@ class Accumulator:
             collections = self.collections
         return collections
 
+    def __len__(self):
+        return len(self.collections)
